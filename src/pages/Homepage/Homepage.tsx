@@ -17,7 +17,7 @@ const Homepage = () => {
     currentCharIndex,
     typedChars,
     wordHistory,
-  } = useTypingSession({ wordsCount: 40, initialTime: 30 });
+  } = useTypingSession({ charsCount: 200, initialTime: 30 });
 
   const correctlyTypedWordsCount = useMemo(() => {
     if (!words.length) return 0;

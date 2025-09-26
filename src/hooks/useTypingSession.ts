@@ -1,29 +1,11 @@
 import React from "react";
 import { getRandomLengthWords } from "../services/randomWordsService";
-
-type UseTypingSessionOptions = {
-  wordsCount: number;
-  initialTime: number;
-};
-
-export type TypedChar = {
-  char: string;
-  correct: boolean;
-};
-
-export type TypingSessionState = {
-  words: string[];
-  isLoading: boolean;
-  time: number;
-  isStartedTyping: boolean;
-  activeWordIndex: number;
-  currentCharIndex: number;
-  typedChars: TypedChar[];
-  wordHistory: TypedChar[][];
-};
+import type { UseTypingSessionOptions } from "../types/UseTypingSessionOptions";
+import type { TypingSessionState } from "../types/TypingSessionState";
+import type { TypedChar } from "../types/TypedChar";
 
 const useTypingSession = ({
-  wordsCount,
+  charsCount,
   initialTime,
 }: UseTypingSessionOptions): TypingSessionState => {
   const [words, setWords] = React.useState<string[]>([]);
@@ -50,7 +32,7 @@ const useTypingSession = ({
     let isCancelled = false;
 
     setIsLoading(true);
-    getRandomLengthWords(wordsCount)
+    getRandomLengthWords(charsCount)
       .then((nextWords) => {
         if (isCancelled) return;
         setWords(nextWords);
@@ -65,7 +47,7 @@ const useTypingSession = ({
     return () => {
       isCancelled = true;
     };
-  }, [wordsCount]);
+  }, [charsCount]);
 
   // сброс активного слова при смене
   React.useEffect(() => {

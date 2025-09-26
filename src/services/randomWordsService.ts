@@ -1,8 +1,8 @@
 import { getRandomWords } from "../api/randomWord/requests";
 
 const SHUFFLE_CHUNK_SIZE = 12;
-const MIN_LENGTH = 1;
-const MAX_LENGTH = 8;
+const MIN_LENGTH = 2;
+const MAX_LENGTH = 6;
 
 const getRandomLength = () =>
   Math.floor(Math.random() * (MAX_LENGTH - MIN_LENGTH + 1)) + MIN_LENGTH;
@@ -16,17 +16,24 @@ const shuffleArray = <T>(values: T[]): T[] => {
   return array;
 };
 
-const getRandomLengthWords = async (number: number): Promise<string[]> => {
-  if (number <= 0) return [];
+const getRandomLengthWords = async (
+  numberOfChars: number
+): Promise<string[]> => {
+  if (numberOfChars <= 0) return [];
 
   const collected: string[] = [];
-  while (collected.length < number) {
-    const chunkSize = Math.min(SHUFFLE_CHUNK_SIZE, number - collected.length);
+  let totalChars = 0;
+  while (totalChars < numberOfChars) {
+    const chunkSize = Math.min(
+      SHUFFLE_CHUNK_SIZE,
+      numberOfChars - collected.length
+    );
     const newWords = await getRandomWords(chunkSize, getRandomLength());
     collected.push(...newWords);
+    totalChars += newWords.join("").length;
   }
 
-  return shuffleArray(collected).slice(0, number);
+  return shuffleArray(collected).slice(0, numberOfChars);
 };
 
 export { getRandomLengthWords };
