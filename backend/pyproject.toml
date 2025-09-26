@@ -1,0 +1,19 @@
+[project]
+name = "shilka-type-backend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "4444urka",email = "149653447+4444urka@users.noreply.github.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standart] (>=0.117.1,<0.118.0)"
+]
+
+[tool.poetry]
+packages = [{include = "shilka_type_backend", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
