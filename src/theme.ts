@@ -46,6 +46,10 @@ const config = defineConfig({
         from: { transform: "translateY(-10px)", opacity: 0 },
         to: { transform: "translateY(0)", opacity: 1 },
       },
+      cursorSlide: {
+        from: { transform: "translateX(0px)" },
+        to: { transform: "translateX(2px)" },
+      },
     },
   },
 });

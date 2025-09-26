@@ -1,8 +1,11 @@
 import { Box, Text } from "@chakra-ui/react";
+import { LayoutGroup } from "framer-motion";
+import { useMemo } from "react";
 import Cursor from "../../components/Cursor/Cursor";
 import HomepageLoader from "../../components/HomepageLoader/HomepageLoader";
 import Timer from "../../components/Timer/Timer";
 import useTypingSession from "../../hooks/useTypingSession";
+import RestartButton from "../../components/RestartButton/RestartButton";
 
 const Homepage = () => {
   const {
@@ -16,6 +19,35 @@ const Homepage = () => {
     wordHistory,
   } = useTypingSession({ wordsCount: 40, initialTime: 30 });
 
+  const correctlyTypedWordsCount = useMemo(() => {
+    if (!words.length) return 0;
+
+    const completed = wordHistory.reduce((count, history, index) => {
+      const word = words[index];
+      if (!word || history.length !== word.length) return count;
+      const allCorrect = history.every((char) => char.correct);
+      return count + (allCorrect ? 1 : 0);
+    }, 0);
+
+    const activeWord = words[activeWordIndex];
+    const activeCompletedCorrectly =
+      time <= 0 &&
+      !!activeWord &&
+      typedChars.length === activeWord.length &&
+      typedChars.every((char) => char.correct);
+
+    return completed + (activeCompletedCorrectly ? 1 : 0);
+  }, [words, wordHistory, time, activeWordIndex, typedChars]);
+
+  const accuracy = useMemo(() => {
+    const historyChars = wordHistory.flat();
+    const allChars = [...historyChars, ...typedChars];
+    if (allChars.length === 0) return 0;
+
+    const correctChars = allChars.filter((char) => char.correct).length;
+    return (correctChars / allChars.length) * 100;
+  }, [wordHistory, typedChars]);
+
   const renderWord = (
     word: string,
     wordIndex: number,
@@ -26,7 +58,13 @@ const Homepage = () => {
       const history = wordHistory[wordIndex] || [];
       if (history.length > 0) {
         return (
-          <Text key={`${word}-${"done"}`} mr={3} display="flex">
+          <Box
+            as="span"
+            key={`${word}-${"done"}`}
+            mr={3}
+            display="inline-flex"
+            flexWrap="wrap"
+          >
             {word.split("").map((char, idx) => {
               const typed = history[idx];
               const color = typed
@@ -45,20 +83,26 @@ const Homepage = () => {
                 </Text>
               );
             })}
-          </Text>
+          </Box>
         );
       }
       return (
-        <Text key={`${word}-${"done"}`} opacity={1} mr={3}>
+        <Box as="span" key={`${word}-${"done"}`} opacity={1} mr={3}>
           {word}
-        </Text>
+        </Box>
       );
     }
 
     if (isActive) {
       const chars = word.split("");
       return (
-        <Text key={`${word}-${"active"}`} mr={3} display="flex">
+        <Box
+          as="span"
+          key={`${word}-${"active"}`}
+          mr={3}
+          display="inline-flex"
+          flexWrap="wrap"
+        >
           {chars.map((char, idx) => {
             const typed = typedChars[idx];
             const isTyped = idx < currentCharIndex;
@@ -70,18 +114,12 @@ const Homepage = () => {
             }
             const showCursor = idx === currentCharIndex;
             return (
-              <Box key={idx} position="relative">
+              <Box key={idx} as="span" position="relative">
                 <Text as="span" color={color} opacity={isTyped ? 1 : 0.5}>
                   {char}
                 </Text>
                 {showCursor && currentCharIndex < chars.length && (
-                  <Box
-                    as="span"
-                    position="absolute"
-                    left={0}
-                    top={0}
-                    transform="translateX(-2px)"
-                  >
+                  <Box as="span" position="absolute" left={0} top={0}>
                     <Cursor />
                   </Box>
                 )}
@@ -99,49 +137,103 @@ const Homepage = () => {
               <Cursor />
             </Box>
           )}
-        </Text>
+        </Box>
       );
     }
 
     return (
-      <Text key={`${word}-${"idle"}`} opacity={0.5} mr={3}>
+      <Box as="span" key={`${word}-${"idle"}`} opacity={0.5} mr={3}>
         {word}
-      </Text>
+      </Box>
     );
   };
 
   return (
     <Box
       display="flex"
-      px={20}
+      px="200px"
       alignItems="center"
       justifyContent="center"
       gap={5}
       flexDirection="column"
       minHeight={"70vh"}
     >
-      <Timer opacity={isStartedTyping ? 1 : 0}>{time}</Timer>
-      <Box
-        textStyle="body"
-        display={"flex"}
-        flexWrap={"wrap"}
-        alignItems="center"
-        position="relative"
-      >
-        <HomepageLoader isLoading={isLoading} />
-        {!isLoading && words.length > 0 && (
-          <>
-            {words.map((word, index) =>
-              renderWord(
-                word,
-                index,
-                index === activeWordIndex,
-                index < activeWordIndex
-              )
+      {time > 0 ? (
+        <>
+          <Timer opacity={isStartedTyping ? 1 : 0}>{time}</Timer>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gap={6}
+          >
+            <HomepageLoader isLoading={isLoading} />
+            {!isLoading && words.length > 0 && (
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={6}
+              >
+                <LayoutGroup id="typing-session">
+                  <Box
+                    textStyle="body"
+                    display={"flex"}
+                    flexWrap={"wrap"}
+                    alignItems="center"
+                    position="relative"
+                  >
+                    {words.map((word, index) =>
+                      renderWord(
+                        word,
+                        index,
+                        index === activeWordIndex,
+                        index < activeWordIndex
+                      )
+                    )}
+                  </Box>
+                </LayoutGroup>
+                <RestartButton onClick={() => window.location.reload()} />
+              </Box>
             )}
-          </>
-        )}
-      </Box>
+          </Box>
+        </>
+      ) : (
+        <Box
+          animation="fadeIn 0.5s ease-in-out"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={4}
+        >
+          <Text
+            textStyle="body"
+            fontSize={"3xl"}
+            display="flex"
+            gap={2}
+            flexDirection="row"
+          >
+            WPM:
+            <Text as="span" color="primaryColor">
+              {correctlyTypedWordsCount * 2}
+            </Text>
+          </Text>
+
+          <Text
+            textStyle="body"
+            fontSize={"3xl"}
+            display="flex"
+            gap={2}
+            flexDirection="row"
+          >
+            Accuracy:
+            <Text as="span" color="primaryColor">
+              {accuracy.toFixed(0)}%
+            </Text>
+          </Text>
+          <RestartButton onClick={() => window.location.reload()} />
+        </Box>
+      )}
     </Box>
   );
 };

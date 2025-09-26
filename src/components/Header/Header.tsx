@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = () => {
       gap={2}
       bg="white"
       py={5}
-      px={20}
+      px="200px"
       fontSize="3xl"
       fontWeight="bold"
       borderBottom={"1px solid"}

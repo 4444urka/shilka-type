@@ -19,6 +19,7 @@ const HomepageLoader: React.FC<HomepageLoaderProps> = ({ isLoading }) => {
       justifyContent="center"
       zIndex="9999"
       opacity={isLoading ? 1 : 0}
+      pointerEvents={isLoading ? "auto" : "none"}
       transition={"0.3s ease-in-out"}
     >
       <Progress.Root width="300px" colorPalette={"cyan"} size="lg" value={null}>

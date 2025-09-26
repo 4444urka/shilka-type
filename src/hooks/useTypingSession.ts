@@ -47,13 +47,24 @@ const useTypingSession = ({
 
   // загрузка слов
   React.useEffect(() => {
+    let isCancelled = false;
+
     setIsLoading(true);
     getRandomLengthWords(wordsCount)
       .then((nextWords) => {
+        if (isCancelled) return;
         setWords(nextWords);
         setWordHistory(Array.from({ length: nextWords.length }, () => []));
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [wordsCount]);
 
   // сброс активного слова при смене
@@ -74,11 +85,14 @@ const useTypingSession = ({
 
       if (key === " ") {
         if (currentCharIndex === currentWord.length) {
+          const typedSnapshot = typedChars;
           setWordHistory((prev) => {
             const next = [...prev];
-            next[activeWordIndex] = typedChars;
+            next[activeWordIndex] = typedSnapshot;
             return next;
           });
+          setTypedChars([]);
+          setCurrentCharIndex(0);
           setActiveWordIndex((prev) => prev + 1);
         }
         return;

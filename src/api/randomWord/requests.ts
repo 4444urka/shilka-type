@@ -6,6 +6,5 @@ export const getRandomWords = async (number: number, length?: number) => {
     url += `&length=${length}`;
   }
   const response = await randomWordApiInstance.get(url);
-  console.log(response.data);
   return response.data;
 };
