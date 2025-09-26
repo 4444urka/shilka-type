@@ -1,0 +1,4 @@
+.typed-cursor {
+  color: var(--chakra-colors-primary-color);
+  width: 2px;
+}
