@@ -1,9 +1,11 @@
-import { Box, Icon } from "@chakra-ui/react";
+import { Box, Icon, IconButton, type BoxProps } from "@chakra-ui/react";
 import React from "react";
+import { IoStatsChartSharp } from "react-icons/io5";
 import { BsKeyboardFill } from "react-icons/bs";
 import Typed from "typed.js";
+import { NavLink } from "react-router-dom";
 
-interface HeaderProps {
+interface HeaderProps extends BoxProps {
   children?: React.ReactNode;
 }
 
@@ -37,7 +39,7 @@ const Header: React.FC<HeaderProps> = () => {
       textStyle="header"
       display="flex"
       alignItems="center"
-      gap={2}
+      justifyContent="space-between"
       bg="white"
       py={5}
       px="200px"
@@ -46,8 +48,21 @@ const Header: React.FC<HeaderProps> = () => {
       borderBottom={"1px solid"}
       borderColor={"gray.200"}
     >
-      <Icon as={BsKeyboardFill} color="primaryColor" />
-      <span ref={el} />
+      <Box display="flex" alignItems="center" gap={2}>
+        <Icon as={BsKeyboardFill} color="primaryColor" />
+        <span ref={el} />
+      </Box>
+
+      <NavLink to="/signup">
+        <IconButton
+          variant="ghost"
+          opacity={0.6}
+          aria-label="Stats"
+          _hover={{ opacity: 1, color: "primaryColor" }}
+        >
+          <IoStatsChartSharp />
+        </IconButton>
+      </NavLink>
     </Box>
   );
 };

@@ -19,4 +19,14 @@ export const textStyles = defineTextStyles({
       fontSize: "24px",
     },
   },
+  input: {
+    description: "The input text style - used in form inputs",
+    value: {
+      fontFamily: "JetBrains Mono",
+      fontWeight: "500",
+      fontSize: "16px",
+      textDecoration: "None",
+      textTransform: "None",
+    },
+  },
 });

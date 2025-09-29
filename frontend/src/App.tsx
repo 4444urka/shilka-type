@@ -1,17 +1,17 @@
 import "./App.css";
 import Header from "./components/Header/Header";
-import { BsKeyboardFill } from "react-icons/bs";
-import { Icon, Text } from "@chakra-ui/react";
 import Homepage from "./pages/Homepage/Homepage";
+import { Route, Routes } from "react-router";
+import SignUp from "./pages/SignUp/SignUp";
 
 const App = () => {
   return (
     <>
-      <Header>
-        <Icon as={BsKeyboardFill} color="primaryColor" />
-        <Text>shilkatype.</Text>
-      </Header>
-      <Homepage />
+      <Header />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
     </>
   );
 };
