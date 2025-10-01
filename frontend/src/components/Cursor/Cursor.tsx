@@ -6,7 +6,7 @@ const MotionBox = motion(Box);
 const Cursor = () => {
   return (
     <MotionBox
-      layoutId="typing-cursor"
+      layout
       initial={false}
       display="inline-block"
       width="3px"
@@ -15,7 +15,7 @@ const Cursor = () => {
       animation="blink 0.7s infinite"
       position="relative"
       top="6px"
-      transition={{ type: "spring", stiffness: 2000, damping: 150 }}
+      transition={{ type: "spring", stiffness: 500, damping: 4100 }}
     />
   );
 };

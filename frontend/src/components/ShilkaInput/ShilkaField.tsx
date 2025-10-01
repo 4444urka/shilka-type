@@ -31,7 +31,12 @@ const ShilkaField = ({
       <Field.Label textStyle="input" fontSize="18px">
         {label}
       </Field.Label>
-      <Input placeholder={placeholder} {...inputProps} {...registration} />
+      <Input
+        size="lg"
+        placeholder={placeholder}
+        {...inputProps}
+        {...registration}
+      />
       {errorText ? (
         <FieldErrorText fontSize="14px">{errorText}</FieldErrorText>
       ) : null}

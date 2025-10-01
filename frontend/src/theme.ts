@@ -30,6 +30,12 @@ const config = defineConfig({
       },
     },
     keyframes: {
+      counterAnimation: {
+        "0%": { transform: "translateY(0)", opacity: "0%" },
+        "75%": { transform: "translateY(0)", opacity: "100%" },
+        "100%": { transform: "translateY(-25px)", opacity: "0%" },
+      },
+
       blink: {
         "0%, 100%": { opacity: 1 },
         "50%": { opacity: 0 },
@@ -48,7 +54,7 @@ const config = defineConfig({
       },
       cursorSlide: {
         from: { transform: "translateX(0px)" },
-        to: { transform: "translateX(2px)" },
+        to: { transform: "translateX(4px)" },
       },
     },
   },

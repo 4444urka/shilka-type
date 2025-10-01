@@ -3,17 +3,25 @@ import { getRandomLengthWords } from "../services/randomWordsService";
 import type { UseTypingSessionOptions } from "../types/UseTypingSessionOptions";
 import type { TypingSessionState } from "../types/TypingSessionState";
 import type { TypedChar } from "../types/TypedChar";
+import { useAppDispatch } from "../store";
+import { addPoints, reset } from "../slices/shilkaCoinsSlice";
 
 const useTypingSession = ({
   charsCount,
+  minLength,
+  maxLength,
   initialTime,
 }: UseTypingSessionOptions): TypingSessionState => {
+  const dispatch = useAppDispatch();
   const [words, setWords] = React.useState<string[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [time, setTime] = React.useState(initialTime);
   const [isStartedTyping, setIsStartedTyping] = React.useState(false);
-  const [activeWordIndex, setActiveWordIndex] = React.useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = React.useState(0);
+  const [position, setPosition] = React.useState({
+    activeWordIndex: 0,
+    currentCharIndex: 0,
+  });
+  const { activeWordIndex, currentCharIndex } = position;
   const [typedChars, setTypedChars] = React.useState<TypedChar[]>([]);
   const [wordHistory, setWordHistory] = React.useState<TypedChar[][]>([]);
 
@@ -29,14 +37,17 @@ const useTypingSession = ({
 
   // загрузка слов
   React.useEffect(() => {
+    dispatch(reset());
     let isCancelled = false;
 
     setIsLoading(true);
-    getRandomLengthWords(charsCount)
+    getRandomLengthWords(charsCount, minLength, maxLength)
       .then((nextWords) => {
         if (isCancelled) return;
         setWords(nextWords);
         setWordHistory(Array.from({ length: nextWords.length }, () => []));
+        setTypedChars([]);
+        setPosition({ activeWordIndex: 0, currentCharIndex: 0 });
       })
       .finally(() => {
         if (!isCancelled) {
@@ -47,17 +58,12 @@ const useTypingSession = ({
     return () => {
       isCancelled = true;
     };
-  }, [charsCount]);
-
-  // сброс активного слова при смене
-  React.useEffect(() => {
-    setTypedChars([]);
-    setCurrentCharIndex(0);
-  }, [activeWordIndex]);
+  }, [charsCount, minLength, maxLength, dispatch]);
 
   // обработчик клавиатуры
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (time <= 0) return;
       const key = event.key;
 
       setIsStartedTyping((prev) => prev || key.length === 1 || key === " ");
@@ -74,8 +80,10 @@ const useTypingSession = ({
             return next;
           });
           setTypedChars([]);
-          setCurrentCharIndex(0);
-          setActiveWordIndex((prev) => prev + 1);
+          setPosition((prev) => ({
+            activeWordIndex: prev.activeWordIndex + 1,
+            currentCharIndex: 0,
+          }));
         }
         return;
       }
@@ -83,7 +91,10 @@ const useTypingSession = ({
       if (key === "Backspace") {
         if (currentCharIndex > 0) {
           setTypedChars((prev) => prev.slice(0, -1));
-          setCurrentCharIndex((prev) => prev - 1);
+          setPosition((prev) => ({
+            ...prev,
+            currentCharIndex: prev.currentCharIndex - 1,
+          }));
         }
         return;
       }
@@ -97,12 +108,21 @@ const useTypingSession = ({
       const correct = entered.toLowerCase() === expected.toLowerCase();
 
       setTypedChars((prev) => [...prev, { char: entered, correct }]);
-      setCurrentCharIndex((prev) => prev + 1);
+      setPosition((prev) => ({
+        ...prev,
+        currentCharIndex: prev.currentCharIndex + 1,
+      }));
+
+      if (correct) {
+        dispatch(addPoints(1));
+      } else {
+        dispatch(addPoints(-1));
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [words, activeWordIndex, currentCharIndex, typedChars]);
+  }, [words, activeWordIndex, currentCharIndex, typedChars, dispatch, time]);
 
   return {
     words,
