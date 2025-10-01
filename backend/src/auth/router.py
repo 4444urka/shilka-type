@@ -16,7 +16,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    hashed_password = utils.get_password_hash(user.password)
+    try:
+        hashed_password = utils.get_password_hash(user.password)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     db_user = models.User(username=user.username, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()

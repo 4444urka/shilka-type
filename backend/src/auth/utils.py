@@ -1,12 +1,16 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
+import bcrypt
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from ..config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["bcrypt_sha256", "bcrypt"],
+    deprecated=["bcrypt"],
+)
 
 SECRET_KEY = settings["auth"]["secret_key"]
 ALGORITHM = settings["auth"]["algorithm"]

@@ -1,17 +1,24 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 class UserBase(BaseModel):
     username: str
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=256)
+
+    @field_validator("password")
+    @classmethod
+    def ensure_password_not_too_long(cls, value: str) -> str:
+        if len(value.encode("utf-8")) > 256:
+            raise ValueError("Password must be at most 256 bytes when encoded in UTF-8")
+        return value
 
 class UserInDB(UserBase):
     id: int
     hashed_password: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str
