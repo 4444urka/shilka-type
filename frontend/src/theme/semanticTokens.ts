@@ -20,11 +20,17 @@ export const semanticTokens = defineSemanticTokens({
     bgPage: {
       value: {
         _light: "{colors.white}",
-        _dark: "{colors.950}",
+        _dark: "{colors.gray.950}",
       },
     },
 
     // Text colors - цвета текста
+    textColor: {
+      value: {
+        _light: "{colors.gray.900}",
+        _dark: "{colors.gray.100}",
+      },
+    },
     textPrimary: {
       value: {
         _light: "{colors.gray.900}",

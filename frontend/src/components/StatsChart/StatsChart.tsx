@@ -1,5 +1,5 @@
 import { Chart, useChart } from "@chakra-ui/charts";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useToken } from "@chakra-ui/react";
 import React from "react";
 import {
   CartesianGrid,
@@ -18,6 +18,13 @@ export interface StatsChartProps {
 }
 
 export const StatsChart: React.FC<StatsChartProps> = ({ sessions }) => {
+  // Получаем реальные значения цветов из темы
+  const [bgCardColor, borderColor, textColor] = useToken("colors", [
+    "bgCardColor",
+    "borderColor",
+    "textColor",
+  ]);
+
   // Преобразование данных для useChart с учетом локального часового пояса
   const chartData = sessions.map((session) => {
     // Парсим время как UTC и конвертируем в локальное время
@@ -72,9 +79,10 @@ export const StatsChart: React.FC<StatsChartProps> = ({ sessions }) => {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e2e8f0",
+                backgroundColor: bgCardColor,
+                border: `1px solid ${borderColor}`,
                 borderRadius: "8px",
+                color: textColor,
               }}
             />
             <Legend wrapperStyle={{ fontSize: "14px" }} iconType="line" />
