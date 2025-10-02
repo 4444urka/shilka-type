@@ -24,3 +24,15 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(stats_router, prefix="/stats", tags=["stats"])
+
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint для Docker и мониторинга"""
+    return {"status": "ok"}
+
+
+@app.get("/")
+def read_root():
+    """Root endpoint"""
+    return {"message": "Shilka Type API", "version": "1.0.0"}

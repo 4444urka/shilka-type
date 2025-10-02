@@ -62,7 +62,7 @@ export const semanticTokens = defineSemanticTokens({
     errorColor: {
       value: {
         _light: "{colors.red.600}",
-        _dark: "{colors.red.400}",
+        _dark: "{colors.red.500}",
       },
     },
     successColor: {

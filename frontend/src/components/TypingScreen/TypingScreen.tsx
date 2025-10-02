@@ -44,7 +44,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
               const color = typed
                 ? typed.correct
                   ? undefined
-                  : "red.600"
+                  : "errorColor"
                 : undefined;
               return (
                 <Text
@@ -81,7 +81,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
             const isTyped = idx < currentCharIndex;
             let color: string | undefined;
             if (isTyped && typed) {
-              color = typed.correct ? undefined : "red.600";
+              color = typed.correct ? undefined : "errorColor";
             } else {
               color = undefined;
             }

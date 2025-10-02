@@ -1,24 +1,20 @@
-[project]
+[tool.poetry]
 name = "shilka-type-backend"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "4444urka",email = "149653447+4444urka@users.noreply.github.com"}
-]
+description = "Typing education website with stats"
+authors = ["4444urka <149653447+4444urka@users.noreply.github.com>"]
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "fastapi[standart] (>=0.117.1,<0.118.0)",
-    "sqlalchemy (>=2.0.43,<3.0.0)",
-    "python-jose (>=3.5.0,<4.0.0)",
-    "psycopg2-binary (>=2.9.10,<3.0.0)",
-    "alembic (>=1.16.5,<2.0.0)",
-    "bcrypt (==4.0.1)",
-    "passlib (>=1.7.4,<2.0.0)",
-]
-
-[tool.poetry]
 packages = [{include="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+fastapi = {extras = ["standard"], version = "^0.117.1"}
+sqlalchemy = "^2.0.43"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+psycopg2-binary = "^2.9.10"
+alembic = "^1.16.5"
+bcrypt = "^4.0.1"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

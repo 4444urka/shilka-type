@@ -50,15 +50,20 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     try:
         token = request.cookies.get(COOKIE_NAME)
         if not token:
+            print("No token found in cookies")
             raise credentials_exception
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
+            print("No username in token payload")
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
+        print(f"User authenticated: {username}")
+    except JWTError as e:
+        print(f"JWT Error: {e}")
         raise credentials_exception
     user = db.query(User).filter(User.username == token_data.username).first()
     if user is None:
+        print(f"User not found in database: {token_data.username}")
         raise credentials_exception
     return user

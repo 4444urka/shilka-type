@@ -11,6 +11,10 @@ export const keyframes = defineKeyframes({
     "0%, 100%": { opacity: 1 },
     "50%": { opacity: 0 },
   },
+  dropDown: {
+    from: { transform: "translateY(-100px)", opacity: 0 },
+    to: { transform: "translateY(0)", opacity: 1 },
+  },
   fadeIn: {
     from: { opacity: 0 },
     to: { opacity: 1 },

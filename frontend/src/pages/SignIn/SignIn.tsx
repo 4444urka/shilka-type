@@ -11,6 +11,7 @@ import { signInSchema } from "../../lib/validation/signInSchema";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setPoints } from "../../slices/shilkaCoinsSlice";
+import { getAccessTokenFromCookie } from "../../utils/cookies";
 
 type ErrorDetailItem = { loc?: (string | number)[]; msg?: string };
 type ErrorResponse = { detail?: string | ErrorDetailItem[] };
@@ -36,17 +37,19 @@ const SignIn = () => {
   const onSubmit = async (values: SignInFormValues) => {
     try {
       clearErrors();
-      const response = await login({
+      await login({
         username: values.username,
         password: values.password,
       });
 
       const me: Me = await fetchCurrentUser();
+      const accessToken = getAccessTokenFromCookie();
+
       dispatch(
         setUser({
           id: me.id,
           username: me.username,
-          access_token: response.access_token,
+          access_token: accessToken,
         })
       );
       dispatch(setPoints(me.shilka_coins));

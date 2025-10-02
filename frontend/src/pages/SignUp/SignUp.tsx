@@ -5,14 +5,12 @@ import * as yup from "yup";
 import ShilkaField from "../../components/ShilkaInput/ShilkaField";
 import { signUpSchema } from "../../lib/validation/signUpSchema";
 import { login, register as registerUser } from "../../api/auth/authRequests";
-import type {
-  UserLoginResponse,
-  UserRegistrationResponse,
-} from "../../types/User";
+import type { UserRegistrationResponse } from "../../types/User";
 import { useAppDispatch } from "../../store";
 import { setUser } from "../../slices/userSlice";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getAccessTokenFromCookie } from "../../utils/cookies";
 
 type SignUpFormValues = yup.InferType<typeof signUpSchema>;
 
@@ -40,16 +38,18 @@ const SignUp = () => {
         password: values.password,
       });
 
-      const login_response: UserLoginResponse = await login({
+      await login({
         username: values.username,
         password: values.password,
       });
+
+      const accessToken = getAccessTokenFromCookie();
 
       dispatch(
         setUser({
           id: register_response.id,
           username: register_response.username,
-          access_token: login_response.access_token,
+          access_token: accessToken,
         })
       );
       reset();

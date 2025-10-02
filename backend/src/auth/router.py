@@ -51,15 +51,17 @@ def login_for_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     # Set HttpOnly cookie with access token
+    cookie_max_age = int(utils.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
         secure=False,  # set True in production behind HTTPS
         samesite="lax",
-        max_age=int(utils.ACCESS_TOKEN_EXPIRE_MINUTES * 60),
+        max_age=cookie_max_age,
         path="/",
     )
+    print(f"Setting cookie with max_age: {cookie_max_age} seconds ({utils.ACCESS_TOKEN_EXPIRE_MINUTES} minutes)")
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/me", response_model=schemas.UserPublic)
