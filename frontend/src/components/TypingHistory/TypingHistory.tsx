@@ -33,7 +33,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
           >
             <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
               <Box>
-                <Text fontSize="md" color="gray.500">
+                <Text fontSize="md">
                   {new Date(
                     session.created_at +
                       (session.created_at.endsWith("Z") ? "" : "Z")

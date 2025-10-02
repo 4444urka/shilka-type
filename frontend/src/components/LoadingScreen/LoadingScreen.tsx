@@ -13,7 +13,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading }) => {
       left="0"
       width="100vw"
       height="100vh"
-      bg="white"
+      bg="bgPage"
       display="flex"
       alignItems="center"
       justifyContent="center"

@@ -123,7 +123,7 @@ const SignIn = () => {
             type="submit"
             textStyle="input"
             variant="solid"
-            colorPalette="cyan"
+            bg="primaryColor"
             width="100%"
             size="lg"
             loading={isSubmitting}

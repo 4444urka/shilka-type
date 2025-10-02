@@ -7,14 +7,17 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { system } from "./theme/index.ts";
+import { ThemeProvider } from "next-themes";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <ChakraProvider value={system}>
-          <App />
-        </ChakraProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ChakraProvider value={system}>
+            <App />
+          </ChakraProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </Provider>
   </StrictMode>
