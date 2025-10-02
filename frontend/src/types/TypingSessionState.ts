@@ -9,4 +9,5 @@ export type TypingSessionState = {
   currentCharIndex: number;
   typedChars: TypedChar[];
   wordHistory: TypedChar[][];
+  restart: () => void;
 };

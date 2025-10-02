@@ -5,10 +5,12 @@ import {
   type TypedUseSelectorHook,
 } from "react-redux";
 import shilkaCoinsReducer from "../slices/shilkaCoinsSlice";
+import userReducer from "../slices/userSlice";
 
 export const store = configureStore({
   reducer: {
     shilkaCoins: shilkaCoinsReducer,
+    user: userReducer,
   },
 });
 

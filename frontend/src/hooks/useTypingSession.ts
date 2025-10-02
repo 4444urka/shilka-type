@@ -5,6 +5,8 @@ import type { TypingSessionState } from "../types/TypingSessionState";
 import type { TypedChar } from "../types/TypedChar";
 import { useAppDispatch } from "../store";
 import { addPoints, reset } from "../slices/shilkaCoinsSlice";
+import { useIsAuthed } from "./useIsAuthed";
+import { postWordHistory } from "../api/stats/statsRequests";
 
 const useTypingSession = ({
   charsCount,
@@ -24,6 +26,8 @@ const useTypingSession = ({
   const { activeWordIndex, currentCharIndex } = position;
   const [typedChars, setTypedChars] = React.useState<TypedChar[]>([]);
   const [wordHistory, setWordHistory] = React.useState<TypedChar[][]>([]);
+  const isAuthed = useIsAuthed();
+  const sentRef = React.useRef(false);
 
   // таймер
   React.useEffect(() => {
@@ -107,7 +111,7 @@ const useTypingSession = ({
       const entered = key;
       const correct = entered.toLowerCase() === expected.toLowerCase();
 
-      setTypedChars((prev) => [...prev, { char: entered, correct }]);
+      setTypedChars((prev) => [...prev, { char: entered, correct, time }]);
       setPosition((prev) => ({
         ...prev,
         currentCharIndex: prev.currentCharIndex + 1,
@@ -124,6 +128,58 @@ const useTypingSession = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [words, activeWordIndex, currentCharIndex, typedChars, dispatch, time]);
 
+  // отправка истории по завершении сессии (time === 0)
+  React.useEffect(() => {
+    if (time > 0) return;
+    if (sentRef.current) return;
+    if (!isAuthed) return;
+    if (!words.length) return;
+
+    // финализируем историю: добавим текущие набранные символы активного слова
+    const finalized: TypedChar[][] = wordHistory.map((w) => [...w]);
+    if (typedChars.length > 0 && activeWordIndex < finalized.length) {
+      finalized[activeWordIndex] = typedChars.slice();
+    }
+    const duration = typeof initialTime === "number" ? initialTime : undefined;
+    (async () => {
+      try {
+        await postWordHistory({ words, history: finalized, duration });
+        sentRef.current = true;
+      } catch {
+        // ignore errors for now
+      }
+    })();
+  }, [
+    time,
+    isAuthed,
+    words,
+    wordHistory,
+    typedChars,
+    activeWordIndex,
+    initialTime,
+  ]);
+
+  const restart = React.useCallback(() => {
+    dispatch(reset());
+    sentRef.current = false;
+    setTime(initialTime);
+    setIsStartedTyping(false);
+    setPosition({ activeWordIndex: 0, currentCharIndex: 0 });
+    setTypedChars([]);
+    setWordHistory(Array.from({ length: words.length }, () => []));
+
+    // Загружаем новые слова
+    setIsLoading(true);
+    getRandomLengthWords(charsCount, minLength, maxLength)
+      .then((nextWords) => {
+        setWords(nextWords);
+        setWordHistory(Array.from({ length: nextWords.length }, () => []));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [charsCount, minLength, maxLength, initialTime, words.length, dispatch]);
+
   return {
     words,
     isLoading,
@@ -133,6 +189,7 @@ const useTypingSession = ({
     currentCharIndex,
     typedChars,
     wordHistory,
+    restart,
   };
 };
 

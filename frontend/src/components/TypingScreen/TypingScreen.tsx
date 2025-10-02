@@ -1,9 +1,8 @@
 import { Box, type BoxProps, Text } from "@chakra-ui/react";
 import React, { Fragment } from "react";
-import HomepageLoader from "../HomepageLoader/HomepageLoader";
-import Timer from "../Timer/Timer";
-import RestartButton from "../RestartButton/RestartButton";
 import Cursor from "../Cursor/Cursor";
+import RestartButton from "../RestartButton/RestartButton";
+import Timer from "../Timer/Timer";
 
 interface TypingScreenProps extends BoxProps {
   words: string[];
@@ -14,6 +13,7 @@ interface TypingScreenProps extends BoxProps {
   currentCharIndex: number;
   typedChars: { char: string; correct: boolean }[];
   wordHistory: { char: string; correct: boolean }[][];
+  onRestart?: () => void;
 }
 
 const TypingScreen: React.FC<TypingScreenProps> = ({
@@ -25,6 +25,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   currentCharIndex,
   typedChars,
   wordHistory,
+  onRestart,
   ...rest
 }) => {
   const renderWord = (
@@ -128,16 +129,18 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
     <Box display="flex" flexDirection="column" alignItems="center" {...rest}>
       <Timer opacity={isStartedTyping ? 1 : 0}>{time}</Timer>
       <Box display="flex" flexDirection="column" alignItems="center" gap={6}>
-        <HomepageLoader isLoading={isLoading} />
         {!isLoading && words.length > 0 && (
           <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
             gap={6}
+            animation="fadeIn 0.5s ease-in-out"
+            key={words.join("-")}
           >
             <Box
               textStyle="body"
+              height="200px"
               display="block"
               width="100%"
               textAlign="justify"
@@ -160,7 +163,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
                 </Fragment>
               ))}
             </Box>
-            <RestartButton onClick={() => window.location.reload()} />
+            <RestartButton onClick={() => onRestart?.()} />
           </Box>
         )}
       </Box>

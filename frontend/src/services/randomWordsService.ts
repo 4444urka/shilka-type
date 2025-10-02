@@ -12,7 +12,6 @@ const getRandomLengthWords = async (
       maxLength: maxLength,
       exactly: 1,
     });
-    console.log(randomWords);
     wordsArr = [...wordsArr, ...randomWords];
   }
   return wordsArr;

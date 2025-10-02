@@ -1,9 +1,10 @@
 import { Box, Icon, IconButton, type BoxProps } from "@chakra-ui/react";
 import React from "react";
-import { IoStatsChartSharp } from "react-icons/io5";
 import { BsKeyboardFill } from "react-icons/bs";
-import Typed from "typed.js";
+import { IoStatsChartSharp } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
+import Typed from "typed.js";
+import { useIsAuthed } from "../../hooks/useIsAuthed";
 
 interface HeaderProps extends BoxProps {
   children?: React.ReactNode;
@@ -11,6 +12,7 @@ interface HeaderProps extends BoxProps {
 
 const Header: React.FC<HeaderProps> = () => {
   const el = React.useRef(null);
+  const isAuthed = useIsAuthed();
 
   React.useEffect(() => {
     const typed = new Typed(el.current, {
@@ -48,12 +50,14 @@ const Header: React.FC<HeaderProps> = () => {
       borderBottom={"1px solid"}
       borderColor={"gray.200"}
     >
-      <Box display="flex" alignItems="center" gap={2}>
-        <Icon as={BsKeyboardFill} color="primaryColor" />
-        <span ref={el} />
-      </Box>
+      <NavLink to="/">
+        <Box display="flex" alignItems="center" gap={2} cursor="pointer">
+          <Icon as={BsKeyboardFill} color="primaryColor" />
+          <span ref={el} />
+        </Box>
+      </NavLink>
 
-      <NavLink to="/signup">
+      <NavLink to={isAuthed ? "/stats" : "/signin"}>
         <IconButton
           variant="ghost"
           opacity={0.6}

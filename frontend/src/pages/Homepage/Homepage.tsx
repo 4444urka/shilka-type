@@ -1,11 +1,13 @@
 import { Box } from "@chakra-ui/react";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
+import TypingScreen from "../../components/TypingScreen/TypingScreen";
+import VictoryScreen from "../../components/VictoryScreen/VictoryScreen";
+import { useIsAuthed } from "../../hooks/useIsAuthed";
 import useTypingSession from "../../hooks/useTypingSession";
 import { useAppSelector } from "../../store";
-import VictoryScreen from "../../components/VictoryScreen/VictoryScreen";
-import TypingScreen from "../../components/TypingScreen/TypingScreen";
 
 const Homepage = () => {
+  const isAuthed = useIsAuthed();
   const shilkaCoins = useAppSelector((state) => state.shilkaCoins);
   const {
     words,
@@ -16,12 +18,18 @@ const Homepage = () => {
     currentCharIndex,
     typedChars,
     wordHistory,
+    restart,
   } = useTypingSession({
     charsCount: 250,
     initialTime: 30,
     minLength: 3,
     maxLength: 5,
   });
+
+  // TODO: удалить лог
+  React.useEffect(() => {
+    if (isAuthed) console.log("User is authenticated");
+  }, [isAuthed]);
 
   const correctlyTypedWordsCount = useMemo(() => {
     if (!words.length) return 0;
@@ -60,6 +68,7 @@ const Homepage = () => {
       justifyContent="center"
       flexDirection="column"
       minHeight={"70vh"}
+      animation="fadeIn 0.5s ease-in-out"
     >
       {time > 0 ? (
         <TypingScreen
@@ -71,6 +80,7 @@ const Homepage = () => {
           currentCharIndex={currentCharIndex}
           typedChars={typedChars}
           wordHistory={wordHistory}
+          onRestart={restart}
         />
       ) : (
         <VictoryScreen

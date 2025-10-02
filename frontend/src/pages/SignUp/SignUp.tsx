@@ -1,28 +1,93 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import ShilkaField from "../../components/ShilkaInput/ShilkaField";
 import { signUpSchema } from "../../lib/validation/signUpSchema";
+import { login, register as registerUser } from "../../api/auth/authRequests";
+import type {
+  UserLoginResponse,
+  UserRegistrationResponse,
+} from "../../types/User";
+import { useAppDispatch } from "../../store";
+import { setUser } from "../../slices/userSlice";
+import { NavLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 type SignUpFormValues = yup.InferType<typeof signUpSchema>;
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setError,
+    clearErrors,
   } = useForm<SignUpFormValues>({
     resolver: yupResolver(signUpSchema),
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
+  const dispatch = useAppDispatch();
 
-  const onSubmit = (values: SignUpFormValues) => {
-    // TODO: заменить на вызов API регистрации
-    console.log("Sign up payload", values);
-    reset();
+  const onSubmit = async (values: SignUpFormValues) => {
+    try {
+      clearErrors();
+      const register_response: UserRegistrationResponse = await registerUser({
+        username: values.username,
+        password: values.password,
+      });
+
+      const login_response: UserLoginResponse = await login({
+        username: values.username,
+        password: values.password,
+      });
+
+      dispatch(
+        setUser({
+          id: register_response.id,
+          username: register_response.username,
+          access_token: login_response.access_token,
+        })
+      );
+      reset();
+      navigate("/stats");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data as { detail?: string } | undefined;
+        const detail = data?.detail;
+        if (status === 400) {
+          // Возможные бизнес-ошибки, например "Username already registered"
+          if (typeof detail === "string") {
+            setError("username", { type: "server", message: detail });
+          } else {
+            setError("username", {
+              type: "server",
+              message: "Ошибка регистрации",
+            });
+          }
+        } else if (status === 422) {
+          // Валидация: покажем под username как общий фоллбек
+          setError("username", {
+            type: "server",
+            message: "Проверьте правильность заполнения формы",
+          });
+        } else {
+          setError("username", {
+            type: "server",
+            message: "Произошла ошибка. Попробуйте позже.",
+          });
+        }
+      } else {
+        setError("username", {
+          type: "server",
+          message: "Неизвестная ошибка. Попробуйте позже.",
+        });
+      }
+    }
   };
 
   return (
@@ -66,6 +131,13 @@ const SignUp = () => {
           >
             Зарегистрироваться
           </Button>
+
+          <Text as="span" color="primaryColor" textStyle="input">
+            Уже есть аккаунт?{" "}
+            <NavLink to="/signin" style={{ textDecoration: "underline wavy" }}>
+              Войти
+            </NavLink>
+          </Text>
         </Stack>
       </Box>
     </Box>

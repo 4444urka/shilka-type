@@ -16,6 +16,16 @@ class UserCreate(UserBase):
 class UserInDB(UserBase):
     id: int
     hashed_password: str
+    shilka_coins: int | None = 0
+
+    class Config:
+        from_attributes = True
+
+
+class UserPublic(UserBase):
+    id: int
+    # Может прийти None из ORM, позволяем и даём дефолт 0
+    shilka_coins: int | None = 0
 
     class Config:
         from_attributes = True

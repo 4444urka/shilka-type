@@ -5,7 +5,7 @@ export interface ShilkaCoinsState {
 }
 
 const initialState: ShilkaCoinsState = {
-  value: 0,
+  value: JSON.parse(localStorage.getItem("shilkaCoins") || "0"),
 };
 
 const shilkaCoinsSlice = createSlice({
@@ -14,6 +14,20 @@ const shilkaCoinsSlice = createSlice({
   reducers: {
     addPoints(state: ShilkaCoinsState, action: PayloadAction<number>) {
       state.value += action.payload;
+      if (action.payload) {
+        localStorage.setItem(
+          "shilkaCoins",
+          JSON.stringify(state.value + action.payload)
+        );
+      }
+    },
+    setPoints(state: ShilkaCoinsState, action: PayloadAction<number>) {
+      state.value = action.payload;
+      if (action.payload) {
+        localStorage.setItem("shilkaCoins", JSON.stringify(action.payload));
+      } else {
+        localStorage.removeItem("shilkaCoins");
+      }
     },
     removePoints(state: ShilkaCoinsState, action: PayloadAction<number>) {
       state.value -= action.payload;
@@ -24,5 +38,5 @@ const shilkaCoinsSlice = createSlice({
   },
 });
 
-export const { addPoints, reset } = shilkaCoinsSlice.actions;
+export const { addPoints, reset, setPoints } = shilkaCoinsSlice.actions;
 export default shilkaCoinsSlice.reducer;

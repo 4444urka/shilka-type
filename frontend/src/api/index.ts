@@ -1,7 +1,10 @@
 import axios from "axios";
 
-const randomWordApiInstance = axios.create({
-  baseURL: "https://random-word-api.herokuapp.com/",
+const instance = axios.create({
+  baseURL: "http://localhost:8000",
+  withCredentials: true,
 });
 
-export default randomWordApiInstance;
+instance.interceptors.request.use((config) => config);
+
+export default instance;

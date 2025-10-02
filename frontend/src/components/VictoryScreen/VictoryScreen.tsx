@@ -1,6 +1,8 @@
 import { Box, Text, type BoxProps } from "@chakra-ui/react";
 import React from "react";
 import RestartButton from "../RestartButton/RestartButton";
+import { useIsAuthed } from "../../hooks/useIsAuthed";
+import { addCoins } from "../../api/stats/statsRequests";
 
 export interface VictoryScreenProps extends BoxProps {
   correctlyTypedWordsCount: number;
@@ -15,6 +17,15 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
   accuracy,
   shilkaCoins,
 }) => {
+  const isAuthed = useIsAuthed();
+  React.useEffect(() => {
+    if (!isAuthed) return;
+    (async () => {
+      if (shilkaCoins.value !== 0) {
+        await addCoins(shilkaCoins.value);
+      }
+    })();
+  }, [shilkaCoins.value, isAuthed]);
   return (
     <Box
       animation="fadeIn 0.5s ease-in-out"
@@ -49,19 +60,21 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         </Text>
       </Text>
       <RestartButton onClick={() => window.location.reload()} />
-      <Box
-        position="fixed"
-        top="55px "
-        textStyle="body"
-        fontSize="18px"
-        color="primaryColor"
-        opacity="0"
-        right="209px"
-        animation="counterAnimation 2s ease-in-out"
-      >
-        {shilkaCoins.value > 0 ? "+" : ""}
-        {shilkaCoins.value}
-      </Box>
+      {isAuthed ? (
+        <Box
+          position="fixed"
+          top="55px "
+          textStyle="body"
+          fontSize="18px"
+          color="primaryColor"
+          opacity="0"
+          right="209px"
+          animation="counterAnimation 2s ease-in-out"
+        >
+          {shilkaCoins.value > 0 ? "+" : ""}
+          {shilkaCoins.value}
+        </Box>
+      ) : null}
     </Box>
   );
 };

@@ -1,5 +1,5 @@
-import React from "react";
 import { Text, type TextProps } from "@chakra-ui/react";
+import React from "react";
 
 interface TimerProps extends TextProps {
   children?: React.ReactNode;

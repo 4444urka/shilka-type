@@ -1,11 +1,11 @@
-import { Progress, Box } from "@chakra-ui/react";
+import { Box, Progress } from "@chakra-ui/react";
 
-interface HomepageLoaderProps {
+interface LoadingScreenProps {
   children?: React.ReactNode;
   isLoading?: boolean;
 }
 
-const HomepageLoader: React.FC<HomepageLoaderProps> = ({ isLoading }) => {
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading }) => {
   return (
     <Box
       position="fixed"
@@ -31,4 +31,4 @@ const HomepageLoader: React.FC<HomepageLoaderProps> = ({ isLoading }) => {
   );
 };
 
-export default HomepageLoader;
+export default LoadingScreen;
