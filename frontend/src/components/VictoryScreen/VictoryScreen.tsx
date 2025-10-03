@@ -63,7 +63,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       {isAuthed ? (
         <Box
           position="fixed"
-          top="55px "
+          top="90px "
           textStyle="body"
           fontSize="18px"
           color="primaryColor"

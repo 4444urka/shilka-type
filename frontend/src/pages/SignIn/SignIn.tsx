@@ -6,12 +6,11 @@ import ShilkaField from "../../components/ShilkaInput/ShilkaField";
 import { fetchCurrentUser, login } from "../../api/auth/authRequests";
 import type { Me } from "../../types/User";
 import { useAppDispatch } from "../../store";
-import { setUser } from "../../slices/userSlice";
 import { signInSchema } from "../../lib/validation/signInSchema";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setPoints } from "../../slices/shilkaCoinsSlice";
-import { getAccessTokenFromCookie } from "../../utils/cookies";
+import { setUser } from "../../slices/userSlice";
 
 type ErrorDetailItem = { loc?: (string | number)[]; msg?: string };
 type ErrorResponse = { detail?: string | ErrorDetailItem[] };
@@ -43,15 +42,8 @@ const SignIn = () => {
       });
 
       const me: Me = await fetchCurrentUser();
-      const accessToken = getAccessTokenFromCookie();
 
-      dispatch(
-        setUser({
-          id: me.id,
-          username: me.username,
-          access_token: accessToken,
-        })
-      );
+      dispatch(setUser(me)); // Обновляем состояние пользователя в Redux
       dispatch(setPoints(me.shilka_coins));
       reset();
       navigate("/stats");

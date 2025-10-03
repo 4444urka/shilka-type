@@ -4,7 +4,7 @@ export const keyframes = defineKeyframes({
   counterAnimation: {
     "0%": { transform: "translateY(0)", opacity: "0%" },
     "75%": { transform: "translateY(0)", opacity: "100%" },
-    "100%": { transform: "translateY(-25px)", opacity: "0%" },
+    "100%": { transform: "translateY(-80px)", opacity: "0%" },
   },
 
   blink: {

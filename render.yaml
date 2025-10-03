@@ -1,0 +1,43 @@
+# Render.com deployment configuration
+services:
+  - type: web
+    name: shilka-type-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "cd backend && poetry install --only=main"
+    startCommand: "cd backend && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: DB_HOST
+        fromDatabase:
+          name: shilka-type-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: shilka-type-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: shilka-type-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: shilka-type-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: shilka-type-db
+          property: database
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+
+databases:
+  - name: shilka-type-db
+    databaseName: shilka_db
+    user: shilka_user
+    region: oregon
+    plan: free

@@ -48,7 +48,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     WPM
                   </Text>
                   <Text fontSize="lg" fontWeight="bold" color="primaryColor">
-                    {session.wpm}
+                    {Number(session.wpm).toFixed(1)}
                   </Text>
                 </Box>
                 <Box textAlign="center">
@@ -56,7 +56,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     Точность
                   </Text>
                   <Text fontSize="lg" fontWeight="bold" color="primaryColor">
-                    {session.accuracy}%
+                    {Number(session.accuracy).toFixed(1)}%
                   </Text>
                 </Box>
                 {session.duration && (

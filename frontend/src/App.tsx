@@ -6,15 +6,19 @@ import SignUp from "./pages/SignUp/SignUp";
 import SignIn from "./pages/SignIn/SignIn";
 import Stats from "./pages/Stats/Stats";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
-import { useInitAuth } from "./hooks/useInitAuth";
+import { useEffect } from "react";
+import { useAppDispatch } from "./store";
+import { initializeUser } from "./slices/userSlice";
 
 const App = () => {
-  // Инициализируем аутентификацию из cookie при загрузке
-  useInitAuth();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(initializeUser());
+  }, [dispatch]);
 
   const location = useLocation();
 
-  // Список известных маршрутов
   const knownRoutes = ["/", "/signup", "/signin", "/stats"];
   const isKnownRoute = knownRoutes.includes(location.pathname);
 

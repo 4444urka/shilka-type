@@ -1,0 +1,112 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { register, login, logout, fetchCurrentUser } from "./authRequests";
+import instance from "../index";
+
+// Мокируем axios instance
+vi.mock("../index");
+
+describe("authRequests", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("register", () => {
+    it("должен отправлять POST запрос на /auth/register", async () => {
+      const userData = {
+        username: "newuser",
+        password: "password123",
+      };
+      const mockResponse = {
+        data: {
+          id: 1,
+          username: "newuser",
+          shilka_coins: 0,
+        },
+      };
+      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+
+      const result = await register(userData);
+
+      expect(instance.post).toHaveBeenCalledWith("/auth/register", userData);
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
+  describe("login", () => {
+    it("должен отправлять POST запрос с URLSearchParams", async () => {
+      const userData = {
+        username: "testuser",
+        password: "testpass",
+      };
+      const mockResponse = {
+        data: {
+          access_token: "token123",
+          token_type: "bearer",
+        },
+      };
+      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+
+      const result = await login(userData);
+
+      expect(instance.post).toHaveBeenCalledWith(
+        "/auth/login",
+        expect.any(URLSearchParams),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("должен правильно формировать URLSearchParams", async () => {
+      const userData = {
+        username: "user",
+        password: "pass",
+      };
+      const mockResponse = {
+        data: { access_token: "token", token_type: "bearer" },
+      };
+      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+
+      await login(userData);
+
+      const callArgs = vi.mocked(instance.post).mock.calls[0];
+      const params = callArgs[1] as URLSearchParams;
+
+      expect(params.get("username")).toBe("user");
+      expect(params.get("password")).toBe("pass");
+    });
+  });
+
+  describe("logout", () => {
+    it("должен отправлять POST запрос на /auth/logout", async () => {
+      const mockResponse = { data: { message: "Logged out" } };
+      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+
+      const result = await logout();
+
+      expect(instance.post).toHaveBeenCalledWith("/auth/logout");
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
+  describe("fetchCurrentUser", () => {
+    it("должен отправлять GET запрос на /auth/me", async () => {
+      const mockResponse = {
+        data: {
+          id: 1,
+          username: "testuser",
+          shilka_coins: 100,
+        },
+      };
+      vi.mocked(instance.get).mockResolvedValue(mockResponse);
+
+      const result = await fetchCurrentUser();
+
+      expect(instance.get).toHaveBeenCalledWith("/auth/me");
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+});

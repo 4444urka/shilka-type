@@ -17,4 +17,12 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // Отключаем ручное разделение чанков
+      },
+    },
+  },
 });

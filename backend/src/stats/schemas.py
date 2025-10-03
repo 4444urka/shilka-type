@@ -60,3 +60,10 @@ class TypingSessionResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+class CharErrorStat(BaseModel):
+    char: str
+    error_rate: float
+    total_typed: int
+    errors: int
