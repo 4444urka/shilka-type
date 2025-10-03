@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,12 +8,18 @@ from .database import Base, engine
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title="Shilka Type API", version="1.0.0")
 
+# CORS origins для разработки и продакшена
 origins = [
     "http://localhost:5173",
-    "http://localhost",
+    "http://localhost:3000",
+    "https://shilka-type-8en55k55t-4444urkas-projects.vercel.app/",
 ]
+
+# Добавляем дополнительные origins из переменных окружения
+additional_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+origins.extend([origin.strip() for origin in additional_origins if origin.strip()])
 
 app.add_middleware(
     CORSMiddleware,
