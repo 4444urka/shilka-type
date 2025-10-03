@@ -18,17 +18,11 @@ export default defineConfig({
     },
   },
   build: {
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-          router: ["react-router", "react-router-dom"],
-          ui: ["@chakra-ui/react", "@emotion/react", "@emotion/styled"],
-          charts: ["recharts", "@chakra-ui/charts"],
-          utils: ["axios", "yup", "@reduxjs/toolkit"],
-        },
+        manualChunks: undefined, // Отключаем ручное разделение чанков
       },
     },
-    chunkSizeWarningLimit: 1000,
   },
 });
