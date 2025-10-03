@@ -1,6 +1,9 @@
 {
   "version": 2,
   "name": "shilka-type",
+  "buildCommand": "yarn build",
+  "outputDirectory": "dist",
+  "installCommand": "yarn install --frozen-lockfile",
   "routes": [
     {
       "handle": "filesystem"

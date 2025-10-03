@@ -17,4 +17,18 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          router: ["react-router", "react-router-dom"],
+          ui: ["@chakra-ui/react", "@emotion/react", "@emotion/styled"],
+          charts: ["recharts", "@chakra-ui/charts"],
+          utils: ["axios", "yup", "@reduxjs/toolkit"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });
