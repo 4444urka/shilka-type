@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "shilka-type",
+  "buildCommand": "cd frontend && yarn build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "cd frontend && yarn install",
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
