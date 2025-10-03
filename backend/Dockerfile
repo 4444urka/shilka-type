@@ -19,8 +19,13 @@ RUN pip install --no-cache-dir poetry==1.8.3
 # Настраиваем Poetry для установки в системное окружение
 RUN poetry config virtualenvs.create false
 
-# Устанавливаем зависимости (только main, без dev)
-RUN poetry install --only main --no-interaction --no-ansi
+# Настраиваем pip для увеличенного таймаута (используется Poetry внутри)
+ENV PIP_DEFAULT_TIMEOUT=600
+
+# Устанавливаем ВСЕ зависимости (включая dev для тестов) с повторными попытками
+RUN poetry install --no-interaction --no-ansi || \
+    (sleep 5 && poetry install --no-interaction --no-ansi) || \
+    (sleep 10 && poetry install --no-interaction --no-ansi)
 
 # Копируем остальные файлы приложения
 COPY . .

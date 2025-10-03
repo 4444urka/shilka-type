@@ -4,18 +4,21 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import ShilkaField from "../../components/ShilkaInput/ShilkaField";
 import { signUpSchema } from "../../lib/validation/signUpSchema";
-import { login, register as registerUser } from "../../api/auth/authRequests";
-import type { UserRegistrationResponse } from "../../types/User";
-import { useAppDispatch } from "../../store";
-import { setUser } from "../../slices/userSlice";
+import {
+  login,
+  register as registerUser,
+  fetchCurrentUser,
+} from "../../api/auth/authRequests";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getAccessTokenFromCookie } from "../../utils/cookies";
+import { useAppDispatch } from "../../store";
+import { setUser } from "../../slices/userSlice";
 
 type SignUpFormValues = yup.InferType<typeof signUpSchema>;
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -28,12 +31,11 @@ const SignUp = () => {
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
-  const dispatch = useAppDispatch();
 
   const onSubmit = async (values: SignUpFormValues) => {
     try {
       clearErrors();
-      const register_response: UserRegistrationResponse = await registerUser({
+      await registerUser({
         username: values.username,
         password: values.password,
       });
@@ -43,15 +45,9 @@ const SignUp = () => {
         password: values.password,
       });
 
-      const accessToken = getAccessTokenFromCookie();
+      const me = await fetchCurrentUser();
+      dispatch(setUser(me)); // Обновляем состояние пользователя в Redux
 
-      dispatch(
-        setUser({
-          id: register_response.id,
-          username: register_response.username,
-          access_token: accessToken,
-        })
-      );
       reset();
       navigate("/stats");
     } catch (error) {

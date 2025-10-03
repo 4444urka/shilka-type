@@ -31,7 +31,6 @@ def get_leaderboard(db: Session = Depends(get_db)):
             func.coalesce(auth_models.User.shilka_coins, 0).desc(),
             auth_models.User.id.asc(),
         )
-        .limit(10)
         .all()
     )
     return users
@@ -88,6 +87,7 @@ def get_typing_sessions(
     sessions = (
         db.query(models.TypingSession)
         .filter(models.TypingSession.user_id == current_user.id)
+        .filter(models.TypingSession.wpm > 0)
         .order_by(models.TypingSession.created_at.desc())
         .limit(limit)
         .all()
@@ -103,3 +103,75 @@ def get_typing_sessions(
         )
         for session in sessions
     ]
+
+
+@router.get("/char-errors", response_model=list[schemas.CharErrorStat])
+def get_char_error_stats(
+    current_user: auth_models.User = Depends(auth_utils.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Получить статистику ошибок по символам, отсортированную по % ошибок (убывание)."""
+    # Получаем все сессии пользователя
+    sessions = (
+        db.query(models.TypingSession)
+        .filter(models.TypingSession.user_id == current_user.id)
+        .all()
+    )
+    
+    # Словарь для подсчёта статистики по каждому символу
+    # char -> {"total": int, "errors": int}
+    char_stats = {}
+    
+    for session in sessions:
+        if not session.history:
+            continue
+        
+        try:
+            history = json.loads(session.history)
+            
+            # Проходим по каждому слову в истории
+            for word in history:
+                for char_data in word:
+                    char = char_data.get("char", "")
+                    correct = char_data.get("correct", True)
+                    
+                    if not char:
+                        continue
+                    
+                    if char not in char_stats:
+                        char_stats[char] = {"total": 0, "errors": 0}
+                    
+                    char_stats[char]["total"] += 1
+                    if not correct:
+                        char_stats[char]["errors"] += 1
+        except (json.JSONDecodeError, KeyError, TypeError):
+            continue
+    
+    # Формируем результат со статистикой
+    result = []
+    for char, stats in char_stats.items():
+        total = stats["total"]
+        errors = stats["errors"]
+        
+        # Пропускаем символы, которые не были напечатаны
+        if total == 0:
+            continue
+        
+        error_rate = (errors / total * 100)
+        
+        if error_rate == 100.0:
+            continue
+        
+        result.append(
+            schemas.CharErrorStat(
+                char=char,
+                error_rate=round(error_rate, 2),
+                total_typed=total,
+                errors=errors,
+            )
+        )
+    
+    # Сортируем по проценту ошибок (убывание)
+    result.sort(key=lambda x: x.error_rate, reverse=True)
+    
+    return result

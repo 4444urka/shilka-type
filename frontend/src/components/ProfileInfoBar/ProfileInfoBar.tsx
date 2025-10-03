@@ -54,8 +54,8 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
         _hover={{ color: "primaryColor" }}
         onClick={async () => {
           try {
-            await logout();
             navigate("/");
+            await logout();
           } catch {
             // ignore
           }

@@ -110,8 +110,7 @@ const useTypingSession = ({
       const expected = currentWord[currentCharIndex];
       const entered = key;
       const correct = entered.toLowerCase() === expected.toLowerCase();
-
-      setTypedChars((prev) => [...prev, { char: entered, correct, time }]);
+      setTypedChars((prev) => [...prev, { char: expected, correct, time }]);
       setPosition((prev) => ({
         ...prev,
         currentCharIndex: prev.currentCharIndex + 1,

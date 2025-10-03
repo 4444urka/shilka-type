@@ -1,4 +1,5 @@
 import instance from "..";
+import type { CharErrorResponse } from "../../types/CharErrorResponse";
 import type { TypingSession } from "../../types/TypingSession";
 import type { WordHistoryPayload } from "../../types/WordHistoryPayload";
 
@@ -23,5 +24,10 @@ export const fetchTypingSessions = async (
   const response = await instance.get(`/stats/typing-sessions`, {
     params: { limit },
   });
+  return response.data;
+};
+
+export const fetchCharErrors = async (): Promise<CharErrorResponse[]> => {
+  const response = await instance.get(`/stats/char-errors`);
   return response.data;
 };

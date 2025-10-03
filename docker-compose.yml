@@ -39,7 +39,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./backend:/app
-      - /app/.venv
 
   frontend:
     build:
