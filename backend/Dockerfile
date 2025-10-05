@@ -25,15 +25,12 @@ RUN poetry install --only=main --no-interaction --no-ansi
 # Копируем остальные файлы приложения
 COPY . .
 
-# Запускаем миграции
-RUN poetry run alembic upgrade head
-
 # Создаем пользователя для безопасности
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
 
 # Открываем порт для FastAPI
-EXPOSE 10000
+EXPOSE 8000
 
-# Команда запуска приложения (используем sh для переменной окружения)
-CMD ["sh", "-c", "poetry run uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
+# Команда запуска приложения с миграциями
+CMD ["sh", "-c", "poetry run alembic upgrade head && poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000"]
