@@ -7,7 +7,7 @@ const getRandomLengthWords = async (
 ): Promise<string[]> => {
   let wordsArr: string[] = [];
   while (wordsArr.reduce((acc, word) => acc + word.length, 0) < numberOfChars) {
-    const randomWords = await generate({
+    const randomWords = generate({
       minLength: minLength,
       maxLength: maxLength,
       exactly: 1,

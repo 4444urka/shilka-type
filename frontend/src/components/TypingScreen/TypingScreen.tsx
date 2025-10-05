@@ -1,142 +1,106 @@
-import { Box, type BoxProps, Text } from "@chakra-ui/react";
-import React, { Fragment } from "react";
-import Cursor from "../Cursor/Cursor";
+import { Box } from "@chakra-ui/react";
+import React from "react";
+import { TypingWordComponent } from "../TypingWordComponent/TypingWordComponent";
+import { TypingScreenStats } from "../TypingScreenStats/TypingScreenStats";
+import SettingsBar from "../SettingsBar/SettingsBar";
 import RestartButton from "../RestartButton/RestartButton";
-import Timer from "../Timer/Timer";
+import type { TypingSessionNew } from "../../types/TypingTypes";
+import LoadingScreen from "../LoadingScreen/LoadingScreen";
 
-interface TypingScreenProps extends BoxProps {
-  words: string[];
+interface TypingScreenProps {
+  session: TypingSessionNew;
+  timeLeft: number;
   isLoading: boolean;
-  time: number;
-  isStartedTyping: boolean;
-  activeWordIndex: number;
-  currentCharIndex: number;
-  typedChars: { char: string; correct: boolean }[];
-  wordHistory: { char: string; correct: boolean }[][];
-  onRestart?: () => void;
+  onKeyPress: (key: string) => void;
+  onRestart: () => void;
+  // Пропсы для настроек
+  selectedTime: number;
+  selectedLanguage: string;
+  onTimeChange: (time: number) => void;
+  onLanguageChange: (language: string) => void;
 }
 
 const TypingScreen: React.FC<TypingScreenProps> = ({
-  words,
+  session,
+  timeLeft,
   isLoading,
-  time,
-  isStartedTyping,
-  activeWordIndex,
-  currentCharIndex,
-  typedChars,
-  wordHistory,
+  onKeyPress,
   onRestart,
-  ...rest
+  selectedTime,
+  selectedLanguage,
+  onTimeChange,
+  onLanguageChange,
 }) => {
-  const renderWord = (
-    word: string,
-    wordIndex: number,
-    isActive: boolean,
-    isCompleted: boolean
-  ) => {
-    if (isCompleted) {
-      const history = wordHistory[wordIndex] || [];
-      if (history.length > 0) {
-        return (
-          <Box as="span" display="inline-flex" flexWrap="wrap">
-            {word.split("").map((char, idx) => {
-              const typed = history[idx];
-              const color = typed
-                ? typed.correct
-                  ? undefined
-                  : "errorColor"
-                : undefined;
-              return (
-                <Text
-                  as="span"
-                  key={`${char}-${idx}`}
-                  color={color}
-                  opacity={typed ? 1 : 0.5}
-                >
-                  {char}
-                </Text>
-              );
-            })}
-          </Box>
-        );
+  // Обработка клавиатуры вынесена в родительский компонент
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Игнорируем события клавиатуры, если активен фокус на кнопках или других интерактивных элементах
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === "BUTTON" ||
+          activeElement.getAttribute("role") === "button" ||
+          activeElement.getAttribute("tabindex") !== null)
+      ) {
+        return;
       }
-      return (
-        <Box as="span" opacity={1}>
-          {word}
-        </Box>
-      );
-    }
 
-    if (isActive) {
-      const chars = word.split("");
-      return (
-        <Box
-          as="span"
-          display="inline-flex"
-          flexWrap="wrap"
-          minWidth={`${word.length}ch`}
-        >
-          {chars.map((char, idx) => {
-            const typed = typedChars[idx];
-            const isTyped = idx < currentCharIndex;
-            let color: string | undefined;
-            if (isTyped && typed) {
-              color = typed.correct ? undefined : "errorColor";
-            } else {
-              color = undefined;
-            }
-            const showCursor = idx === currentCharIndex;
-            return (
-              <Box
-                key={`${word}-${wordIndex}-${idx}`}
-                as="span"
-                position="relative"
-              >
-                <Text as="span" color={color} opacity={isTyped ? 1 : 0.5}>
-                  {char}
-                </Text>
-                {showCursor && currentCharIndex < chars.length && (
-                  <Box as="span" position="absolute" left={0} top={0}>
-                    <Cursor />
-                  </Box>
-                )}
-              </Box>
-            );
-          })}
-          {currentCharIndex === chars.length && (
-            <Box
-              as="span"
-              position="relative"
-              display="inline-block"
-              width="0"
-              aria-hidden
-            >
-              <Cursor />
-            </Box>
-          )}
-        </Box>
-      );
-    }
+      // Предотвращаем стандартное поведение для некоторых клавиш
+      if (
+        [
+          "Backspace",
+          "Tab",
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+        ].includes(event.key)
+      ) {
+        event.preventDefault();
+      }
 
-    return (
-      <Box as="span" opacity={0.5}>
-        {word}
-      </Box>
-    );
-  };
+      // Игнорируем комбинации с Ctrl/Cmd/Alt
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      onKeyPress(event.key);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onKeyPress]);
+
+  if (isLoading || session.words.length === 0) {
+    return <LoadingScreen />;
+  }
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" {...rest}>
-      <Timer opacity={isStartedTyping ? 1 : 0}>{time}</Timer>
+    <Box display="flex" flexDirection="column" alignItems="center" gap={10}>
+      {session.isStarted ? (
+        <TypingScreenStats
+          stats={session.stats}
+          displayTime={timeLeft}
+          isVisible={session.isStarted}
+        />
+      ) : (
+        <SettingsBar
+          isVisible={!session.isStarted}
+          selectedTime={selectedTime}
+          selectedLanguage={selectedLanguage}
+          onTimeChange={onTimeChange}
+          onLanguageChange={onLanguageChange}
+        />
+      )}
       <Box display="flex" flexDirection="column" alignItems="center" gap={6}>
-        {!isLoading && words.length > 0 && (
+        {!isLoading && session.words.length > 0 && (
           <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
-            gap={6}
+            gap={10}
             animation="fadeIn 0.5s ease-in-out"
-            key={words.join("-")}
+            key={session.words.map((w) => w.text).join("-")}
           >
             <Box
               textStyle="body"
@@ -145,25 +109,22 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
               width="100%"
               textAlign="justify"
               position="relative"
-              _after={{
-                content: '""',
-                display: "inline-block",
-                width: "100%",
-              }}
-              textAlignLast="left"
             >
-              {words.map((word, index) => (
-                <Fragment key={`${word}-${index}`}>
-                  {renderWord(
-                    word,
-                    index,
-                    index === activeWordIndex,
-                    index < activeWordIndex
-                  )}{" "}
-                </Fragment>
+              {session.words.map((word, wordIndex) => (
+                <TypingWordComponent
+                  key={`word-${wordIndex}`}
+                  word={word}
+                  wordIndex={wordIndex}
+                  currentCharIndex={
+                    wordIndex === session.currentWordIndex
+                      ? session.currentCharIndex
+                      : -1
+                  }
+                  isCurrentWord={wordIndex === session.currentWordIndex}
+                />
               ))}
             </Box>
-            <RestartButton onClick={() => onRestart?.()} />
+            <RestartButton onClick={onRestart} />
           </Box>
         )}
       </Box>
