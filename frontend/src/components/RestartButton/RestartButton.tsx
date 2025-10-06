@@ -7,6 +7,12 @@ interface RestartButtonProps extends IconButtonProps {
 }
 
 const RestartButton: React.FC<RestartButtonProps> = ({ onClick, ...rest }) => {
+  const handleClick = () => {
+    onClick();
+    // Убираем фокус с кнопки после клика
+    (document.activeElement as HTMLElement)?.blur();
+  };
+
   return (
     <IconButton
       aria-label="Restart"
@@ -14,7 +20,8 @@ const RestartButton: React.FC<RestartButtonProps> = ({ onClick, ...rest }) => {
       alignSelf="center"
       size="lg"
       color="primaryColor"
-      onClick={onClick}
+      onClick={handleClick}
+      onMouseDown={(e) => e.preventDefault()}
       {...rest}
     >
       <VscDebugRestart />

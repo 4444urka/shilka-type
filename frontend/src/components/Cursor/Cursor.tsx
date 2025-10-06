@@ -6,25 +6,37 @@ const MotionBox = motion(Box);
 const Cursor = () => {
   return (
     <MotionBox
-      layout
-      initial={{ opacity: 1 }}
+      layoutId="typing-cursor"
+      initial={{ opacity: 1, scaleY: 1 }}
       animate={{
         opacity: [1, 0, 1],
-        scale: [1, 0.9, 1],
+        scaleY: [1, 0.95, 1],
       }}
       transition={{
-        duration: 1,
-        repeat: Infinity,
-        ease: "easeInOut",
-        layout: { type: "spring", stiffness: 1, damping: 300 },
+        opacity: {
+          duration: 1,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+        scaleY: {
+          duration: 0.8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+        layout: {
+          type: "spring",
+          stiffness: 400,
+          damping: 25,
+          duration: 0.3,
+        },
       }}
       display="inline-block"
       width="3px"
       height="2rem"
       bg="primaryColor"
       position="relative"
-      top="6px"
-      transformOrigin="center"
+      transformOrigin="center bottom"
+      borderRadius="2px"
     />
   );
 };

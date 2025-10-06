@@ -43,9 +43,20 @@ def post_typing_session(
     db: Session = Depends(get_db),
 ):
     
-    # Вычисляем метрики
+    # Получаем метрики (приоритет у значений с фронтенда)
     wpm = payload.calculate_wpm()
     accuracy = payload.calculate_accuracy()
+    
+    # Логируем источник данных для отладки
+    if payload.wpm is not None:
+        print(f"Using WPM from frontend: {payload.wpm}")
+    else:
+        print(f"Calculated WPM on backend: {wpm}")
+        
+    if payload.accuracy is not None:
+        print(f"Using accuracy from frontend: {payload.accuracy}")
+    else:
+        print(f"Calculated accuracy on backend: {accuracy}")
     
     # Сериализуем данные для хранения
     words_json = json.dumps(payload.words)
@@ -62,6 +73,8 @@ def post_typing_session(
         duration=payload.duration,
         words=words_json,
         history=history_json,
+        typing_mode=payload.mode,
+        language=payload.language,
     )
     
     db.add(typing_session)
@@ -73,6 +86,8 @@ def post_typing_session(
         wpm=typing_session.wpm,
         accuracy=typing_session.accuracy,
         duration=typing_session.duration,
+        typing_mode=typing_session.typing_mode,
+        language=typing_session.language,
         created_at=typing_session.created_at.isoformat(),
     )
 
@@ -99,6 +114,8 @@ def get_typing_sessions(
             wpm=session.wpm,
             accuracy=session.accuracy,
             duration=session.duration,
+            typing_mode=session.typing_mode,
+            language=session.language,
             created_at=session.created_at.isoformat(),
         )
         for session in sessions

@@ -1,5 +1,9 @@
-import { Box, Text, Flex, type BoxProps } from "@chakra-ui/react";
+import { Box, Text, Flex, Badge, type BoxProps } from "@chakra-ui/react";
 import type { TypingSession } from "../../types/TypingSession";
+import {
+  getModeDisplay,
+  getLanguageDisplay,
+} from "../../utils/sessionDisplayUtils";
 
 export interface TypingHistoryProps extends BoxProps {
   sessions: TypingSession[];
@@ -23,56 +27,94 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
         История сессий
       </Text>
       <Flex direction="column" gap={3}>
-        {sessions.map((session) => (
-          <Box
-            key={session.id}
-            p={2}
-            px={4}
-            borderBottom="1px solid"
-            borderColor="gray.300"
-          >
-            <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-              <Box>
-                <Text fontSize="md">
-                  {new Date(
-                    session.created_at +
-                      (session.created_at.endsWith("Z") ? "" : "Z")
-                  )
-                    .toLocaleString("ru-RU")
-                    .slice(0, -3)}
-                </Text>
-              </Box>
-              <Flex gap={6}>
-                <Box textAlign="center">
-                  <Text fontSize="xs" color="gray.500">
-                    WPM
+        {sessions.map((session) => {
+          const modeDisplay = getModeDisplay(session.typing_mode);
+          const languageDisplay = getLanguageDisplay(session.language);
+
+          return (
+            <Box
+              key={session.id}
+              p={3}
+              px={4}
+              borderBottom="1px solid"
+              borderColor="gray.300"
+            >
+              <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  gap={4}
+                  alignItems="center"
+                  mt={4}
+                >
+                  <Text fontSize="md">
+                    {new Date(
+                      session.created_at +
+                        (session.created_at.endsWith("Z") ? "" : "Z")
+                    )
+                      .toLocaleString("ru-RU")
+                      .slice(0, -3)}
                   </Text>
-                  <Text fontSize="lg" fontWeight="bold" color="primaryColor">
-                    {Number(session.wpm).toFixed(1)}
-                  </Text>
+
+                  {/* Бейджи для режима и языка */}
+                  <Flex gap={2}>
+                    {session.typing_mode && (
+                      <Badge
+                        colorScheme="blue"
+                        variant="subtle"
+                        fontSize="sm"
+                        px={2}
+                        py={1}
+                      >
+                        {modeDisplay.icon} {modeDisplay.label}
+                      </Badge>
+                    )}
+                    {session.language && (
+                      <Badge
+                        colorScheme="green"
+                        variant="subtle"
+                        fontSize="sm"
+                        px={2}
+                        py={1}
+                      >
+                        {languageDisplay.flag} {languageDisplay.label}
+                      </Badge>
+                    )}
+                  </Flex>
                 </Box>
-                <Box textAlign="center">
-                  <Text fontSize="xs" color="gray.500">
-                    Точность
-                  </Text>
-                  <Text fontSize="lg" fontWeight="bold" color="primaryColor">
-                    {Number(session.accuracy).toFixed(1)}%
-                  </Text>
-                </Box>
-                {session.duration && (
+
+                <Flex gap={6}>
                   <Box textAlign="center">
                     <Text fontSize="xs" color="gray.500">
-                      Время
+                      WPM
                     </Text>
-                    <Text fontSize="lg" fontWeight="bold">
-                      {session.duration}с
+                    <Text fontSize="lg" fontWeight="bold" color="primaryColor">
+                      {Number(session.wpm).toFixed(1)}
                     </Text>
                   </Box>
-                )}
+                  <Box textAlign="center">
+                    <Text fontSize="xs" color="gray.500">
+                      Точность
+                    </Text>
+                    <Text fontSize="lg" fontWeight="bold" color="primaryColor">
+                      {Number(session.accuracy).toFixed(1)}%
+                    </Text>
+                  </Box>
+                  {session.duration && (
+                    <Box textAlign="center">
+                      <Text fontSize="xs" color="gray.500">
+                        Время
+                      </Text>
+                      <Text fontSize="lg" fontWeight="bold">
+                        {session.duration}с
+                      </Text>
+                    </Box>
+                  )}
+                </Flex>
               </Flex>
-            </Flex>
-          </Box>
-        ))}
+            </Box>
+          );
+        })}
       </Flex>
     </Box>
   );

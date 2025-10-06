@@ -3,5 +3,7 @@ export type TypingSession = {
   wpm: number;
   accuracy: number;
   duration: number | null;
+  typing_mode: string | null;
+  language: string | null;
   created_at: string;
 };
