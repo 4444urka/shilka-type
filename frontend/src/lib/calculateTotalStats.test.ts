@@ -18,6 +18,8 @@ describe("calculateTotalStats", () => {
         wpm: 60,
         accuracy: 95.5,
         duration: 120,
+        typing_mode: "normal",
+        language: "ru",
         created_at: "2024-01-01T00:00:00Z",
       },
     ];
@@ -35,6 +37,8 @@ describe("calculateTotalStats", () => {
         wpm: 60,
         accuracy: 95.5,
         duration: 60,
+        typing_mode: "normal",
+        language: "ru",
         created_at: "2024-01-01T00:00:00Z",
       },
       {
@@ -42,6 +46,8 @@ describe("calculateTotalStats", () => {
         wpm: 80,
         accuracy: 98.0,
         duration: 120,
+        typing_mode: "normal",
+        language: "ru",
         created_at: "2024-01-02T00:00:00Z",
       },
     ];
@@ -61,6 +67,8 @@ describe("calculateTotalStats", () => {
         wpm: 40,
         accuracy: 95.5,
         duration: 90,
+        typing_mode: "normal",
+        language: "ru",
         created_at: "2024-01-01T00:00:00Z",
       },
     ];
