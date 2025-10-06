@@ -9,7 +9,7 @@ import type { Me } from "../types/User";
 describe("User Slice", () => {
   const initialState = {
     user: null,
-    isLoading: false,
+    isLoading: true,
     error: null,
   };
 

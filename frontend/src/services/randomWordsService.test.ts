@@ -13,9 +13,9 @@ describe("randomWordsService", () => {
   it("должен генерировать слова до достижения нужного количества символов", async () => {
     // Мокируем generate чтобы возвращать слова по одному
     (generate as Mock)
-      .mockResolvedValueOnce(["hello"]) // 5 символов
-      .mockResolvedValueOnce(["world"]) // 5 символов
-      .mockResolvedValueOnce(["test"]); // 4 символа
+      .mockReturnValueOnce(["hello"]) // 5 символов
+      .mockReturnValueOnce(["world"]) // 5 символов
+      .mockReturnValueOnce(["test"]); // 4 символа
 
     const result = await getRandomLengthWords(12, 3, 6);
 
@@ -27,7 +27,7 @@ describe("randomWordsService", () => {
   });
 
   it("должен вызывать generate с правильными параметрами", async () => {
-    (generate as Mock).mockResolvedValue(["word"]);
+    (generate as Mock).mockReturnValue(["word"]);
 
     await getRandomLengthWords(10, 4, 8);
 
@@ -40,9 +40,9 @@ describe("randomWordsService", () => {
 
   it("должен собирать слова пока не наберётся нужное количество символов", async () => {
     (generate as Mock)
-      .mockResolvedValueOnce(["cat"]) // 3 символа
-      .mockResolvedValueOnce(["dog"]) // 3 символа
-      .mockResolvedValueOnce(["bird"]); // 4 символа
+      .mockReturnValueOnce(["cat"]) // 3 символа
+      .mockReturnValueOnce(["dog"]) // 3 символа
+      .mockReturnValueOnce(["bird"]); // 4 символа
 
     const result = await getRandomLengthWords(8, 2, 5);
 
