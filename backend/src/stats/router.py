@@ -73,6 +73,8 @@ def post_typing_session(
         duration=payload.duration,
         words=words_json,
         history=history_json,
+        typing_mode=payload.mode,
+        language=payload.language,
     )
     
     db.add(typing_session)
@@ -84,6 +86,8 @@ def post_typing_session(
         wpm=typing_session.wpm,
         accuracy=typing_session.accuracy,
         duration=typing_session.duration,
+        typing_mode=typing_session.typing_mode,
+        language=typing_session.language,
         created_at=typing_session.created_at.isoformat(),
     )
 
@@ -110,6 +114,8 @@ def get_typing_sessions(
             wpm=session.wpm,
             accuracy=session.accuracy,
             duration=session.duration,
+            typing_mode=session.typing_mode,
+            language=session.language,
             created_at=session.created_at.isoformat(),
         )
         for session in sessions

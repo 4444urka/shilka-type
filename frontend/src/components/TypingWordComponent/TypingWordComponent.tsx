@@ -36,7 +36,7 @@ export const TypingWordComponent = ({
       display="inline-flex"
       flexWrap="nowrap"
       alignItems="center"
-      marginRight="0.5rem"
+      marginRight="1rem"
       marginBottom="0.25rem"
       animate={{
         opacity: getWordOpacity(),

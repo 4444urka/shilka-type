@@ -10,17 +10,29 @@ import { useIsAuthed } from "../../hooks/useIsAuthed";
 
 const Homepage = () => {
   const isAuthed = useIsAuthed();
-  const words = useGetRandomWords(2, 5, 270);
   const [showResults, setShowResults] = useState(false);
   const [shilkaCoins, setShilkaCoins] = useState({ value: 0 });
 
   // Состояние настроек
   const [selectedTime, setSelectedTime] = useState(30);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ru">("en");
+  const [selectedMode, setSelectedMode] = useState<"words" | "sentences">(
+    "words"
+  );
+
+  const { words, refreshWords } = useGetRandomWords(
+    2,
+    5,
+    250,
+    selectedLanguage,
+    selectedMode
+  );
 
   // Хук для отправки данных на сервер
   const { sendSessionData, resetSyncState } = useSessionDataSync({
     enabled: isAuthed,
+    mode: selectedMode,
+    language: selectedLanguage,
   });
 
   const handleTypingComplete = useCallback(
@@ -57,8 +69,9 @@ const Homepage = () => {
   const handleRestart = useCallback(() => {
     setShowResults(false);
     resetSyncState(); // Сбрасываем состояние отправки данных
+    refreshWords(); // Генерируем новые слова
     resetSession();
-  }, [resetSession, resetSyncState]);
+  }, [resetSession, resetSyncState, refreshWords]);
 
   // Обработчики настроек
   const handleTimeChange = useCallback(
@@ -72,10 +85,19 @@ const Homepage = () => {
     [session.isStarted, resetSession]
   );
 
-  const handleLanguageChange = useCallback((language: string) => {
+  const handleLanguageChange = useCallback((language: "en" | "ru") => {
     setSelectedLanguage(language);
     // Здесь в будущем можно добавить логику смены языка
   }, []);
+
+  const handleModeChange = useCallback(
+    (mode: "words" | "sentences") => {
+      setSelectedMode(mode);
+      // Генерируем новые слова при смене режима
+      refreshWords();
+    },
+    [refreshWords]
+  );
 
   return (
     <Box
@@ -96,8 +118,10 @@ const Homepage = () => {
           onRestart={handleRestart}
           selectedTime={selectedTime}
           selectedLanguage={selectedLanguage}
+          selectedMode={selectedMode}
           onTimeChange={handleTimeChange}
           onLanguageChange={handleLanguageChange}
+          onModeChange={handleModeChange}
         />
       ) : (
         <VictoryScreen session={session} shilkaCoins={shilkaCoins} />

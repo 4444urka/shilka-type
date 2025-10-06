@@ -4,4 +4,6 @@ export type WordHistoryPayload = {
   duration?: number;
   wpm?: number; // WPM с фронтенда
   accuracy?: number; // Точность с фронтенда
+  mode?: string; // режим набора (words, time, quote, etc.)
+  language?: string; // язык (ru, en, etc.)
 };

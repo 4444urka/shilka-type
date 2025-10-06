@@ -6,7 +6,9 @@ import type { WordHistoryPayload } from "../types/WordHistoryPayload";
  */
 export const convertSessionToPayload = (
   session: TypingSessionNew,
-  duration: number
+  duration: number,
+  mode?: string,
+  language?: string
 ): WordHistoryPayload => {
   // Извлекаем оригинальные слова
   const words = session.words.map((word) => word.text);
@@ -28,5 +30,7 @@ export const convertSessionToPayload = (
     duration,
     wpm: session.stats.wpm, // Передаем WPM с фронтенда
     accuracy: session.stats.accuracy, // Передаем accuracy с фронтенда
+    mode, // Добавляем режим
+    language, // Добавляем язык
   };
 };

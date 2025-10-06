@@ -17,6 +17,8 @@ class WordHistoryPayload(BaseModel):
     duration: int | None = None
     wpm: float | None = None  # WPM с фронтенда
     accuracy: float | None = None  # Точность с фронтенда
+    mode: str | None = None  # режим набора (words, time, quote, etc.)
+    language: str | None = None  # язык (ru, en, etc.)
 
     def calculate_wpm(self) -> float:
         """Вычисляет слов в минуту (WPM) на основе истории (fallback если не передан с фронта)."""
@@ -64,6 +66,8 @@ class TypingSessionResponse(BaseModel):
     wpm: float
     accuracy: float
     duration: int | None
+    typing_mode: str | None
+    language: str | None
     created_at: str
     
     class Config:

@@ -5,6 +5,8 @@ import { convertSessionToPayload } from "../utils/sessionDataConverter";
 
 interface UseSessionDataSyncProps {
   enabled?: boolean;
+  mode?: string;
+  language?: string;
 }
 
 /**
@@ -12,6 +14,8 @@ interface UseSessionDataSyncProps {
  */
 export const useSessionDataSync = ({
   enabled = true,
+  mode,
+  language,
 }: UseSessionDataSyncProps = {}) => {
   const dataSentRef = useRef<boolean>(false);
 
@@ -34,13 +38,20 @@ export const useSessionDataSync = ({
           ? Math.floor((Date.now() - session.startTime) / 1000)
           : session.initialTime;
 
-        const payload = convertSessionToPayload(session, duration);
+        const payload = convertSessionToPayload(
+          session,
+          duration,
+          mode,
+          language
+        );
 
         console.log("Отправляем данные сессии на сервер:", {
           duration,
           wordsCount: payload.words.length,
           wpm: session.stats.wpm,
           accuracy: session.stats.accuracy,
+          mode: payload.mode,
+          language: payload.language,
         });
 
         await postWordHistory(payload);
@@ -50,7 +61,7 @@ export const useSessionDataSync = ({
         dataSentRef.current = false; // Сбрасываем флаг при ошибке
       }
     },
-    [enabled]
+    [enabled, mode, language]
   );
 
   const resetSyncState = useCallback(() => {

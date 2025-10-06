@@ -4,6 +4,8 @@ import RestartButton from "../RestartButton/RestartButton";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
 import { addCoins } from "../../api/stats/statsRequests";
 import type { TypingSessionNew } from "../../types/TypingTypes";
+import { useAppDispatch } from "../../store";
+import { addPoints } from "../../slices/shilkaCoinsSlice";
 
 export interface VictoryScreenProps extends BoxProps {
   session: TypingSessionNew;
@@ -16,15 +18,17 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
   session,
   shilkaCoins,
 }) => {
+  const dispatch = useAppDispatch();
   const isAuthed = useIsAuthed();
   React.useEffect(() => {
     if (!isAuthed) return;
     (async () => {
       if (shilkaCoins.value !== 0) {
         await addCoins(shilkaCoins.value);
+        dispatch(addPoints(shilkaCoins.value));
       }
     })();
-  }, [shilkaCoins.value, isAuthed]);
+  }, [shilkaCoins.value, isAuthed, dispatch]);
   return (
     <Box
       animation="fadeIn 0.5s ease-in-out"

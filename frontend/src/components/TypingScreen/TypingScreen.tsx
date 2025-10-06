@@ -15,9 +15,11 @@ interface TypingScreenProps {
   onRestart: () => void;
   // Пропсы для настроек
   selectedTime: number;
-  selectedLanguage: string;
+  selectedLanguage: "en" | "ru";
+  selectedMode: "words" | "sentences";
   onTimeChange: (time: number) => void;
-  onLanguageChange: (language: string) => void;
+  onLanguageChange: (language: "en" | "ru") => void;
+  onModeChange: (mode: "words" | "sentences") => void;
 }
 
 const TypingScreen: React.FC<TypingScreenProps> = ({
@@ -28,9 +30,13 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   onRestart,
   selectedTime,
   selectedLanguage,
+  selectedMode,
   onTimeChange,
   onLanguageChange,
+  onModeChange,
 }) => {
+  const pressedKeysRef = React.useRef<Set<string>>(new Set());
+
   // Обработка клавиатуры вынесена в родительский компонент
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,15 +51,26 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
         return;
       }
 
+      // Предотвращаем повторные нажатия (зажатие клавиш)
+      if (pressedKeysRef.current.has(event.key)) {
+        event.preventDefault();
+        return;
+      }
+
+      // Добавляем клавишу в набор нажатых
+      pressedKeysRef.current.add(event.key);
+
       // Предотвращаем стандартное поведение для некоторых клавиш
       if (
         [
           "Backspace",
+          "Enter",
           "Tab",
           "ArrowUp",
           "ArrowDown",
           "ArrowLeft",
           "ArrowRight",
+          " ", // Добавляем пробел
         ].includes(event.key)
       ) {
         event.preventDefault();
@@ -67,8 +84,18 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
       onKeyPress(event.key);
     };
 
+    const handleKeyUp = (event: KeyboardEvent) => {
+      // Удаляем клавишу из набора нажатых при отпускании
+      pressedKeysRef.current.delete(event.key);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, [onKeyPress]);
 
   if (isLoading || session.words.length === 0) {
@@ -88,8 +115,10 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
           isVisible={!session.isStarted}
           selectedTime={selectedTime}
           selectedLanguage={selectedLanguage}
+          selectedMode={selectedMode}
           onTimeChange={onTimeChange}
           onLanguageChange={onLanguageChange}
+          onModeChange={onModeChange}
         />
       )}
       <Box display="flex" flexDirection="column" alignItems="center" gap={6}>
