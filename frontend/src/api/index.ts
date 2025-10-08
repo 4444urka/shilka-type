@@ -8,15 +8,15 @@ if (!import.meta.env.VITE_API_URL) {
   console.warn("VITE_API_URL is not set. Using fallback URL:", apiUrl);
 }
 
-const instance = axios.create({
+const myapiInstance = axios.create({
   baseURL: apiUrl,
   withCredentials: true,
 });
 
-instance.interceptors.request.use((config) => config);
+myapiInstance.interceptors.request.use((config) => config);
 
 // Перехватчик ответов для обработки 401 ошибок
-instance.interceptors.response.use(
+myapiInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     // Если получили 401 (Unauthorized), значит токен невалиден или истёк
@@ -31,4 +31,8 @@ instance.interceptors.response.use(
   }
 );
 
-export default instance;
+const githubInstance = axios.create({
+  baseURL: "https://api.github.com",
+});
+
+export { myapiInstance, githubInstance };

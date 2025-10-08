@@ -5,7 +5,7 @@ import {
   postWordHistory,
   fetchTypingSessions,
 } from "./statsRequests";
-import instance from "../index";
+import { myapiInstance } from "../index";
 
 // Мокируем axios instance
 vi.mock("../index");
@@ -19,11 +19,11 @@ describe("statsRequests", () => {
     it("должен отправлять POST запрос на /stats/add-coins", async () => {
       const amount = 50;
       const mockResponse = { data: { shilka_coins: 150 } };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       const result = await addCoins(amount);
 
-      expect(instance.post).toHaveBeenCalledWith("/stats/add-coins", {
+      expect(myapiInstance.post).toHaveBeenCalledWith("/stats/add-coins", {
         amount,
       });
       expect(result).toEqual(mockResponse.data);
@@ -37,11 +37,11 @@ describe("statsRequests", () => {
         { username: "user2", shilka_coins: 900 },
       ];
       const mockResponse = { data: mockLeaderboard };
-      vi.mocked(instance.get).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.get).mockResolvedValue(mockResponse);
 
       const result = await fetchLeaderboard();
 
-      expect(instance.get).toHaveBeenCalledWith("/stats/leaderboard");
+      expect(myapiInstance.get).toHaveBeenCalledWith("/stats/leaderboard");
       expect(result).toEqual(mockLeaderboard);
     });
   });
@@ -67,11 +67,11 @@ describe("statsRequests", () => {
           created_at: "2025-10-03T00:00:00Z",
         },
       };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       const result = await postWordHistory(payload);
 
-      expect(instance.post).toHaveBeenCalledWith(
+      expect(myapiInstance.post).toHaveBeenCalledWith(
         "/stats/typing-session",
         payload
       );
@@ -91,11 +91,11 @@ describe("statsRequests", () => {
         },
       ];
       const mockResponse = { data: mockSessions };
-      vi.mocked(instance.get).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.get).mockResolvedValue(mockResponse);
 
       const result = await fetchTypingSessions();
 
-      expect(instance.get).toHaveBeenCalledWith("/stats/typing-sessions", {
+      expect(myapiInstance.get).toHaveBeenCalledWith("/stats/typing-sessions", {
         params: { limit: 100 },
       });
       expect(result).toEqual(mockSessions);
@@ -112,11 +112,11 @@ describe("statsRequests", () => {
         },
       ];
       const mockResponse = { data: mockSessions };
-      vi.mocked(instance.get).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.get).mockResolvedValue(mockResponse);
 
       const result = await fetchTypingSessions(50);
 
-      expect(instance.get).toHaveBeenCalledWith("/stats/typing-sessions", {
+      expect(myapiInstance.get).toHaveBeenCalledWith("/stats/typing-sessions", {
         params: { limit: 50 },
       });
       expect(result).toEqual(mockSessions);

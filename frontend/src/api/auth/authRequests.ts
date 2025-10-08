@@ -1,4 +1,4 @@
-import instance from "..";
+import { myapiInstance } from "..";
 import type { OAuth2PasswordRequestForm } from "../../types/Oauth2PasswordRequestForm";
 import type {
   UserLoginResponse,
@@ -9,7 +9,7 @@ import type {
 export const register = async (
   userData: UserRegistrationRequest
 ): Promise<UserRegistrationResponse> => {
-  const response = await instance.post(`/auth/register`, userData);
+  const response = await myapiInstance.post(`/auth/register`, userData);
   return response.data;
 };
 
@@ -20,7 +20,7 @@ export const login = async (
   params.append("username", userData.username);
   params.append("password", userData.password);
 
-  const response = await instance.post(`/auth/login`, params, {
+  const response = await myapiInstance.post(`/auth/login`, params, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
@@ -29,11 +29,11 @@ export const login = async (
 };
 
 export const logout = async () => {
-  const response = await instance.post(`/auth/logout`);
+  const response = await myapiInstance.post(`/auth/logout`);
   return response.data;
 };
 
 export const fetchCurrentUser = async () => {
-  const response = await instance.get(`/auth/me`);
+  const response = await myapiInstance.get(`/auth/me`);
   return response.data;
 };
