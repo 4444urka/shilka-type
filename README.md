@@ -9,6 +9,7 @@ Shilka Type - это современное веб-приложение для �
 ## 🚀 Технологический стек
 
 ### Frontend
+
 - **React 19** - UI библиотека
 - **TypeScript** - типизация
 - **Vite 7** - сборщик и dev-сервер
@@ -18,6 +19,7 @@ Shilka Type - это современное веб-приложение для �
 - **Framer Motion** - анимации
 
 ### Backend
+
 - **FastAPI** - веб-фреймворк
 - **SQLAlchemy** - ORM
 - **Alembic** - миграции БД
@@ -25,12 +27,14 @@ Shilka Type - это современное веб-приложение для �
 - **Poetry** - управление зависимостями Python
 
 ### DevOps
+
 - **Docker & Docker Compose** - контейнеризация
 - **Nginx** - веб-сервер (продакшен)
 
 ## 📦 Установка и запуск
 
 ### Требования
+
 - Node.js 20.19.0+ или 22.12.0+
 - Python 3.11+
 - Docker и Docker Compose (для контейнерного запуска)
@@ -39,6 +43,7 @@ Shilka Type - это современное веб-приложение для �
 ### Локальная разработка
 
 #### Frontend
+
 ```bash
 cd frontend
 yarn install
@@ -48,6 +53,7 @@ yarn dev
 Приложение будет доступно по адресу: http://localhost:5173
 
 #### Backend
+
 ```bash
 cd backend
 poetry install
@@ -60,11 +66,13 @@ API будет доступно по адресу: http://localhost:8000
 ### Docker (полный стек)
 
 #### Разработка
+
 ```bash
 docker-compose up --build
 ```
 
 #### Продакшен
+
 ```bash
 docker-compose -f docker-compose.prod.yml up --build
 ```
@@ -100,12 +108,14 @@ shilka-type/
 ## 🧪 Тестирование
 
 ### Frontend
+
 ```bash
 cd frontend
 yarn test
 ```
 
 ### Backend
+
 ```bash
 cd backend
 poetry run pytest
@@ -114,13 +124,17 @@ poetry run pytest
 ## 🔧 Переменные окружения
 
 ### Frontend
+
 Создайте `.env` файл в директории `frontend/`:
+
 ```env
 VITE_API_URL=http://localhost:8000
 ```
 
 ### Backend
+
 Создайте `.env` файл в директории `backend/`:
+
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/shilkatype
 SECRET_KEY=your-secret-key
@@ -131,6 +145,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 ## 📝 API Документация
 
 После запуска backend, API документация доступна по адресам:
+
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
@@ -152,7 +167,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
 4. Push в branch (`git push origin feature/AmazingFeature`)
 5. Откройте Pull Request
-
 
 ## 👥 Авторы
 
