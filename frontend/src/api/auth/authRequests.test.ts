@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { register, login, logout, fetchCurrentUser } from "./authRequests";
-import instance from "../index";
+import { myapiInstance } from "../index";
 
 // Мокируем axios instance
 vi.mock("../index");
@@ -23,11 +23,14 @@ describe("authRequests", () => {
           shilka_coins: 0,
         },
       };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       const result = await register(userData);
 
-      expect(instance.post).toHaveBeenCalledWith("/auth/register", userData);
+      expect(myapiInstance.post).toHaveBeenCalledWith(
+        "/auth/register",
+        userData
+      );
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -44,11 +47,11 @@ describe("authRequests", () => {
           token_type: "bearer",
         },
       };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       const result = await login(userData);
 
-      expect(instance.post).toHaveBeenCalledWith(
+      expect(myapiInstance.post).toHaveBeenCalledWith(
         "/auth/login",
         expect.any(URLSearchParams),
         {
@@ -68,11 +71,11 @@ describe("authRequests", () => {
       const mockResponse = {
         data: { access_token: "token", token_type: "bearer" },
       };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       await login(userData);
 
-      const callArgs = vi.mocked(instance.post).mock.calls[0];
+      const callArgs = vi.mocked(myapiInstance.post).mock.calls[0];
       const params = callArgs[1] as URLSearchParams;
 
       expect(params.get("username")).toBe("user");
@@ -83,11 +86,11 @@ describe("authRequests", () => {
   describe("logout", () => {
     it("должен отправлять POST запрос на /auth/logout", async () => {
       const mockResponse = { data: { message: "Logged out" } };
-      vi.mocked(instance.post).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.post).mockResolvedValue(mockResponse);
 
       const result = await logout();
 
-      expect(instance.post).toHaveBeenCalledWith("/auth/logout");
+      expect(myapiInstance.post).toHaveBeenCalledWith("/auth/logout");
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -101,11 +104,11 @@ describe("authRequests", () => {
           shilka_coins: 100,
         },
       };
-      vi.mocked(instance.get).mockResolvedValue(mockResponse);
+      vi.mocked(myapiInstance.get).mockResolvedValue(mockResponse);
 
       const result = await fetchCurrentUser();
 
-      expect(instance.get).toHaveBeenCalledWith("/auth/me");
+      expect(myapiInstance.get).toHaveBeenCalledWith("/auth/me");
       expect(result).toEqual(mockResponse.data);
     });
   });

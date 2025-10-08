@@ -1,11 +1,22 @@
 import { Box, Flex, Link, Icon, Text, type BoxProps } from "@chakra-ui/react";
+import React from "react";
 import { FaGithub, FaTelegram } from "react-icons/fa";
+import { getMyAppVer } from "../../api/github/githubRequests";
 
 interface FooterProps extends BoxProps {
   children?: React.ReactNode;
 }
 
 const Footer: React.FC<FooterProps> = () => {
+  const [version, setVersion] = React.useState<string>("");
+  React.useEffect(() => {
+    const fetchVersion = async () => {
+      const appVersion = await getMyAppVer();
+      setVersion(appVersion);
+    };
+    fetchVersion();
+  }, []);
+
   return (
     <Box as="footer" textStyle="body" bg="bgPage" py={6} px="200px" mt="auto">
       <Flex
@@ -15,7 +26,7 @@ const Footer: React.FC<FooterProps> = () => {
         gap={4}
       >
         <Text opacity={0.6} fontSize="md" textAlign="center">
-          &copy; shilkagod {new Date().getFullYear()}
+          &copy; shilkagod {new Date().getFullYear()} {version}
         </Text>
         <Flex gap={4} align="center">
           <Link

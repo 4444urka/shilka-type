@@ -3,12 +3,14 @@
 Использование:
     python -m scripts.seed_db
 """
+import asyncio
 import json
 import random
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import SessionLocal, engine, Base
+from src.database import AsyncSessionLocal, engine, Base
 from src.auth.models import User
 from src.stats.models import TypingSession
 from src.auth.utils import get_password_hash
@@ -102,7 +104,7 @@ def generate_typing_session(user_id: int, days_ago: int = 0) -> TypingSession:
     )
 
 
-def seed_users(db: Session, count: int = 10) -> list[User]:
+async def seed_users(db: AsyncSession, count: int = 10) -> list[User]:
     """Создает тестовых пользователей"""
     users = []
     
@@ -110,7 +112,8 @@ def seed_users(db: Session, count: int = 10) -> list[User]:
         username = f"{random.choice(USERNAMES)}{random.randint(1, 999)}"
         
         # Проверяем, что пользователь не существует
-        existing = db.query(User).filter(User.username == username).first()
+        result = await db.execute(select(User).filter(User.username == username))
+        existing = result.scalar_one_or_none()
         if existing:
             continue
         
@@ -123,16 +126,16 @@ def seed_users(db: Session, count: int = 10) -> list[User]:
         db.add(user)
         users.append(user)
     
-    db.commit()
+    await db.commit()
     
     # Обновляем ID пользователей
     for user in users:
-        db.refresh(user)
+        await db.refresh(user)
     
     return users
 
 
-def seed_sessions(db: Session, users: list[User], sessions_per_user: int = 20):
+async def seed_sessions(db: AsyncSession, users: list[User], sessions_per_user: int = 20):
     """Создает тестовые сессии печати для пользователей"""
     for user in users:
         for day in range(sessions_per_user):
@@ -145,43 +148,48 @@ def seed_sessions(db: Session, users: list[User], sessions_per_user: int = 20):
         
         print(f"✓ Создано {sessions_per_user * 2} сессий для пользователя {user.username}")
     
-    db.commit()
+    await db.commit()
     print(f"\n✓ Всего создано {sessions_per_user * 2 * len(users)} сессий")
 
 
-def main():
+async def main():
     """Основная функция для генерации тестовых данных"""
     print("🌱 Начинаем генерацию тестовых данных...\n")
     
     # Создаем таблицы, если их нет
-    Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     
-    # Создаем сессию БД
-    db = SessionLocal()
-    
-    try:
-        # Генерируем пользователей
-        print("👥 Создаем тестовых пользователей...")
-        users = seed_users(db, count=10)
-        print(f"✓ Создано {len(users)} пользователей\n")
-        
-        # Генерируем сессии печати
-        print("⌨️  Создаем тестовые сессии печати...")
-        seed_sessions(db, users, sessions_per_user=20)
-        
-        print("\n✅ Генерация тестовых данных завершена успешно!")
-        print("\n📊 Статистика:")
-        total_users = db.query(User).count()
-        total_sessions = db.query(TypingSession).count()
-        print(f"  - Всего пользователей в БД: {total_users}")
-        print(f"  - Всего сессий в БД: {total_sessions}")
-        
-    except Exception as e:
-        print(f"\n❌ Ошибка при генерации данных: {e}")
-        db.rollback()
-    finally:
-        db.close()
+    # Создаем async сессию БД
+    async with AsyncSessionLocal() as db:
+        try:
+            # Генерируем пользователей
+            print("👥 Создаем тестовых пользователей...")
+            users = await seed_users(db, count=10)
+            print(f"✓ Создано {len(users)} пользователей\n")
+            
+            # Генерируем сессии печати
+            print("⌨️  Создаем тестовые сессии печати...")
+            await seed_sessions(db, users, sessions_per_user=20)
+            
+            print("\n✅ Генерация тестовых данных завершена успешно!")
+            print("\n📊 Статистика:")
+            
+            # Подсчитываем общее количество
+            result_users = await db.execute(select(User))
+            total_users = len(result_users.scalars().all())
+            
+            result_sessions = await db.execute(select(TypingSession))
+            total_sessions = len(result_sessions.scalars().all())
+            
+            print(f"  - Всего пользователей в БД: {total_users}")
+            print(f"  - Всего сессий в БД: {total_sessions}")
+            
+        except Exception as e:
+            print(f"\n❌ Ошибка при генерации данных: {e}")
+            await db.rollback()
+            raise
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
