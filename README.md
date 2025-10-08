@@ -71,12 +71,6 @@ API будет доступно по адресу: http://localhost:8000
 docker-compose up --build
 ```
 
-#### Продакшен
-
-```bash
-docker-compose -f docker-compose.prod.yml up --build
-```
-
 ## 🏗️ Структура проекта
 
 ```
@@ -121,27 +115,6 @@ cd backend
 poetry run pytest
 ```
 
-## 🔧 Переменные окружения
-
-### Frontend
-
-Создайте `.env` файл в директории `frontend/`:
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-### Backend
-
-Создайте `.env` файл в директории `backend/`:
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/shilkatype
-SECRET_KEY=your-secret-key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
 ## 📝 API Документация
 
 После запуска backend, API документация доступна по адресам:
@@ -159,14 +132,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 - ✅ История тренировок
 - ✅ Система внутренней валюты (Shilka Coins)
 - ✅ Темная/светлая тема
-
-## 🤝 Вклад в проект
-
-1. Fork проекта
-2. Создайте feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Push в branch (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
 
 ## 👥 Авторы
 
