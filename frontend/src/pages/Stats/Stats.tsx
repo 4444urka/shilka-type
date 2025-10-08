@@ -44,7 +44,7 @@ const Stats = () => {
       />
 
       {/* ProfileInfoBar - на всю ширину */}
-      <Box gridColumn="1 / -1" >
+      <Box gridColumn="1 / -1">
         <ProfileInfoBar user={user} totalStats={totalStats} />
       </Box>
 

@@ -47,7 +47,7 @@ const Keyboard = () => {
               key={key}
               boxSize={"60px"}
               display="flex"
-              bg={getBackgroundForChar(key)}  
+              bg={getBackgroundForChar(key)}
               alignItems="center"
               justifyContent="center"
               border="1px solid"
