@@ -1,0 +1,45 @@
+{
+  "name": "shilka-type",
+  "version": "1.0.0",
+  "description": "Typing practice application with Russian and English support",
+  "private": true,
+  "scripts": {
+    "release": "semantic-release",
+    "prepare": "husky || true",
+    "commit": "git-cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/4444urka/shilka-type.git"
+  },
+  "keywords": [
+    "typing",
+    "practice",
+    "touch-typing",
+    "wpm",
+    "russian",
+    "english"
+  ],
+  "author": "4444urka",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/4444urka/shilka-type/issues"
+  },
+  "homepage": "https://github.com/4444urka/shilka-type#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.0.0",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.0.0",
+    "semantic-release": "^23.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
