@@ -2,9 +2,9 @@
 Конфигурация pytest и общие фикстуры для тестов
 """
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.pool import StaticPool
 
 from src.database import Base, get_db
@@ -12,46 +12,51 @@ from src.main import app
 from src.auth.models import User
 from src.auth.utils import get_password_hash
 
-# Создаём in-memory SQLite базу для тестов
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+# Создаём in-memory SQLite базу для тестов (async версия)
+SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
-engine = create_engine(
+engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = async_sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
 
 
-@pytest.fixture(scope="function")
-def db_session():
-    """Создаёт новую сессию БД для каждого теста"""
-    Base.metadata.create_all(bind=engine)
-    session = TestingSessionLocal()
-    try:
+@pytest_asyncio.fixture(scope="function")
+async def db_session():
+    """Создаёт новую async сессию БД для каждого теста"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
+    async with TestingSessionLocal() as session:
         yield session
-    finally:
-        session.close()
-        Base.metadata.drop_all(bind=engine)
+    
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture(scope="function")
-def client(db_session):
-    """Создаёт тестовый клиент FastAPI с тестовой БД"""
-    def override_get_db():
-        try:
-            yield db_session
-        finally:
-            pass
+@pytest_asyncio.fixture(scope="function")
+async def client(db_session):
+    """Создаёт async тестовый клиент FastAPI с тестовой БД"""
+    async def override_get_db():
+        yield db_session
     
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as test_client:
+    
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test"
+    ) as test_client:
         yield test_client
+    
     app.dependency_overrides.clear()
 
 
-@pytest.fixture(scope="function")
-def test_user(db_session):
+@pytest_asyncio.fixture(scope="function")
+async def test_user(db_session):
     """Создаёт тестового пользователя в БД"""
     user = User(
         username="testuser",
@@ -59,15 +64,15 @@ def test_user(db_session):
         shilka_coins=100
     )
     db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
+    await db_session.commit()
+    await db_session.refresh(user)
     return user
 
 
-@pytest.fixture(scope="function")
-def authenticated_client(client, test_user):
+@pytest_asyncio.fixture(scope="function")
+async def authenticated_client(client, test_user):
     """Возвращает клиент с авторизованным пользователем"""
-    response = client.post(
+    response = await client.post(
         "/auth/login",
         data={"username": "testuser", "password": "testpass123"}
     )

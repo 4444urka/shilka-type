@@ -9,17 +9,23 @@ packages = [{include="src"}]
 [tool.poetry.dependencies]
 python = "^3.13"
 fastapi = {extras = ["standard"], version = "^0.117.1"}
-sqlalchemy = "^2.0.43"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.43"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+asyncpg = "^0.30.0"
 psycopg2-binary = "^2.9.10"
 alembic = "^1.16.5"
 bcrypt = "^4.0.1"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+greenlet = "^3.1.1"
+redis = {extras = ["hiredis"], version = "^4.6.0"}
+fastapi-cache2 = {extras = ["redis"], version = "^0.2.2"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
 httpx = "^0.28.1"
 pytest-cov = "^7.0.0"
+pytest-asyncio = "^0.25.2"
+aiosqlite = "^0.20.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

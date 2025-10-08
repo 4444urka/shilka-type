@@ -12,7 +12,8 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
 
-from src.database import Base, DATABASE_URL  # noqa: E402
+from src.database import Base  # noqa: E402
+from src.config import settings  # noqa: E402
 # Ensure models are imported so that their metadata is registered
 from src.auth import models as auth_models  # noqa: F401,E402
 
@@ -20,8 +21,16 @@ from src.auth import models as auth_models  # noqa: F401,E402
 # access to the values within the .ini file in use.
 config = context.config
 
-# Use application database URL for migrations
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+# Create synchronous database URL for Alembic migrations (using psycopg2)
+DB_USER = settings.get("database").get("user")
+DB_PASSWORD = settings.get("database").get("password")
+DB_NAME = settings.get("database").get("db_name")
+DB_HOST = settings.get("database").get("host")
+DB_PORT = settings.get("database").get("port")
+SYNC_DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Use synchronous database URL for migrations
+config.set_main_option("sqlalchemy.url", SYNC_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
