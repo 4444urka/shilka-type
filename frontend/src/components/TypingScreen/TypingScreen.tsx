@@ -138,6 +138,10 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
               width="100%"
               textAlign="justify"
               position="relative"
+              css={{
+                textAlignLast: "justify",
+                hyphens: "none",
+              }}
             >
               {session.words.map((word, wordIndex) => (
                 <TypingWordComponent

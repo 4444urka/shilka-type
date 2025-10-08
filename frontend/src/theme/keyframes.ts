@@ -32,7 +32,7 @@ export const keyframes = defineKeyframes({
     to: { transform: "translateX(4px)" },
   },
   primaryColorChange: {
-    from: { color: "#d1d5db" },
-    to: { color: "#06b6d4" },
+    from: { color: "var(--chakra-colors-color-palette-muted)" },
+    to: { color: "var(--chakra-colors-primary-color)" },
   },
 });

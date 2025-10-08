@@ -34,9 +34,10 @@ const Stats = () => {
       p="20px"
       px="200px"
       display="grid"
-      gridTemplateColumns="repeat(8, 1fr)"
-      gridTemplateRows="auto auto auto"
+      gridTemplateColumns="repeat(12, 1fr)"
+      gridTemplateRows="auto"
       gap={4}
+      minHeight="calc(100vh - 140px)"
     >
       <LoadingScreen
         isLoading={isLoadingLeaderboard || isLoadingUser || isLoadingSessions}
@@ -47,24 +48,24 @@ const Stats = () => {
         <ProfileInfoBar user={user} totalStats={totalStats} />
       </Box>
 
-      {/* Leaderboard - 2 колонки из 8 */}
-      <Box gridColumn="1 / 3">
+      {/* Leaderboard - левая колонка (3 из 12) */}
+      <Box gridColumn={{ base: "1 / -1", lg: "1 / 4" }} gridRow="2 / 4">
         <Leaderboard leaderboard={leaderboard} />
       </Box>
 
-      {/* StatsChart - 6 колонок из 8 */}
-      <Box gridColumn="3 / -1">
+      {/* StatsChart - правая верхняя часть (9 из 12) */}
+      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} gridRow={{ lg: "2" }}>
         <StatsChart sessions={[...sessions].reverse()} />
       </Box>
 
-      {/* TypingHistory - 6 колонок из 8 */}
-      <Box gridColumn="1 / 5">
-        <TypingHistory sessions={sessions} />
+      {/* Keyboard - правая средняя часть (9 из 12) */}
+      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} gridRow={{ lg: "3" }}>
+        <Keyboard />
       </Box>
 
-      {/* Keyboard - 2 колонки из 8 */}
-      <Box gridColumn="5 / -1">
-        <Keyboard />
+      {/* TypingHistory - на всю ширину внизу */}
+      <Box gridColumn="1 / -1" gridRow={{ lg: "4" }}>
+        <TypingHistory sessions={sessions} />
       </Box>
     </Box>
   );

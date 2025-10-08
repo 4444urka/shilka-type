@@ -1,5 +1,6 @@
 import "./App.css";
 import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 import Homepage from "./pages/Homepage/Homepage";
 import { Route, Routes, useLocation } from "react-router";
 import SignUp from "./pages/SignUp/SignUp";
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/stats" element={<Stats />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      {isKnownRoute && <Footer />}
     </>
   );
 };

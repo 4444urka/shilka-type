@@ -2,8 +2,14 @@ import axios from "axios";
 import { store } from "../store";
 import { clearUser } from "../slices/userSlice";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+if (!import.meta.env.VITE_API_URL) {
+  console.warn("VITE_API_URL is not set. Using fallback URL:", apiUrl);
+}
+
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  baseURL: apiUrl,
   withCredentials: true,
 });
 
