@@ -24,10 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+          cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/github
+        run: npm ci
 
       - name: Run Semantic Release
         env:
