@@ -12,5 +12,10 @@ settings = {
         "secret_key": os.getenv("SECRET_KEY", "dev-secret-key-change-in-production"),
         "algorithm": os.getenv("ALGORITHM", "HS256"),
         "access_token_expire_minutes": int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    },
+    "redis": {
+        "host": os.getenv("REDIS_HOST", "redis"),
+        "port": int(os.getenv("REDIS_PORT", "6379")),
+        "db": int(os.getenv("REDIS_DB", "0"))
     }
 }
