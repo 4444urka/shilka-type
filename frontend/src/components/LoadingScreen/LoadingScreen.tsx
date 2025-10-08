@@ -22,9 +22,9 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading }) => {
       pointerEvents={isLoading ? "auto" : "none"}
       transition={"0.3s ease-in-out"}
     >
-      <Progress.Root width="300px" colorPalette={"cyan"} size="lg" value={null}>
+      <Progress.Root width="300px" size="lg" value={null}>
         <Progress.Track>
-          <Progress.Range />
+          <Progress.Range bg="primaryColor" />
         </Progress.Track>
       </Progress.Root>
     </Box>

@@ -3,9 +3,9 @@ services:
     image: postgres:latest
     container_name: shilka-db
     environment:
-      POSTGRES_USER: shilka-type
-      POSTGRES_PASSWORD: Churka98765
-      POSTGRES_DB: shilka-db
+      POSTGRES_USER: ${DB_USER:-shilka-type}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-shilka-db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -25,12 +25,12 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=shilka-type
-      - DB_PASSWORD=Churka98765
-      - DB_NAME=shilka-db
-      - SECRET_KEY=${SECRET_KEY:-MamaVadimaShalava}
+      - DB_USER=${DB_USER:-shilka-type}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-shilka-db}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
       - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=10080
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-10080}
     ports:
       - "8000:8000"
     depends_on:

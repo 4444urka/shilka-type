@@ -33,14 +33,14 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       </Text>
       <Box
         display="flex"
-        gap={currentUserIndex > 9 && currentUser ? 3 : 4}
+        gap={currentUserIndex > 12 && currentUser ? 6 : 7}
         flexDirection="column"
         alignItems="flex-start"
         w="100%"
       >
         {/* Топ 9 или топ 10 в зависимости от позиции пользователя */}
         {leaderboard
-          .slice(0, currentUserIndex > 9 ? 9 : 10)
+          .slice(0, currentUserIndex > 12 ? 12 : 13)
           .filter((u) => u && typeof u.id === "number" && !!u.username)
           .map((user, index) => (
             <Box
@@ -82,7 +82,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
           ))}
 
         {/* Разделитель и позиция пользователя, если он не в топ-10 */}
-        {currentUserIndex > 9 && currentUser && (
+        {currentUserIndex > 12 && currentUser && (
           <>
             <Box display="flex" justifyContent="center" w="100%">
               <Text color="textSecondary" fontSize="14px" fontWeight="bold">

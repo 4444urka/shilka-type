@@ -134,6 +134,7 @@ export const useTypingSession = ({
 
             prevChar.typed = false;
             prevChar.correct = false;
+            prevChar.time = undefined; // Удаляем время при backspace
             newSession.currentCharIndex = prevCharIndex;
 
             updateCursorPosition(
@@ -176,6 +177,10 @@ export const useTypingSession = ({
           if (currentChar) {
             currentChar.typed = true;
             currentChar.correct = currentChar.char === key;
+            // Записываем относительное время (миллисекунды с начала сессии)
+            currentChar.time = newSession.startTime
+              ? Date.now() - newSession.startTime
+              : 0;
 
             newSession.currentCharIndex++;
             updateCursorPosition(

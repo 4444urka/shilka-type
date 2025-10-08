@@ -2,6 +2,7 @@ export interface TypingChar {
   char: string;
   correct: boolean;
   typed: boolean;
+  time?: number; // Время нажатия в миллисекундах (timestamp)
 }
 
 export interface TypingWord {

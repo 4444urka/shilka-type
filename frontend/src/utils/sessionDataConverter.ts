@@ -13,14 +13,12 @@ export const convertSessionToPayload = (
   // Извлекаем оригинальные слова
   const words = session.words.map((word) => word.text);
 
-  // Конвертируем историю печати в формат API
+  // Конвертируем историю печати в формат API, используя реальное время нажатия
   const history = session.words.map((word) => {
-    return word.chars.map((char, index) => ({
+    return word.chars.map((char) => ({
       char: char.char,
       correct: char.typed ? char.correct : true, // Если символ не был напечатан, считаем правильным
-      time: session.startTime
-        ? session.startTime + index * 50 // Примерное время печати каждого символа
-        : Date.now(),
+      time: char.time || 0, // Используем реальное время нажатия из сессии
     }));
   });
 
