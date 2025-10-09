@@ -1,14 +1,29 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Button } from "@chakra-ui/react";
 import React from "react";
 import type { CharErrorResponse } from "../../types/CharErrorResponse";
 import { fetchCharErrors } from "../../api/stats/statsRequests";
 
+type KeyboardLanguage = "en" | "ru";
+
 const Keyboard = () => {
-  const keyboardLayout = [
-    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-    ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"],
-    ["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
-  ];
+  const [selectedLanguage, setSelectedLanguage] =
+    React.useState<KeyboardLanguage>("en");
+
+  const keyboardLayouts = {
+    en: [
+      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+      ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"],
+      ["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
+    ],
+    ru: [
+      ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х"],
+      ["ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э"],
+      ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ",", "."],
+    ],
+  };
+
+  const keyboardLayout = keyboardLayouts[selectedLanguage];
+
   const [charsErrorStats, setCharsErrorStats] = React.useState<
     CharErrorResponse[]
   >([]);
@@ -22,32 +37,73 @@ const Keyboard = () => {
   }, []);
 
   // Функция для получения цвета фона с альфа-каналом на основе процента ошибок
-  const getBackgroundForChar = (char: string): string => {
+  const getOpacityForChar = (char: string): number => {
     const charStat = charsErrorStats.find((stat) => stat.char === char);
-    if (!charStat) return ""; // Если нет данных - прозрачный фон
+    if (!charStat) return 0; // Если нет данных - прозрачный фон
 
     const errorRate = charStat.error_rate;
     // Преобразуем процент ошибок (0-100) в альфа-канал (0.3-1)
     // 0% ошибок = альфа 0.3 (почти прозрачный фон)
     // Чем больше ошибок, тем больше альфа (тем ярче/непрозрачнее фон)
-    const alpha = 0 + (errorRate / 100) * 2;
+    const alpha = 0 + errorRate / 100;
     const finalAlpha = Math.max(0, Math.min(1, alpha));
-    return `rgba(34, 211, 238, ${finalAlpha})`; // cyan цвет с изменяющейся прозрачностью
+    return finalAlpha;
   };
 
   return (
     <Box p={4} bg="bgCardColor" borderRadius="md" w="100%">
-      <Text mb={4} color="primaryColor" fontSize="20px">
-        Самые ошибочные символы
-      </Text>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={4}
+      >
+        <Text color="primaryColor" fontSize="20px">
+          Самые ошибочные символы
+        </Text>
+        <Box display="flex" gap={2}>
+          <Button
+            size="sm"
+            variant="ghost"
+            color={selectedLanguage === "en" ? "primaryColor" : undefined}
+            onClick={() => setSelectedLanguage("en")}
+            fontWeight="medium"
+            _hover={{
+              transform: "scale(1.02)",
+              transition: "all 0.2s",
+            }}
+            _active={{
+              transform: "scale(0.95)",
+            }}
+          >
+            English
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            color={selectedLanguage === "ru" ? "primaryColor" : undefined}
+            onClick={() => setSelectedLanguage("ru")}
+            fontWeight="medium"
+            _hover={{
+              transform: "scale(1.02)",
+              transition: "all 0.2s",
+            }}
+            _active={{
+              transform: "scale(0.95)",
+            }}
+          >
+            Русский
+          </Button>
+        </Box>
+      </Box>
       {keyboardLayout.map((row, rowIndex) => (
         <Box key={rowIndex} display="flex" justifyContent="center" mb={2}>
-          {row.map((key) => (
+          {row.map((key, keyIndex) => (
             <Box
-              key={key}
+              key={`${selectedLanguage}-${rowIndex}-${keyIndex}-${key}`}
               boxSize={"60px"}
+              animation="fadeIn 1s ease-in-out"
               display="flex"
-              bg={getBackgroundForChar(key)}
               alignItems="center"
               justifyContent="center"
               border="1px solid"
@@ -59,21 +115,37 @@ const Keyboard = () => {
               userSelect="none"
               transition="all 0.3s ease"
               position="relative"
+              overflow="hidden"
               _hover={{
                 borderColor: "primaryColor",
                 color: "primaryColor",
                 boxShadow: "sm",
               }}
+              _before={{
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bg: "primaryColor",
+                opacity: getOpacityForChar(key),
+                borderRadius: "inherit",
+                zIndex: 0,
+              }}
             >
-              {key}
-              {/* Насечки на клавишах F и J */}
-              {(key === "f" || key === "j") && (
+              <Box position="relative" zIndex={1}>
+                {key}
+              </Box>
+              {/* Насечки на клавишах F и J (English) или А и О (Russian) */}
+              {(key === "f" || key === "j" || key === "а" || key === "о") && (
                 <Box
                   position="absolute"
                   bottom="8px"
                   width="8px"
                   height="2px"
                   bg="currentColor"
+                  zIndex={1}
                 />
               )}
             </Box>
