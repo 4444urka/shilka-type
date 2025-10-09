@@ -59,7 +59,7 @@ export const TypingScreenStats = ({
           </Text>
         </VStack>
 
-        <VStack gap={1}>
+        <VStack gap={3}>
           <HStack gap={2}>
             <Text fontSize="lg" fontWeight="bold" color="successColor">
               {stats.correctChars}

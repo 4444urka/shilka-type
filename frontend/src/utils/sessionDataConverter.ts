@@ -8,7 +8,8 @@ export const convertSessionToPayload = (
   session: TypingSessionNew,
   duration: number,
   mode?: string,
-  language?: string
+  language?: string,
+  testType?: string
 ): WordHistoryPayload => {
   // Извлекаем оригинальные слова
   const words = session.words.map((word) => word.text);
@@ -30,5 +31,6 @@ export const convertSessionToPayload = (
     accuracy: session.stats.accuracy, // Передаем accuracy с фронтенда
     mode, // Добавляем режим
     language, // Добавляем язык
+    testType, // Добавляем тип теста
   };
 };

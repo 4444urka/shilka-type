@@ -15,9 +15,13 @@ const Homepage = () => {
 
   // Состояние настроек
   const [selectedTime, setSelectedTime] = useState(30);
+  const [selectedWords, setSelectedWords] = useState(25);
   const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ru">("en");
   const [selectedMode, setSelectedMode] = useState<"words" | "sentences">(
     "words"
+  );
+  const [selectedTestType, setSelectedTestType] = useState<"time" | "words">(
+    "time"
   );
 
   const { words, refreshWords } = useGetRandomWords(
@@ -33,6 +37,7 @@ const Homepage = () => {
     enabled: isAuthed,
     mode: selectedMode,
     language: selectedLanguage,
+    testType: selectedTestType,
   });
 
   const handleTypingComplete = useCallback(
@@ -56,6 +61,8 @@ const Homepage = () => {
     initialTime: selectedTime,
     onComplete: handleTypingComplete,
     onTimeUp: handleTimeUp,
+    testType: selectedTestType,
+    wordsCount: selectedWords,
   });
 
   React.useEffect(() => {
@@ -77,7 +84,6 @@ const Homepage = () => {
   const handleTimeChange = useCallback(
     (time: number) => {
       setSelectedTime(time);
-      // Если сессия еще не началась, сбрасываем ее при изменении времени
       if (!session.isStarted) {
         resetSession();
       }
@@ -85,18 +91,36 @@ const Homepage = () => {
     [session.isStarted, resetSession]
   );
 
+  const handleWordsChange = useCallback(
+    (words: number) => {
+      setSelectedWords(words);
+      if (!session.isStarted) {
+        resetSession();
+        refreshWords();
+      }
+    },
+    [session.isStarted, resetSession, refreshWords]
+  );
+
   const handleLanguageChange = useCallback((language: "en" | "ru") => {
     setSelectedLanguage(language);
-    // Здесь в будущем можно добавить логику смены языка
   }, []);
 
   const handleModeChange = useCallback(
     (mode: "words" | "sentences") => {
       setSelectedMode(mode);
-      // Генерируем новые слова при смене режима
       refreshWords();
     },
     [refreshWords]
+  );
+
+  const handleTestTypeChange = useCallback(
+    (testType: "time" | "words") => {
+      setSelectedTestType(testType);
+      refreshWords();
+      resetSession();
+    },
+    [refreshWords, resetSession]
   );
 
   return (
@@ -117,14 +141,22 @@ const Homepage = () => {
           onKeyPress={handleKeyPress}
           onRestart={handleRestart}
           selectedTime={selectedTime}
+          selectedWords={selectedWords}
           selectedLanguage={selectedLanguage}
           selectedMode={selectedMode}
+          selectedTestType={selectedTestType}
           onTimeChange={handleTimeChange}
+          onWordsChange={handleWordsChange}
           onLanguageChange={handleLanguageChange}
           onModeChange={handleModeChange}
+          onTestTypeChange={handleTestTypeChange}
         />
       ) : (
-        <VictoryScreen session={session} shilkaCoins={shilkaCoins} />
+        <VictoryScreen
+          session={session}
+          shilkaCoins={shilkaCoins}
+          testType={selectedTestType}
+        />
       )}
     </Box>
   );

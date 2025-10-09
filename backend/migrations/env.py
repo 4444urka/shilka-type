@@ -15,7 +15,8 @@ if BASE_DIR not in sys.path:
 from src.database import Base  # noqa: E402
 from src.config import settings  # noqa: E402
 # Ensure models are imported so that their metadata is registered
-from src.auth import models as auth_models  # noqa: F401,E402
+from src.auth import models as auth_models  # noqa: E402
+from src.stats import models as stats_models  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
