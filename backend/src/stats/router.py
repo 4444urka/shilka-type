@@ -54,6 +54,9 @@ async def post_typing_session(
     db: AsyncSession = Depends(get_db),
 ):
     
+    # Логируем полученные данные для отладки
+    print(f"Received payload: mode={payload.mode}, language={payload.language}, test_type={payload.test_type}")
+    
     # Получаем метрики (приоритет у значений с фронтенда)
     wpm = payload.calculate_wpm()
     accuracy = payload.calculate_accuracy()
@@ -86,6 +89,7 @@ async def post_typing_session(
         history=history_json,
         typing_mode=payload.mode,
         language=payload.language,
+        test_type=payload.test_type,
     )
     
     db.add(typing_session)
@@ -103,6 +107,7 @@ async def post_typing_session(
         duration=typing_session.duration,
         typing_mode=typing_session.typing_mode,
         language=typing_session.language,
+        test_type=typing_session.test_type,
         created_at=typing_session.created_at.isoformat(),
     )
 
@@ -132,6 +137,7 @@ async def get_typing_sessions(
             duration=session.duration,
             typing_mode=session.typing_mode,
             language=session.language,
+            test_type=session.test_type,
             created_at=session.created_at.isoformat(),
         )
         for session in sessions

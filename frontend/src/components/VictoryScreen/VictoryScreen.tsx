@@ -12,11 +12,13 @@ export interface VictoryScreenProps extends BoxProps {
   shilkaCoins: {
     value: number;
   };
+  testType?: "time" | "words";
 }
 
 const VictoryScreen: React.FC<VictoryScreenProps> = ({
   session,
   shilkaCoins,
+  testType,
 }) => {
   const dispatch = useAppDispatch();
   const isAuthed = useIsAuthed();
@@ -29,6 +31,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       }
     })();
   }, [shilkaCoins.value, isAuthed, dispatch]);
+
   return (
     <Box
       animation="fadeIn 0.5s ease-in-out"
@@ -44,8 +47,11 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         gap={2}
         flexDirection="row"
       >
-        Время:
-        <Text as="span">{session.initialTime}</Text>
+        {testType == "time" ? (
+          <Text as="span">Время: {session.initialTime}с</Text>
+        ) : (
+          <Text as="span">Слова: {session.words.length}</Text>
+        )}
       </Text>
       <Text
         textStyle="body"

@@ -7,6 +7,7 @@ interface UseSessionDataSyncProps {
   enabled?: boolean;
   mode?: string;
   language?: string;
+  testType?: string;
 }
 
 /**
@@ -16,6 +17,7 @@ export const useSessionDataSync = ({
   enabled = true,
   mode,
   language,
+  testType,
 }: UseSessionDataSyncProps = {}) => {
   const dataSentRef = useRef<boolean>(false);
 
@@ -42,7 +44,8 @@ export const useSessionDataSync = ({
           session,
           duration,
           mode,
-          language
+          language,
+          testType
         );
 
         console.log("Отправляем данные сессии на сервер:", {
@@ -52,7 +55,10 @@ export const useSessionDataSync = ({
           accuracy: session.stats.accuracy,
           mode: payload.mode,
           language: payload.language,
+          testType: payload.testType,
         });
+
+        console.log("Полный payload:", JSON.stringify(payload, null, 2));
 
         await postWordHistory(payload);
         console.log("Данные сессии успешно отправлены на сервер");
@@ -61,7 +67,7 @@ export const useSessionDataSync = ({
         dataSentRef.current = false; // Сбрасываем флаг при ошибке
       }
     },
-    [enabled, mode, language]
+    [enabled, mode, language, testType]
   );
 
   const resetSyncState = useCallback(() => {

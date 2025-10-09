@@ -5,5 +5,6 @@ export type TypingSession = {
   duration: number | null;
   typing_mode: string | null;
   language: string | null;
+  test_type: string | null;
   created_at: string;
 };

@@ -1,31 +1,46 @@
 import { Box, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { MdAccessTimeFilled, MdTextFields, MdSubject } from "react-icons/md";
+import {
+  MdAccessTimeFilled,
+  MdTextFields,
+  MdSubject,
+  MdFunctions,
+} from "react-icons/md";
 
 const MotionBox = motion(Box);
 
 type ModeType = "words" | "sentences";
+type TestType = "time" | "words";
 
 interface SettingsBarProps {
   isVisible: boolean;
   selectedTime: number;
+  selectedWords: number;
   selectedLanguage: "en" | "ru";
   selectedMode: ModeType;
+  selectedTestType: TestType;
   onTimeChange: (time: number) => void;
+  onWordsChange: (words: number) => void;
   onLanguageChange: (language: "en" | "ru") => void;
   onModeChange: (mode: ModeType) => void;
+  onTestTypeChange: (testType: TestType) => void;
 }
 
 const SettingsBar: React.FC<SettingsBarProps> = ({
   isVisible,
   selectedTime,
+  selectedWords,
   selectedLanguage,
   selectedMode,
+  selectedTestType,
   onTimeChange,
+  onWordsChange,
   onLanguageChange,
   onModeChange,
+  onTestTypeChange,
 }) => {
   const timeOptions = [15, 30, 60, 120];
+  const wordsOptions = [10, 25, 50, 100];
   const languageOptions = [
     { code: "en" as const, name: "English" },
     { code: "ru" as const, name: "Русский" },
@@ -34,22 +49,33 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
     { code: "words" as const, name: "Слова", icon: MdTextFields },
     { code: "sentences" as const, name: "Предложения", icon: MdSubject },
   ];
+  const testTypeOptions = [
+    { code: "time" as const, name: "Время", icon: MdAccessTimeFilled },
+    { code: "words" as const, name: "Слова", icon: MdFunctions },
+  ];
 
   const handleTimeChange = (time: number) => {
     onTimeChange(time);
-    // Убираем фокус с кнопки после клика
+    (document.activeElement as HTMLElement)?.blur();
+  };
+
+  const handleWordsChange = (words: number) => {
+    onWordsChange(words);
     (document.activeElement as HTMLElement)?.blur();
   };
 
   const handleLanguageChange = (language: "en" | "ru") => {
     onLanguageChange(language);
-    // Убираем фокус с кнопки после клика
     (document.activeElement as HTMLElement)?.blur();
   };
 
   const handleModeChange = (mode: ModeType) => {
     onModeChange(mode);
-    // Убираем фокус с кнопки после клика
+    (document.activeElement as HTMLElement)?.blur();
+  };
+
+  const handleTestTypeChange = (testType: TestType) => {
+    onTestTypeChange(testType);
     (document.activeElement as HTMLElement)?.blur();
   };
 
@@ -72,46 +98,100 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
       backdropFilter="blur(16px)"
       textStyle="input"
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        gap={2}
-        color="primaryColor"
-        fontSize="sm"
-        fontWeight="medium"
-      >
-        <MdAccessTimeFilled />
-        Время
-      </Box>
-      {/* Разделитель */}
-      <Box width="1px" height="32px" bg="primaryColor" />
-
-      {/* Настройка времени */}
+      {/* Переключатель типа теста */}
       <Box display="flex" alignItems="center" gap={3}>
         <Box display="flex" gap={2}>
-          {timeOptions.map((time) => (
-            <Button
-              key={time}
-              size="sm"
-              variant="ghost"
-              color={selectedTime === time ? "primaryColor" : undefined}
-              onClick={() => handleTimeChange(time)}
-              onMouseDown={(e) => e.preventDefault()} // Предотвращаем фокус при клике мышью
-              minW="60px"
-              fontWeight="medium"
-              _hover={{
-                transform: "scale(1.02)",
-                transition: "all 0.2s",
-              }}
-              _active={{
-                transform: "scale(0.95)",
-              }}
-            >
-              {time}с
-            </Button>
-          ))}
+          {testTypeOptions.map((testType) => {
+            const IconComponent = testType.icon;
+            return (
+              <Button
+                key={testType.code}
+                size="sm"
+                variant="ghost"
+                color={
+                  selectedTestType === testType.code
+                    ? "primaryColor"
+                    : undefined
+                }
+                onClick={() => handleTestTypeChange(testType.code)}
+                onMouseDown={(e) => e.preventDefault()}
+                minW="100px"
+                fontWeight="medium"
+                display="flex"
+                alignItems="center"
+                gap={2}
+                _hover={{
+                  transform: "scale(1.02)",
+                  transition: "all 0.2s",
+                }}
+                _active={{
+                  transform: "scale(0.95)",
+                }}
+              >
+                <IconComponent />
+                {testType.name}
+              </Button>
+            );
+          })}
         </Box>
       </Box>
+
+      <Box width="1px" height="32px" bg="primaryColor" />
+
+      {/* Настройка времени или количества слов */}
+      {selectedTestType === "time" ? (
+        <Box display="flex" alignItems="center" gap={3}>
+          <Box display="flex" gap={2}>
+            {timeOptions.map((time) => (
+              <Button
+                key={time}
+                size="sm"
+                variant="ghost"
+                color={selectedTime === time ? "primaryColor" : undefined}
+                onClick={() => handleTimeChange(time)}
+                onMouseDown={(e) => e.preventDefault()}
+                minW="60px"
+                fontWeight="medium"
+                _hover={{
+                  transform: "scale(1.02)",
+                  transition: "all 0.2s",
+                }}
+                _active={{
+                  transform: "scale(0.95)",
+                }}
+              >
+                {time}с
+              </Button>
+            ))}
+          </Box>
+        </Box>
+      ) : (
+        <Box display="flex" alignItems="center" gap={3}>
+          <Box display="flex" gap={2}>
+            {wordsOptions.map((words) => (
+              <Button
+                key={words}
+                size="sm"
+                variant="ghost"
+                color={selectedWords === words ? "primaryColor" : undefined}
+                onClick={() => handleWordsChange(words)}
+                onMouseDown={(e) => e.preventDefault()}
+                minW="60px"
+                fontWeight="medium"
+                _hover={{
+                  transform: "scale(1.02)",
+                  transition: "all 0.2s",
+                }}
+                _active={{
+                  transform: "scale(0.95)",
+                }}
+              >
+                {words}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+      )}
 
       {/* Разделитель */}
       <Box width="1px" height="32px" bg="primaryColor" />

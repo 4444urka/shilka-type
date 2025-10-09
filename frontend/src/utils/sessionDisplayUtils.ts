@@ -102,3 +102,37 @@ export const getLanguageDisplay = (
     }
   );
 };
+
+export interface TestTypeDisplay {
+  label: string;
+  icon: string;
+  color: string;
+}
+
+/**
+ * Получить красивое отображение типа теста
+ */
+export const getTestTypeDisplay = (
+  testType: string | null
+): TestTypeDisplay => {
+  const testTypes: Record<string, TestTypeDisplay> = {
+    time: {
+      label: "По времени",
+      icon: "⏱️",
+      color: "purple.500",
+    },
+    words: {
+      label: "По словам",
+      icon: "🔢",
+      color: "cyan.500",
+    },
+  };
+
+  return (
+    testTypes[testType || ""] || {
+      label: testType || "Неизвестно",
+      icon: "❓",
+      color: "gray.500",
+    }
+  );
+};

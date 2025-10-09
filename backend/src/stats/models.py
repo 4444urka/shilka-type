@@ -14,8 +14,9 @@ class TypingSession(Base):
     duration = Column(Integer, nullable=True)  # секунды
     words = Column(Text, nullable=False)  # JSON строка списка слов
     history = Column(Text, nullable=False)  # JSON строка истории
-    typing_mode = Column(Text, nullable=True)  # режим набора (words, time, quote, etc.)
+    typing_mode = Column(Text, nullable=True)  # режим набора (words, sentences, etc.)
     language = Column(Text, nullable=True)  # язык (ru, en, etc.)
+    test_type = Column(Text, nullable=True)  # тип теста (time, words)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Связь с пользователем

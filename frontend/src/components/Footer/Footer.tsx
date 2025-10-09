@@ -25,8 +25,16 @@ const Footer: React.FC<FooterProps> = () => {
         align="center"
         gap={4}
       >
-        <Text opacity={0.6} fontSize="md" textAlign="center">
-          &copy; shilkagod {new Date().getFullYear()} {version}
+        <Text
+          opacity={0.6}
+          fontSize="md"
+          textAlign="center"
+          display="flex"
+          flexDirection="row"
+          gap={2}
+        >
+          &copy; shilkagod {new Date().getFullYear()}
+          <Text animation="fadeIn 1s ease-in-out">{version}</Text>
         </Text>
         <Flex gap={4} align="center">
           <Link

@@ -15,11 +15,15 @@ interface TypingScreenProps {
   onRestart: () => void;
   // Пропсы для настроек
   selectedTime: number;
+  selectedWords: number;
   selectedLanguage: "en" | "ru";
   selectedMode: "words" | "sentences";
+  selectedTestType: "time" | "words";
   onTimeChange: (time: number) => void;
+  onWordsChange: (words: number) => void;
   onLanguageChange: (language: "en" | "ru") => void;
   onModeChange: (mode: "words" | "sentences") => void;
+  onTestTypeChange: (testType: "time" | "words") => void;
 }
 
 const TypingScreen: React.FC<TypingScreenProps> = ({
@@ -29,11 +33,15 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   onKeyPress,
   onRestart,
   selectedTime,
+  selectedWords,
   selectedLanguage,
   selectedMode,
+  selectedTestType,
   onTimeChange,
+  onWordsChange,
   onLanguageChange,
   onModeChange,
+  onTestTypeChange,
 }) => {
   const pressedKeysRef = React.useRef<Set<string>>(new Set());
 
@@ -114,11 +122,15 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
         <SettingsBar
           isVisible={!session.isStarted}
           selectedTime={selectedTime}
+          selectedWords={selectedWords}
           selectedLanguage={selectedLanguage}
           selectedMode={selectedMode}
+          selectedTestType={selectedTestType}
           onTimeChange={onTimeChange}
+          onWordsChange={onWordsChange}
           onLanguageChange={onLanguageChange}
           onModeChange={onModeChange}
+          onTestTypeChange={onTestTypeChange}
         />
       )}
       <Box display="flex" flexDirection="column" alignItems="center" gap={6}>

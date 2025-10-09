@@ -3,6 +3,7 @@ import type { TypingSession } from "../../types/TypingSession";
 import {
   getModeDisplay,
   getLanguageDisplay,
+  getTestTypeDisplay,
 } from "../../utils/sessionDisplayUtils";
 
 export interface TypingHistoryProps extends BoxProps {
@@ -30,6 +31,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
         {sessions.map((session) => {
           const modeDisplay = getModeDisplay(session.typing_mode);
           const languageDisplay = getLanguageDisplay(session.language);
+          const testTypeDisplay = getTestTypeDisplay(session.test_type);
 
           return (
             <Box
@@ -56,8 +58,19 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                       .slice(0, -3)}
                   </Text>
 
-                  {/* Бейджи для режима и языка */}
+                  {/* Бейджи для режима, языка и типа теста */}
                   <Flex gap={2}>
+                    {session.test_type && (
+                      <Badge
+                        colorScheme="purple"
+                        variant="subtle"
+                        fontSize="sm"
+                        px={2}
+                        py={1}
+                      >
+                        {testTypeDisplay.icon} {testTypeDisplay.label}
+                      </Badge>
+                    )}
                     {session.typing_mode && (
                       <Badge
                         colorScheme="blue"
