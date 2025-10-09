@@ -28,7 +28,7 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "✨ Новые возможности" },
+            { "type": "feat", "section": "🤯 Новые возможности" },
             { "type": "fix", "section": "🐛 Исправления" },
             { "type": "perf", "section": "⚡ Производительность" },
             { "type": "revert", "section": "⏪ Откаты" },

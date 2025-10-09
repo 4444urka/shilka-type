@@ -20,6 +20,7 @@ describe("calculateTotalStats", () => {
         duration: 120,
         typing_mode: "normal",
         language: "ru",
+        test_type: "time",
         created_at: "2024-01-01T00:00:00Z",
       },
     ];
@@ -39,6 +40,7 @@ describe("calculateTotalStats", () => {
         duration: 60,
         typing_mode: "normal",
         language: "ru",
+        test_type: "time",
         created_at: "2024-01-01T00:00:00Z",
       },
       {
@@ -48,6 +50,7 @@ describe("calculateTotalStats", () => {
         duration: 120,
         typing_mode: "normal",
         language: "ru",
+        test_type: "words",
         created_at: "2024-01-02T00:00:00Z",
       },
     ];
@@ -69,6 +72,7 @@ describe("calculateTotalStats", () => {
         duration: 90,
         typing_mode: "normal",
         language: "ru",
+        test_type: "time",
         created_at: "2024-01-01T00:00:00Z",
       },
     ];

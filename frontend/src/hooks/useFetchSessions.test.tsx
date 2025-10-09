@@ -13,8 +13,8 @@ describe("useFetchSessions", () => {
 
   it("должен загружать сессии успешно", async () => {
     const mockSessions = [
-      { id: 1, wpm: 60, accuracy: 95, duration: 120, typing_mode: "normal", language: "ru", created_at: "2025-10-03" },
-      { id: 2, wpm: 70, accuracy: 97, duration: 180, typing_mode: "normal", language: "ru", created_at: "2025-10-02" },
+      { id: 1, wpm: 60, accuracy: 95, duration: 120, typing_mode: "normal", language: "ru", test_type: "time", created_at: "2025-10-03" },
+      { id: 2, wpm: 70, accuracy: 97, duration: 180, typing_mode: "normal", language: "ru", test_type: "words", created_at: "2025-10-02" },
     ];
     vi.mocked(fetchTypingSessions).mockResolvedValue(mockSessions);
 
@@ -54,7 +54,7 @@ describe("useFetchSessions", () => {
 
   it("должен устанавливать isLoading в false после завершения", async () => {
     const mockSessions = [
-      { id: 1, wpm: 60, accuracy: 95, duration: 120, typing_mode: "normal", language: "ru", created_at: "2025-10-03" },
+      { id: 1, wpm: 60, accuracy: 95, duration: 120, typing_mode: "normal", language: "ru", test_type: "time", created_at: "2025-10-03" },
     ];
     vi.mocked(fetchTypingSessions).mockResolvedValue(mockSessions);
 
