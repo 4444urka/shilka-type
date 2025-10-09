@@ -29,22 +29,30 @@ describe("TypingScreenStats", () => {
   });
 
   it("должен форматировать время как MM:SS", () => {
-    renderWithProviders(<TypingScreenStats {...defaultProps} displayTime={30} />);
+    renderWithProviders(
+      <TypingScreenStats {...defaultProps} displayTime={30} />
+    );
     expect(screen.getByText("0:30")).toBeInTheDocument();
   });
 
   it("должен корректно форматировать время больше минуты", () => {
-    renderWithProviders(<TypingScreenStats {...defaultProps} displayTime={90} />);
+    renderWithProviders(
+      <TypingScreenStats {...defaultProps} displayTime={90} />
+    );
     expect(screen.getByText("1:30")).toBeInTheDocument();
   });
 
   it("должен добавлять ведущий ноль для секунд меньше 10", () => {
-    renderWithProviders(<TypingScreenStats {...defaultProps} displayTime={65} />);
+    renderWithProviders(
+      <TypingScreenStats {...defaultProps} displayTime={65} />
+    );
     expect(screen.getByText("1:05")).toBeInTheDocument();
   });
 
   it("должен корректно форматировать время = 0", () => {
-    renderWithProviders(<TypingScreenStats {...defaultProps} displayTime={0} />);
+    renderWithProviders(
+      <TypingScreenStats {...defaultProps} displayTime={0} />
+    );
     expect(screen.getByText("0:00")).toBeInTheDocument();
   });
 
@@ -102,7 +110,11 @@ describe("TypingScreenStats", () => {
     };
 
     renderWithProviders(
-      <TypingScreenStats {...defaultProps} stats={bigStats} displayTime={3600} />
+      <TypingScreenStats
+        {...defaultProps}
+        stats={bigStats}
+        displayTime={3600}
+      />
     );
 
     expect(screen.getByText("150")).toBeInTheDocument();
@@ -112,9 +124,7 @@ describe("TypingScreenStats", () => {
   });
 
   it("должен применять правильные цвета к элементам", () => {
-    renderWithProviders(
-      <TypingScreenStats {...defaultProps} />
-    );
+    renderWithProviders(<TypingScreenStats {...defaultProps} />);
 
     // Проверяем, что элементы существуют и отображаются
     const wpmElement = screen.getByText("75");

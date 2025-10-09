@@ -116,6 +116,8 @@ describe("TypingHistory", () => {
     const { container } = renderWithProviders(
       <TypingHistory sessions={mockSessions} data-testid="custom-history" />
     );
-    expect(container.querySelector('[data-testid="custom-history"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="custom-history"]')
+    ).toBeInTheDocument();
   });
 });

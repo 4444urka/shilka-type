@@ -31,12 +31,14 @@ describe("SettingsBar", () => {
 
   describe("Переключатель типа теста", () => {
     it("должен отображать кнопки 'Время' и 'Слова'", () => {
-      renderWithProviders(<SettingsBar {...defaultProps} selectedTestType="time" />);
+      renderWithProviders(
+        <SettingsBar {...defaultProps} selectedTestType="time" />
+      );
 
       // Получаем все кнопки "Время" и "Слова"
       const timeButtons = screen.getAllByRole("button", { name: /Время/i });
       const wordsButtons = screen.getAllByRole("button", { name: /Слова/i });
-      
+
       // Должна быть одна кнопка "Время" (в переключателе типа теста)
       expect(timeButtons).toHaveLength(1);
       // Должно быть две кнопки "Слова" - одна в типе теста, одна в режиме
@@ -44,8 +46,10 @@ describe("SettingsBar", () => {
     });
 
     it("должен выделять активный тип теста", () => {
-      renderWithProviders(<SettingsBar {...defaultProps} selectedTestType="time" />);
-      
+      renderWithProviders(
+        <SettingsBar {...defaultProps} selectedTestType="time" />
+      );
+
       const timeButton = screen.getByRole("button", { name: /Время/i });
       expect(timeButton).toBeInTheDocument();
     });
@@ -60,7 +64,7 @@ describe("SettingsBar", () => {
       // Кликаем на первую кнопку "Слова" (которая в типе теста)
       const wordsButtons = screen.getAllByRole("button", { name: /Слова/i });
       await user.click(wordsButtons[0]);
-      
+
       expect(onTestTypeChange).toHaveBeenCalledWith("words");
     });
   });
@@ -80,7 +84,9 @@ describe("SettingsBar", () => {
       renderWithProviders(
         <SettingsBar {...defaultProps} selectedTestType="words" />
       );
-      expect(screen.queryByRole("button", { name: "15с" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "15с" })
+      ).not.toBeInTheDocument();
     });
 
     it("должен вызывать onTimeChange при клике на время", async () => {
@@ -116,7 +122,9 @@ describe("SettingsBar", () => {
       renderWithProviders(
         <SettingsBar {...defaultProps} selectedTestType="time" />
       );
-      expect(screen.queryByRole("button", { name: "10" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "10" })
+      ).not.toBeInTheDocument();
     });
 
     it("должен вызывать onWordsChange при клике на количество", async () => {
@@ -140,7 +148,9 @@ describe("SettingsBar", () => {
   describe("Настройки режима", () => {
     it("должен отображать кнопки 'Слова' и 'Предложения'", () => {
       renderWithProviders(<SettingsBar {...defaultProps} />);
-      const modeButtons = screen.getAllByRole("button", { name: /Слова|Предложения/i });
+      const modeButtons = screen.getAllByRole("button", {
+        name: /Слова|Предложения/i,
+      });
       expect(modeButtons.length).toBeGreaterThanOrEqual(2);
     });
 
@@ -151,7 +161,9 @@ describe("SettingsBar", () => {
         <SettingsBar {...defaultProps} onModeChange={onModeChange} />
       );
 
-      const sentencesButton = screen.getByRole("button", { name: /Предложения/i });
+      const sentencesButton = screen.getByRole("button", {
+        name: /Предложения/i,
+      });
       await user.click(sentencesButton);
 
       expect(onModeChange).toHaveBeenCalledWith("sentences");
@@ -161,8 +173,12 @@ describe("SettingsBar", () => {
   describe("Настройки языка", () => {
     it("должен отображать кнопки 'English' и 'Русский'", () => {
       renderWithProviders(<SettingsBar {...defaultProps} />);
-      expect(screen.getByRole("button", { name: "English" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Русский" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "English" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Русский" })
+      ).toBeInTheDocument();
     });
 
     it("должен вызывать onLanguageChange при клике", async () => {

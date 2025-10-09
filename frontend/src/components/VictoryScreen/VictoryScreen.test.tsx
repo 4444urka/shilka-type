@@ -98,7 +98,9 @@ describe("VictoryScreen", () => {
       },
     };
 
-    renderWithProviders(<VictoryScreen {...defaultProps} />, { preloadedState });
+    renderWithProviders(<VictoryScreen {...defaultProps} />, {
+      preloadedState,
+    });
     expect(screen.getByText("+90")).toBeInTheDocument();
   });
 
@@ -111,7 +113,9 @@ describe("VictoryScreen", () => {
       },
     };
 
-    renderWithProviders(<VictoryScreen {...defaultProps} />, { preloadedState });
+    renderWithProviders(<VictoryScreen {...defaultProps} />, {
+      preloadedState,
+    });
     expect(screen.queryByText("+90")).not.toBeInTheDocument();
   });
 

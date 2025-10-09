@@ -4,12 +4,7 @@ import useGetRandomWords from "./useGetRandomWords";
 
 // Мокируем сервисы
 vi.mock("../utils/getRandomRussianWords", () => ({
-  getRandomRussianWords: vi.fn(() => [
-    "тест",
-    "слово",
-    "проверка",
-    "функция",
-  ]),
+  getRandomRussianWords: vi.fn(() => ["тест", "слово", "проверка", "функция"]),
 }));
 
 vi.mock("../utils/getRandomRussianSentences", () => ({
@@ -122,7 +117,8 @@ describe("useGetRandomWords", () => {
   describe("Обновление при изменении параметров", () => {
     it("должен обновлять слова при изменении языка", async () => {
       const { result, rerender } = renderHook(
-        ({ lang }: { lang: "en" | "ru" }) => useGetRandomWords(2, 5, 250, lang, "words"),
+        ({ lang }: { lang: "en" | "ru" }) =>
+          useGetRandomWords(2, 5, 250, lang, "words"),
         { initialProps: { lang: "en" as "en" | "ru" } }
       );
 
@@ -140,7 +136,8 @@ describe("useGetRandomWords", () => {
 
     it("должен обновлять слова при изменении режима", async () => {
       const { result, rerender } = renderHook(
-        ({ mode }: { mode: "words" | "sentences" }) => useGetRandomWords(2, 5, 250, "ru", mode),
+        ({ mode }: { mode: "words" | "sentences" }) =>
+          useGetRandomWords(2, 5, 250, "ru", mode),
         { initialProps: { mode: "words" as "words" | "sentences" } }
       );
 
