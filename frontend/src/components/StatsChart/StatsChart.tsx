@@ -6,7 +6,6 @@ import {
   Legend,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -65,45 +64,43 @@ export const StatsChart: React.FC<StatsChartProps> = ({ sessions }) => {
       </Text>
 
       <Chart.Root chart={chart} width="100%" height={500}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={chartData}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey="date" tick={{ opacity: 0 }} stroke="#2d3748" />
-            <YAxis
-              tick={{ fontSize: 12, fill: "#718096" }}
-              stroke="#2d3748"
-              domain={[0, 100]}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: bgCardColor,
-                border: `1px solid ${borderColor}`,
-                borderRadius: "8px",
-                color: textColor,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: "14px" }} iconType="line" />
-            <Line
-              type="monotone"
-              dot={false}
-              dataKey="wpm"
-              stroke={chart.color("primaryColor")}
-              strokeWidth={3}
-              name="WPM"
-            />
-            <Line
-              type="monotone"
-              dot={false}
-              dataKey="accuracy"
-              stroke={chart.color("gray.400")}
-              strokeWidth={3}
-              name="Accuracy (%)"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <LineChart
+          data={chartData}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <XAxis dataKey="date" tick={{ opacity: 0 }} stroke="#2d3748" />
+          <YAxis
+            tick={{ fontSize: 12, fill: "#718096" }}
+            stroke="#2d3748"
+            domain={[0, 100]}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: bgCardColor,
+              border: `1px solid ${borderColor}`,
+              borderRadius: "8px",
+              color: textColor,
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: "14px" }} iconType="line" />
+          <Line
+            type="monotone"
+            dot={false}
+            dataKey="wpm"
+            stroke={chart.color("primaryColor")}
+            strokeWidth={3}
+            name="WPM"
+          />
+          <Line
+            type="monotone"
+            dot={false}
+            dataKey="accuracy"
+            stroke={chart.color("gray.400")}
+            strokeWidth={3}
+            name="Accuracy (%)"
+          />
+        </LineChart>
       </Chart.Root>
     </Box>
   );

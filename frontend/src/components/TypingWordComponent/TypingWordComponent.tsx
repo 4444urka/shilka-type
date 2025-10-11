@@ -4,7 +4,7 @@ import type { TypingWord } from "../../types/TypingTypes";
 import { TypingCharacter } from "../TypingCharacter/TypingCharacter";
 import Cursor from "../Cursor/Cursor";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 interface TypingWordProps {
   word: TypingWord;

@@ -1,0 +1,20 @@
+/**
+ * Application-wide constants
+ */
+
+export const LEADERBOARD_CONFIG = {
+  TOP_USERS_COUNT: 12,
+  CURRENT_USER_POSITION: 13,
+} as const;
+
+export const TYPING_CONFIG = {
+  STATS_UPDATE_DEBOUNCE_MS: 100,
+  TIMER_INTERVAL_MS: 1000,
+  DEFAULT_TIME_MODE_DURATION: 60,
+  DEFAULT_WORDS_MODE_COUNT: 50,
+} as const;
+
+export const API_CONFIG = {
+  REQUEST_TIMEOUT_MS: 30000,
+  RETRY_ATTEMPTS: 3,
+} as const;

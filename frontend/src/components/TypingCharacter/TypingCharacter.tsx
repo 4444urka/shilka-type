@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import type { TypingChar } from "../../types/TypingTypes";
 import Cursor from "../Cursor/Cursor";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 interface TypingCharacterProps {
   char: TypingChar;
