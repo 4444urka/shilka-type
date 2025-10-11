@@ -140,6 +140,7 @@ const Keyboard = () => {
               {/* Насечки на клавишах F и J (English) или А и О (Russian) */}
               {(key === "f" || key === "j" || key === "а" || key === "о") && (
                 <Box
+                  data-testid="key-notch"
                   position="absolute"
                   bottom="8px"
                   width="8px"
