@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 import type { TypingSessionNew } from "../types/TypingTypes";
 import { postWordHistory } from "../api/stats/statsRequests";
 import { convertSessionToPayload } from "../utils/sessionDataConverter";
+import { logger } from "../utils/logger";
 
 interface UseSessionDataSyncProps {
   enabled?: boolean;
@@ -24,12 +25,12 @@ export const useSessionDataSync = ({
   const sendSessionData = useCallback(
     async (session: TypingSessionNew) => {
       if (!enabled) {
-        console.log("Отправка данных на сервер отключена");
+        logger.log("Отправка данных на сервер отключена");
         return;
       }
 
       if (dataSentRef.current) {
-        console.log("Данные уже были отправлены на сервер");
+        logger.log("Данные уже были отправлены на сервер");
         return;
       }
 
@@ -48,7 +49,7 @@ export const useSessionDataSync = ({
           testType
         );
 
-        console.log("Отправляем данные сессии на сервер:", {
+        logger.log("Отправляем данные сессии на сервер:", {
           duration,
           wordsCount: payload.words.length,
           wpm: session.stats.wpm,
@@ -58,12 +59,12 @@ export const useSessionDataSync = ({
           testType: payload.testType,
         });
 
-        console.log("Полный payload:", JSON.stringify(payload, null, 2));
+        logger.log("Полный payload:", JSON.stringify(payload, null, 2));
 
         await postWordHistory(payload);
-        console.log("Данные сессии успешно отправлены на сервер");
+        logger.log("Данные сессии успешно отправлены на сервер");
       } catch (error) {
-        console.error("Ошибка при отправке данных сессии:", error);
+        logger.error("Ошибка при отправке данных сессии:", error);
         dataSentRef.current = false; // Сбрасываем флаг при ошибке
       }
     },

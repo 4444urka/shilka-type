@@ -2,7 +2,7 @@ import { Box, Text, HStack, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import type { TypingStats } from "../../types/TypingTypes";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 interface TypingStatsProps {
   stats: TypingStats;

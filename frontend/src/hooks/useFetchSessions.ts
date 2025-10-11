@@ -1,6 +1,7 @@
 import React from "react";
 import type { TypingSession } from "../types/TypingSession";
 import { fetchTypingSessions } from "../api/stats/statsRequests";
+import { logger } from "../utils/logger";
 
 const useFetchSessions = () => {
   const [sessions, setSessions] = React.useState<TypingSession[]>([]);
@@ -12,7 +13,7 @@ const useFetchSessions = () => {
         const data = await fetchTypingSessions();
         setSessions(data);
       } catch (error) {
-        console.error("Error fetching sessions:", error);
+        logger.error("Error fetching sessions:", error);
       } finally {
         setIsLoading(false);
       }

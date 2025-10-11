@@ -7,7 +7,7 @@ import {
   MdFunctions,
 } from "react-icons/md";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 type ModeType = "words" | "sentences";
 type TestType = "time" | "words";

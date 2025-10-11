@@ -1,8 +1,9 @@
-import { Box, type BoxProps, Text, Avatar } from "@chakra-ui/react";
+import { Box, type BoxProps, Text } from "@chakra-ui/react";
 import React from "react";
-import { FaCrown } from "react-icons/fa";
-import type { Me } from "../../types/User";
+import { LEADERBOARD_CONFIG } from "../../config/constants";
 import { useAppSelector } from "../../store";
+import type { Me } from "../../types/User";
+import { LeaderboardItem } from "../LeaderboardItem/LeaderboardItem";
 
 export interface LeaderboardProps extends BoxProps {
   leaderboard: Me[];
@@ -10,10 +11,24 @@ export interface LeaderboardProps extends BoxProps {
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
   const currentUser = useAppSelector((state) => state.user.user);
-  const [currentUserIndex, setCurrentUserIndex] = React.useState(-1);
-  React.useEffect(() => {
-    console.log(leaderboard, currentUser);
-    setCurrentUserIndex(leaderboard.findIndex((u) => u.id === currentUser?.id));
+
+  // Используем useMemo для оптимизации вычислений
+  const { topUsers, currentUserIndex, showCurrentUser } = React.useMemo(() => {
+    const userIndex = leaderboard.findIndex((u) => u.id === currentUser?.id);
+    const isUserBelowTop = userIndex > LEADERBOARD_CONFIG.TOP_USERS_COUNT;
+
+    return {
+      topUsers: leaderboard
+        .slice(
+          0,
+          isUserBelowTop
+            ? LEADERBOARD_CONFIG.TOP_USERS_COUNT
+            : LEADERBOARD_CONFIG.CURRENT_USER_POSITION
+        )
+        .filter((u) => u && typeof u.id === "number" && !!u.username),
+      currentUserIndex: userIndex,
+      showCurrentUser: isUserBelowTop && currentUser,
+    };
   }, [leaderboard, currentUser]);
   return (
     <Box
@@ -33,85 +48,29 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       </Text>
       <Box
         display="flex"
-        gap={currentUserIndex > 12 && currentUser ? 6 : 7}
+        gap={showCurrentUser ? 6 : 7}
         flexDirection="column"
         alignItems="flex-start"
         w="100%"
       >
-        {/* Топ 9 или топ 10 в зависимости от позиции пользователя */}
-        {leaderboard
-          .slice(0, currentUserIndex > 12 ? 12 : 13)
-          .filter((u) => u && typeof u.id === "number" && !!u.username)
-          .map((user, index) => (
-            <Box
-              key={user.id}
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              gap={3}
-              w="100%"
-              justifyContent="flex-start"
-              transition="all 0.2s"
-            >
-              <Text color="primaryColor" minW="30px">
-                {index + 1}.
-              </Text>
-              {index === 0 ? (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  width="32px"
-                  height="32px"
-                  color="primaryColor"
-                  animation="primaryColorChange 1.5s ease-in-out"
-                >
-                  <FaCrown size={24} />
-                </Box>
-              ) : (
-                <Avatar.Root size="sm">
-                  <Avatar.Fallback />
-                  <Avatar.Image />
-                </Avatar.Root>
-              )}
-              <Text flexShrink={0}>{user.username}</Text>
-              <Text color="primaryColor" ml="auto">
-                {Number(user.shilka_coins ?? 0)}
-              </Text>
-            </Box>
-          ))}
+        {/* Топ пользователей */}
+        {topUsers.map((user, index) => (
+          <LeaderboardItem key={user.id} user={user} index={index} />
+        ))}
 
-        {/* Разделитель и позиция пользователя, если он не в топ-10 */}
-        {currentUserIndex > 12 && currentUser && (
+        {/* Разделитель и позиция текущего пользователя, если он не в топе */}
+        {showCurrentUser && (
           <>
             <Box display="flex" justifyContent="center" w="100%">
               <Text color="textSecondary" fontSize="14px" fontWeight="bold">
                 ...
               </Text>
             </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              gap={3}
-              w="100%"
-              justifyContent="flex-start"
-              bg="rgba(var(--primary-color-rgb), 0.15)"
-            >
-              <Text color="primaryColor" minW="30px">
-                {currentUserIndex + 1}.
-              </Text>
-              <Avatar.Root size="sm">
-                <Avatar.Fallback />
-                <Avatar.Image />
-              </Avatar.Root>
-              <Text flexShrink={0} fontWeight="bold">
-                {currentUser.username}
-              </Text>
-              <Text color="primaryColor" ml="auto" fontWeight="bold">
-                {Number(currentUser.shilka_coins ?? 0)}
-              </Text>
-            </Box>
+            <LeaderboardItem
+              user={showCurrentUser}
+              index={currentUserIndex}
+              isCurrentUser
+            />
           </>
         )}
       </Box>
