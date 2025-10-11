@@ -88,7 +88,7 @@ export const useTypingSession = ({
       let wpm = 0;
       const timeElapsed =
         testType === "time"
-          ? initialTime - timeLeft
+          ? (initialTime - timeLeft) * 1000
           : (currentSession.endTime || Date.now()) -
             (currentSession.startTime || Date.now());
 
