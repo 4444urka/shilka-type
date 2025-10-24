@@ -1,17 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Footer from "./Footer";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { system } from "../../theme";
 
-// Мокаем GitHub API запрос
-vi.mock("../../api/github/githubRequests", () => ({
-  getMyAppVer: vi.fn().mockResolvedValue("v1.0.0"),
-}));
-
 describe("Footer", () => {
-  it("должен содержать ссылку на GitHub", async () => {
+  it("должен содержать ссылку на GitHub", () => {
     render(
       <BrowserRouter>
         <ChakraProvider value={system}>
@@ -31,7 +26,7 @@ describe("Footer", () => {
     expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("должен содержать ссылку на Telegram", async () => {
+  it("должен содержать ссылку на Telegram", () => {
     render(
       <BrowserRouter>
         <ChakraProvider value={system}>

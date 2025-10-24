@@ -48,9 +48,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         flexDirection="row"
       >
         {testType == "time" ? (
-          <Box as="span">Время: {session.initialTime}с</Box>
+          <Text as="span">Время: {session.initialTime}с</Text>
         ) : (
-          <Box as="span">Слова: {session.words.length}</Box>
+          <Text as="span">Слова: {session.words.length}</Text>
         )}
       </Text>
       <Text
@@ -61,9 +61,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         flexDirection="row"
       >
         WPM:
-        <Box as="span" color="primaryColor">
+        <Text as="span" color="primaryColor">
           {session.stats.wpm}
-        </Box>
+        </Text>
       </Text>
 
       <Text
@@ -74,9 +74,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         flexDirection="row"
       >
         Accuracy:
-        <Box as="span" color="gray.400">
+        <Text as="span" color="gray.400">
           {session.stats.accuracy.toFixed(0)}%
-        </Box>
+        </Text>
       </Text>
 
       <Text
@@ -87,20 +87,13 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         flexDirection="row"
       >
         Символы:
-        <Box as="span" fontWeight="bold" color="successColor">
+        <Text fontWeight="bold" color="successColor">
           {session.stats.correctChars}
-        </Box>
-        <Box as="span" color="gray.400">
-          /
-        </Box>
-        <Box
-          as="span"
-          fontWeight="bold"
-          color="errorColor"
-          textDecoration="underline"
-        >
+        </Text>
+        <Text color="gray.400">/</Text>
+        <Text fontWeight="bold" color="errorColor" textDecoration="underline">
           {session.stats.incorrectChars}
-        </Box>
+        </Text>
       </Text>
       <RestartButton onClick={() => window.location.reload()} />
       {isAuthed ? (
