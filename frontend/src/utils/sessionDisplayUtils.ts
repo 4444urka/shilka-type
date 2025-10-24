@@ -122,7 +122,7 @@ export const getTestTypeDisplay = (
       color: "purple.500",
     },
     words: {
-      label: "По словам",
+      label: "Количество слов",
       icon: "🔢",
       color: "cyan.500",
     },
