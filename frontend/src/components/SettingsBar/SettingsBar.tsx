@@ -1,11 +1,12 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import {
   MdAccessTimeFilled,
-  MdTextFields,
-  MdSubject,
   MdFunctions,
+  MdSubject,
+  MdTextFields,
 } from "react-icons/md";
+import SettingsBarButton from "../SettingsBarButton/SettingsBarButton";
 
 const MotionBox = motion.create(Box);
 
@@ -104,10 +105,8 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           {testTypeOptions.map((testType) => {
             const IconComponent = testType.icon;
             return (
-              <Button
+              <SettingsBarButton
                 key={testType.code}
-                size="sm"
-                variant="ghost"
                 color={
                   selectedTestType === testType.code
                     ? "primaryColor"
@@ -115,22 +114,10 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                 }
                 onClick={() => handleTestTypeChange(testType.code)}
                 onMouseDown={(e) => e.preventDefault()}
-                minW="100px"
-                fontWeight="medium"
-                display="flex"
-                alignItems="center"
-                gap={2}
-                _hover={{
-                  transform: "scale(1.02)",
-                  transition: "all 0.2s",
-                }}
-                _active={{
-                  transform: "scale(0.95)",
-                }}
               >
                 <IconComponent />
                 {testType.name}
-              </Button>
+              </SettingsBarButton>
             );
           })}
         </Box>
@@ -143,25 +130,13 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         <Box display="flex" alignItems="center" gap={3}>
           <Box display="flex" gap={2}>
             {timeOptions.map((time) => (
-              <Button
+              <SettingsBarButton
                 key={time}
-                size="sm"
-                variant="ghost"
                 color={selectedTime === time ? "primaryColor" : undefined}
                 onClick={() => handleTimeChange(time)}
-                onMouseDown={(e) => e.preventDefault()}
-                minW="60px"
-                fontWeight="medium"
-                _hover={{
-                  transform: "scale(1.02)",
-                  transition: "all 0.2s",
-                }}
-                _active={{
-                  transform: "scale(0.95)",
-                }}
               >
                 {time}с
-              </Button>
+              </SettingsBarButton>
             ))}
           </Box>
         </Box>
@@ -169,25 +144,13 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         <Box display="flex" alignItems="center" gap={3}>
           <Box display="flex" gap={2}>
             {wordsOptions.map((words) => (
-              <Button
+              <SettingsBarButton
                 key={words}
-                size="sm"
-                variant="ghost"
                 color={selectedWords === words ? "primaryColor" : undefined}
                 onClick={() => handleWordsChange(words)}
-                onMouseDown={(e) => e.preventDefault()}
-                minW="60px"
-                fontWeight="medium"
-                _hover={{
-                  transform: "scale(1.02)",
-                  transition: "all 0.2s",
-                }}
-                _active={{
-                  transform: "scale(0.95)",
-                }}
               >
                 {words}
-              </Button>
+              </SettingsBarButton>
             ))}
           </Box>
         </Box>
@@ -202,29 +165,14 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           {modeOptions.map((mode) => {
             const IconComponent = mode.icon;
             return (
-              <Button
+              <SettingsBarButton
                 key={mode.code}
-                size="sm"
-                variant="ghost"
                 color={selectedMode === mode.code ? "primaryColor" : undefined}
                 onClick={() => handleModeChange(mode.code)}
-                onMouseDown={(e) => e.preventDefault()}
-                minW="120px"
-                fontWeight="medium"
-                display="flex"
-                alignItems="center"
-                gap={2}
-                _hover={{
-                  transform: "scale(1.02)",
-                  transition: "all 0.2s",
-                }}
-                _active={{
-                  transform: "scale(0.95)",
-                }}
               >
                 <IconComponent />
                 {mode.name}
-              </Button>
+              </SettingsBarButton>
             );
           })}
         </Box>
@@ -237,27 +185,15 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
       <Box display="flex" alignItems="center" gap={3}>
         <Box display="flex" gap={2}>
           {languageOptions.map((language) => (
-            <Button
+            <SettingsBarButton
               key={language.code}
-              size="sm"
-              variant="ghost"
               color={
                 selectedLanguage === language.code ? "primaryColor" : undefined
               }
               onClick={() => handleLanguageChange(language.code)}
-              onMouseDown={(e) => e.preventDefault()}
-              minW="80px"
-              fontWeight="medium"
-              _hover={{
-                transform: "scale(1.02)",
-                transition: "all 0.2s",
-              }}
-              _active={{
-                transform: "scale(0.95)",
-              }}
             >
               {language.name}
-            </Button>
+            </SettingsBarButton>
           ))}
         </Box>
       </Box>

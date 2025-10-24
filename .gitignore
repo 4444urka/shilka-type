@@ -7,8 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 *coverage
+coverage.xml
 __pycache__
 __pycache__/*
+*.venv
+*.pytest_cache
+*htmlcov
+.husky
+.release-scripts
 
 node_modules
 dist

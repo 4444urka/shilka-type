@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME:-shilka-db}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     restart: unless-stopped
     healthcheck:
       test:
@@ -17,6 +17,20 @@ services:
         ]
       interval: 10s
       timeout: 5s
+      retries: 5
+    networks:
+      - shilka-network
+  redis:
+    image: redis:latest
+    container_name: shilka-redis-prod
+    command: redis-server --appendonly yes --save "" --replica-read-only no --replica-serve-stale-data no
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
       retries: 5
     networks:
       - shilka-network
@@ -32,11 +46,16 @@ services:
       - DB_USER=${DB_USER:-shilka-type}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME:-shilka-db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -59,6 +78,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   shilka-network:
