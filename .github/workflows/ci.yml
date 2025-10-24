@@ -166,6 +166,6 @@ jobs:
             cd /home/vpn/shilka-type/
             git fetch origin
             git reset --hard origin/develop
-            docker compose -f docker-compose.prod.yml down -v
+            docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml up --build -d
             docker system prune -f
