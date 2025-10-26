@@ -70,6 +70,10 @@ services:
     container_name: shilka-frontend-prod
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:/root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:ro
+      - /root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:/root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:ro
     depends_on:
       - backend
     restart: unless-stopped
