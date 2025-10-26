@@ -70,7 +70,7 @@ services:
     container_name: shilka-frontend-prod
     ports:
       - "80:80"
-      - "558:558"
+      - "443:443"
     volumes:
       - /root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:/root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:ro
       - /root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:/root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:ro
