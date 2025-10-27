@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Input,
@@ -64,6 +64,36 @@ const ThemeUploader: React.FC<ThemeUploaderProps> = ({ onThemeCreated }) => {
       successColor: { value: "green.600" },
     },
   };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handler = (e: KeyboardEvent) => {
+      e.stopPropagation();
+
+      const navKeys = [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        " ",
+        "Space",
+        "Enter",
+        "Escape",
+      ];
+
+      try {
+        const key = (e as KeyboardEvent).key;
+        if (navKeys.includes(key)) e.preventDefault();
+      } catch {
+        /* ignore */
+      }
+    };
+
+    // use capture phase to intercept events before other listeners
+    document.addEventListener("keydown", handler, true);
+    return () => document.removeEventListener("keydown", handler, true);
+  }, [open]);
 
   return (
     <>
