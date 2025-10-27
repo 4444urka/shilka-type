@@ -28,17 +28,17 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "🤯 Новые возможности" },
-            { "type": "fix", "section": "🐛 Исправления" },
-            { "type": "perf", "section": "⚡ Производительность" },
-            { "type": "revert", "section": "⏪ Откаты" },
-            { "type": "docs", "section": "📝 Документация" },
-            { "type": "style", "section": "💄 Стилизация" },
-            { "type": "refactor", "section": "♻️ Рефакторинг" },
-            { "type": "test", "section": "✅ Тесты" },
-            { "type": "build", "section": "🏗️ Сборка" },
-            { "type": "ci", "section": "👷 CI/CD" },
-            { "type": "chore", "section": "🔧 Прочее", "hidden": true }
+            { "type": "feat", "section": "Новые возможности" },
+            { "type": "fix", "section": "Исправления" },
+            { "type": "perf", "section": "Производительность" },
+            { "type": "revert", "section": "Откаты" },
+            { "type": "docs", "section": "Документация" },
+            { "type": "style", "section": "Стилизация" },
+            { "type": "refactor", "section": "Рефакторинг" },
+            { "type": "test", "section": "Тесты" },
+            { "type": "build", "section": "Сборка" },
+            { "type": "ci", "section": "CI/CD" },
+            { "type": "chore", "section": "Прочее", "hidden": true }
           ]
         }
       }
@@ -47,7 +47,7 @@
       "@semantic-release/changelog",
       {
         "changelogFile": "CHANGELOG.md",
-        "changelogTitle": "# 📋 История изменений"
+        "changelogTitle": "# История изменений"
       }
     ],
     [
