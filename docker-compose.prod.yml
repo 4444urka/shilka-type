@@ -51,7 +51,8 @@ services:
       - REDIS_DB=0
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - ALLOW_ORIGINS=${ALLOW_ORIGINS:-*}
     depends_on:
       postgres:
         condition: service_healthy
