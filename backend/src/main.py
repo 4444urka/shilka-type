@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .auth.router import router as auth_router
 from .stats.router import router as stats_router
+from .theme.router import router as theme_router
 from .database import Base, engine
 from .redis_client import redis_client
 
@@ -48,6 +49,7 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(stats_router, prefix="/api/stats", tags=["stats"])
+app.include_router(theme_router, prefix="/api/themes", tags=["themes"])
 
 
 @app.get("/health")

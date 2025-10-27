@@ -9,7 +9,6 @@ interface RestartButtonProps extends IconButtonProps {
 const RestartButton: React.FC<RestartButtonProps> = ({ onClick, ...rest }) => {
   const handleClick = () => {
     onClick();
-    // Убираем фокус с кнопки после клика
     (document.activeElement as HTMLElement)?.blur();
   };
 

@@ -12,8 +12,6 @@ const Homepage = () => {
   const isAuthed = useIsAuthed();
   const [showResults, setShowResults] = useState(false);
   const [shilkaCoins, setShilkaCoins] = useState({ value: 0 });
-
-  // Состояние настроек
   const [selectedTime, setSelectedTime] = useState(30);
   const [selectedWords, setSelectedWords] = useState(25);
   const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ru">("en");

@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
-import { ChakraProvider } from "@chakra-ui/react";
+import ChakraWithNextTheme from "./theme/ChakraWithNextTheme";
 import { Provider } from "react-redux";
 import { store } from "./store";
-import { system } from "./theme/index.ts";
+// system import removed — Chakra system is built dynamically inside ChakraWithNextTheme
 import { ThemeProvider } from "next-themes";
 
 createRoot(document.getElementById("root")!).render(
@@ -14,9 +14,9 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ChakraProvider value={system}>
+          <ChakraWithNextTheme>
             <App />
-          </ChakraProvider>
+          </ChakraWithNextTheme>
         </ThemeProvider>
       </BrowserRouter>
     </Provider>
