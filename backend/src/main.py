@@ -36,14 +36,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS origins для разработки и продакшена
-origins = [
-    "http://localhost:5173",
-]
-
-# Добавляем дополнительные origins из переменных окружения
-additional_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
-origins.extend([origin.strip() for origin in additional_origins if origin.strip()])
+origins = os.getenv("ALLOW_ORIGINS", "").split(",")
 
 app.add_middleware(
     CORSMiddleware,

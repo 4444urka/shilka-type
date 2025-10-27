@@ -129,10 +129,7 @@ const SignUp = () => {
           </Button>
 
           <Text as="span" color="primaryColor" textStyle="input">
-            Уже есть аккаунт?{" "}
-            <NavLink to="/signin" style={{ textDecoration: "underline wavy" }}>
-              Войти
-            </NavLink>
+            Уже есть аккаунт? <NavLink to="/signin">Войти</NavLink>
           </Text>
         </Stack>
       </Box>

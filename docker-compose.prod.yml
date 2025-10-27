@@ -51,7 +51,8 @@ services:
       - REDIS_DB=0
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - ALLOW_ORIGINS=${ALLOW_ORIGINS:-*}
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,6 +71,10 @@ services:
     container_name: shilka-frontend-prod
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:/root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:ro
+      - /root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:/root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:ro
     depends_on:
       - backend
     restart: unless-stopped
