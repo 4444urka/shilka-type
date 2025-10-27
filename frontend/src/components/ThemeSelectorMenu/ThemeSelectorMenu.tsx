@@ -83,7 +83,12 @@ const ThemeSelectorMenu: React.FC = () => {
   // with a specific toast implementation
   const { setTheme } = useNextTheme();
   const { open, onOpen, onClose } = useDisclosure();
+  const isClient =
+    typeof window !== "undefined" && typeof document !== "undefined";
   const load = async () => {
+    // protect against calling browser-only APIs in SSR / test node env
+    if (!isClient) return;
+
     setLoading(true);
     try {
       const [pub, mine, sel] = await Promise.all([
@@ -102,8 +107,34 @@ const ThemeSelectorMenu: React.FC = () => {
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    // only run on client; also avoid setting state after unmount
+    if (!isClient) return;
+    let cancelled = false;
+
+    (async () => {
+      setLoading(true);
+      try {
+        const [pub, mine, sel] = await Promise.all([
+          getPublicThemes(),
+          getMyThemes(),
+          getSelectedTheme(),
+        ]);
+        if (cancelled) return;
+        setPublicThemes(pub || []);
+        setMyThemes(mine || []);
+        setSelected(sel || null);
+      } catch (err) {
+        if (!cancelled) console.error("Failed to load themes", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // we intentionally don't depend on load() to avoid re-creating the effect
+  }, [isClient]);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -150,11 +181,13 @@ const ThemeSelectorMenu: React.FC = () => {
     );
     // dispatch event to rebuild system with preview data
     try {
-      document.dispatchEvent(
-        new CustomEvent("shilka:previewTheme", {
-          detail: t?.theme_data as CustomThemeData,
-        })
-      );
+      if (typeof document !== "undefined") {
+        document.dispatchEvent(
+          new CustomEvent("shilka:previewTheme", {
+            detail: t?.theme_data as CustomThemeData,
+          })
+        );
+      }
     } catch (err) {
       console.error("Failed to dispatch preview event", err);
     }
@@ -211,20 +244,32 @@ const ThemeSelectorMenu: React.FC = () => {
       // persist custom theme data and switch next-themes to 'custom'
       if (sel?.theme_data) {
         console.debug("handleSelect: setting localStorage", sel.theme_data);
-        localStorage.setItem(
-          "shilka:customTheme",
-          JSON.stringify(sel.theme_data)
-        );
-        setTheme("custom");
-        // notify chakra bridge in same tab that custom theme changed
-        try {
-          document.dispatchEvent(
-            new CustomEvent("shilka:customThemeChanged", {
-              detail: sel.theme_data,
-            })
-          );
-        } catch (e) {
-          console.debug("shilka:customThemeChanged dispatch failed", e);
+        if (isClient) {
+          try {
+            localStorage.setItem(
+              "shilka:customTheme",
+              JSON.stringify(sel.theme_data)
+            );
+          } catch (e) {
+            console.debug("localStorage set failed", e);
+          }
+
+          try {
+            setTheme("custom");
+          } catch (e) {
+            console.debug("setTheme failed in test/SSR environment", e);
+          }
+
+          // notify chakra bridge in same tab that custom theme changed
+          try {
+            document.dispatchEvent(
+              new CustomEvent("shilka:customThemeChanged", {
+                detail: sel.theme_data,
+              })
+            );
+          } catch (e) {
+            console.debug("shilka:customThemeChanged dispatch failed", e);
+          }
         }
       }
       previewTheme(null);
