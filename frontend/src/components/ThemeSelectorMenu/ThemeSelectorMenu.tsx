@@ -26,6 +26,7 @@ import {
   type Theme,
 } from "../../api/themes/themesRequests";
 import ThemeUploader from "../ThemeUploader/ThemeUploader";
+import ThemeSelectorSwatch from "../ThemeSelectorSwatch/ThemeSelectorSwatch";
 
 type CustomThemeData = {
   colors?: Record<
@@ -36,42 +37,6 @@ type CustomThemeData = {
   >;
   [k: string]: unknown;
 } | null;
-
-const Swatch: React.FC<{
-  bgColor?: string;
-  primaryColor?: string;
-  textColor?: string;
-}> = ({ bgColor, primaryColor, textColor }) => {
-  return (
-    <HStack
-      gap={1}
-      align="center"
-      fontSize="xs"
-      p={1}
-      borderRadius="md"
-      bg="bgCardColor"
-    >
-      <Box
-        width="28px"
-        height="18px"
-        borderRadius="4px"
-        bg={bgColor || "transparent"}
-      />
-      <Box
-        width="28px"
-        height="18px"
-        borderRadius="4px"
-        bg={primaryColor || "transparent"}
-      />
-      <Box
-        width="28px"
-        height="18px"
-        borderRadius="4px"
-        bg={textColor || "transparent"}
-      />
-    </HStack>
-  );
-};
 
 const ThemeSelectorMenu: React.FC = () => {
   const [publicThemes, setPublicThemes] = useState<Theme[]>([]);
@@ -308,7 +273,22 @@ const ThemeSelectorMenu: React.FC = () => {
         }}
         _hover={{ bg: "bgCardColor" }}
         _focus={{ outline: "none" }}
-        bg={isFocused ? "bgCardSecondaryColor" : undefined}
+        _before={
+          isFocused
+            ? {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                opacity: 0.5,
+                bg: "primaryColor",
+                borderRadius: "inherit",
+                zIndex: 0,
+              }
+            : undefined
+        }
         position="relative"
       >
         <HStack justify="space-between" width="full">
@@ -319,12 +299,19 @@ const ThemeSelectorMenu: React.FC = () => {
               justifyContent="space-between"
               w="full"
             >
-              <Text fontSize="sm">{t.name}</Text>
-              <Text fontSize="xs" opacity="0.6">
+              <Text fontSize="sm" zIndex={1}>
+                {t.name}
+              </Text>
+              <Text fontSize="xs" opacity="0.6" zIndex={1}>
                 @{t.author_username}
               </Text>
             </VStack>
-            <Swatch bgColor={bg} primaryColor={primary} textColor={text} />
+            <ThemeSelectorSwatch
+              bgColor={bg}
+              primaryColor={primary}
+              textColor={text}
+              bgOpacity={isFocused ? 0 : 0.3}
+            />
           </HStack>
 
           {selectingId === t.id ? <Spinner size="xs" /> : null}
