@@ -70,24 +70,6 @@ const ThemeUploader: React.FC<ThemeUploaderProps> = ({ onThemeCreated }) => {
 
     const handler = (e: KeyboardEvent) => {
       e.stopPropagation();
-
-      const navKeys = [
-        "ArrowUp",
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        " ",
-        "Space",
-        "Enter",
-        "Escape",
-      ];
-
-      try {
-        const key = (e as KeyboardEvent).key;
-        if (navKeys.includes(key)) e.preventDefault();
-      } catch {
-        /* ignore */
-      }
     };
 
     // use capture phase to intercept events before other listeners
