@@ -90,6 +90,7 @@ const ThemeUploader: React.FC<ThemeUploaderProps> = ({ onThemeCreated }) => {
       </Button>
 
       <Dialog.Root
+        size="lg"
         open={open}
         onOpenChange={(details) => (details.open ? onOpen() : onClose())}
       >

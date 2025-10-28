@@ -356,6 +356,7 @@ const ThemeSelectorMenu: React.FC = () => {
       </Button>
 
       <Dialog.Root
+        size="lg"
         open={open}
         onOpenChange={(d) => {
           if (d.open) {
