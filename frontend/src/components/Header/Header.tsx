@@ -5,7 +5,6 @@ import { IoStatsChartSharp } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 import Typed from "typed.js";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface HeaderProps extends BoxProps {
   children?: React.ReactNode;
@@ -59,7 +58,6 @@ const Header: React.FC<HeaderProps> = () => {
       </NavLink>
 
       <Box display="flex" gap={2} alignItems="center">
-        <ThemeToggle />
         <NavLink
           to={isAuthed ? "/stats" : "/signin"}
           style={{
@@ -73,8 +71,13 @@ const Header: React.FC<HeaderProps> = () => {
           <IconButton
             variant="ghost"
             opacity={0.6}
+            color="textColor"
             aria-label="Stats"
-            _hover={{ opacity: 1, color: "primaryColor" }}
+            _hover={{
+              opacity: 1,
+              color: "primaryColor",
+              bg: "bgCardColor",
+            }}
           >
             <IoStatsChartSharp />
           </IconButton>

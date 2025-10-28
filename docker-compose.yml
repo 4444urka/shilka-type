@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-shilka-db}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -48,6 +48,7 @@ services:
       - REDIS_DB=0
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
       - ALGORITHM=HS256
+      - ALLOW_ORIGINS=*
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-10080}
     ports:
       - "8000:8000"
@@ -66,7 +67,7 @@ services:
       dockerfile: Dockerfile
     container_name: shilka-frontend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8000/api/
     ports:
       - "5173:5173"
     depends_on:

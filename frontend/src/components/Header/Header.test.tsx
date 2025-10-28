@@ -8,11 +8,17 @@ import { useIsAuthed } from "../../hooks/useIsAuthed";
 vi.mock("../../hooks/useIsAuthed");
 
 // Мокируем typed.js
-vi.mock("typed.js", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    destroy: vi.fn(),
-  })),
-}));
+vi.mock("typed.js", () => {
+  // export a class so `new Typed(...)` returns an instance with destroy()
+  return {
+    default: class {
+      constructor() {}
+      destroy() {
+        return undefined;
+      }
+    },
+  };
+});
 
 describe("Header", () => {
   beforeEach(() => {
@@ -45,14 +51,5 @@ describe("Header", () => {
 
     const statsButton = screen.getByRole("button", { name: "Stats" });
     expect(statsButton.closest("a")).toHaveAttribute("href", "/stats");
-  });
-
-  it("должен отрисовывать ThemeToggle", () => {
-    vi.mocked(useIsAuthed).mockReturnValue(false);
-
-    const { container } = renderWithProviders(<Header />);
-
-    // Проверяем что компонент отрисовался (ThemeToggle должен быть в DOM)
-    expect(container.querySelector('[class*="chakra"]')).toBeInTheDocument();
   });
 });

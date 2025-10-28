@@ -1,5 +1,4 @@
 import { Box, Flex, Link, Icon, Text, type BoxProps } from "@chakra-ui/react";
-import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 import React from "react";
 import { FaGithub, FaTelegram } from "react-icons/fa";
 import { getMyAppVer } from "../../api/github/githubRequests";
@@ -39,15 +38,13 @@ const Footer: React.FC<FooterProps> = () => {
           <Text animation="fadeIn 1s ease-in-out">{version}</Text>
         </Box>
         <Flex gap={4} align="center">
-          <ThemeSelectorMenu>
-            цветовая тема
-            <MdOutlineKeyboardArrowUp />
-          </ThemeSelectorMenu>
+          <ThemeSelectorMenu />
           <Link
             href="https://github.com/4444urka/shilka-type"
             target="_blank"
             rel="noopener noreferrer"
-            opacity={0.5}
+            color="textColor"
+            opacity={0.6}
             gap={3}
             _hover={{ opacity: 1, color: "primaryColor" }}
             fontSize="lg"
@@ -60,7 +57,8 @@ const Footer: React.FC<FooterProps> = () => {
             target="_blank"
             gap={3}
             rel="noopener noreferrer"
-            opacity={0.5}
+            color="textColor"
+            opacity={0.6}
             _hover={{ opacity: 1, color: "primaryColor" }}
             fontSize="lg"
             transition="all 0.2s"
