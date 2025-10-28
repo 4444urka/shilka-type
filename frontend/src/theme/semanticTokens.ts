@@ -17,13 +17,6 @@ export const semanticTokens = defineSemanticTokens({
         _dark: "{colors.gray.900}",
       },
     },
-    bgCardSecondaryColor: {
-      value: {
-        _light: "{colors.gray.100}",
-        _dark: "{colors.gray.800}",
-      },
-    },
-
     bgPage: {
       value: {
         _light: "{colors.white}",

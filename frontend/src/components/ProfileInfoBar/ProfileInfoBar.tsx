@@ -33,7 +33,7 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
       justifyContent="space-between"
       w="100%"
     >
-      <Avatar.Root size="2xl" bg="bgCardSecondaryColor" color="textColor">
+      <Avatar.Root size="2xl">
         <Avatar.Fallback />
         <Avatar.Image />
       </Avatar.Root>
@@ -51,8 +51,7 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
         aria-label="Logout"
         variant="ghost"
         size="2xl"
-        color="textColor"
-        _hover={{ color: "primaryColor", bg: "bgCardSecondaryColor" }}
+        _hover={{ color: "primaryColor" }}
         onClick={async () => {
           try {
             navigate("/");

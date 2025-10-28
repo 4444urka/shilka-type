@@ -65,13 +65,12 @@ const Keyboard = () => {
           <Button
             size="sm"
             variant="ghost"
-            color={selectedLanguage === "en" ? "primaryColor" : "textColor"}
+            color={selectedLanguage === "en" ? "primaryColor" : undefined}
             onClick={() => setSelectedLanguage("en")}
             fontWeight="medium"
             _hover={{
               transform: "scale(1.02)",
               transition: "all 0.2s",
-              bg: "bgCardSecondaryColor",
             }}
             _active={{
               transform: "scale(0.95)",
@@ -82,11 +81,10 @@ const Keyboard = () => {
           <Button
             size="sm"
             variant="ghost"
-            color={selectedLanguage === "ru" ? "primaryColor" : "textColor"}
+            color={selectedLanguage === "ru" ? "primaryColor" : undefined}
             onClick={() => setSelectedLanguage("ru")}
             fontWeight="medium"
             _hover={{
-              bg: "bgCardSecondaryColor",
               transform: "scale(1.02)",
               transition: "all 0.2s",
             }}

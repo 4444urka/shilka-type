@@ -62,9 +62,8 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   <Flex gap={2}>
                     {session.test_type && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        colorScheme="purple"
                         variant="subtle"
-                        color="textColor"
                         fontSize="sm"
                         px={2}
                         py={1}
@@ -74,10 +73,9 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     )}
                     {session.typing_mode && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        colorScheme="blue"
                         variant="subtle"
                         fontSize="sm"
-                        color="textColor"
                         px={2}
                         py={1}
                       >
@@ -86,10 +84,9 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     )}
                     {session.language && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        colorScheme="green"
                         variant="subtle"
                         fontSize="sm"
-                        color="textColor"
                         px={2}
                         py={1}
                       >

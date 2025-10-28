@@ -17,7 +17,6 @@ const SettingsBarButton: React.FC<SettingsBarButtonProps> = ({
       minW="60px"
       fontWeight="medium"
       _hover={{
-        bg: "bgCardSecondaryColor",
         transform: "scale(1.02)",
         transition: "all 0.2s",
       }}

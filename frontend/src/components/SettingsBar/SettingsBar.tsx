@@ -110,7 +110,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                 color={
                   selectedTestType === testType.code
                     ? "primaryColor"
-                    : "textColor"
+                    : undefined
                 }
                 onClick={() => handleTestTypeChange(testType.code)}
                 onMouseDown={(e) => e.preventDefault()}
@@ -132,7 +132,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
             {timeOptions.map((time) => (
               <SettingsBarButton
                 key={time}
-                color={selectedTime === time ? "primaryColor" : "textColor"}
+                color={selectedTime === time ? "primaryColor" : undefined}
                 onClick={() => handleTimeChange(time)}
               >
                 {time}с
@@ -146,7 +146,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
             {wordsOptions.map((words) => (
               <SettingsBarButton
                 key={words}
-                color={selectedWords === words ? "primaryColor" : "textColor"}
+                color={selectedWords === words ? "primaryColor" : undefined}
                 onClick={() => handleWordsChange(words)}
               >
                 {words}
@@ -167,9 +167,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
             return (
               <SettingsBarButton
                 key={mode.code}
-                color={
-                  selectedMode === mode.code ? "primaryColor" : "textColor"
-                }
+                color={selectedMode === mode.code ? "primaryColor" : undefined}
                 onClick={() => handleModeChange(mode.code)}
               >
                 <IconComponent />
@@ -190,9 +188,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
             <SettingsBarButton
               key={language.code}
               color={
-                selectedLanguage === language.code
-                  ? "primaryColor"
-                  : "textColor"
+                selectedLanguage === language.code ? "primaryColor" : undefined
               }
               onClick={() => handleLanguageChange(language.code)}
             >
