@@ -15,7 +15,10 @@ import {
   useDisclosure,
   Dialog,
   Input,
+  InputGroup,
+  Kbd,
 } from "@chakra-ui/react";
+import { logger } from "../../utils/logger";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 import { useTheme as useNextTheme } from "next-themes";
 import {
@@ -27,6 +30,7 @@ import {
 } from "../../api/themes/themesRequests";
 import ThemeUploader from "../ThemeUploader/ThemeUploader";
 import ThemeSelectorSwatch from "../ThemeSelectorSwatch/ThemeSelectorSwatch";
+import { LuSearch } from "react-icons/lu";
 
 type CustomThemeData = {
   colors?: Record<
@@ -139,7 +143,7 @@ const ThemeSelectorMenu: React.FC = () => {
   }, []);
 
   const previewTheme = useCallback((t?: Theme | null) => {
-    console.debug(
+    logger.debug(
       "ThemeSelectorMenu: previewTheme called with",
       t?.name,
       t?.theme_data
@@ -168,6 +172,64 @@ const ThemeSelectorMenu: React.FC = () => {
       }
     }
   }, [filteredThemes, previewTheme, open]);
+
+  // when the menu opens, ensure focus is set to the first theme item
+  useEffect(() => {
+    if (!open) return;
+    if (!filteredThemes.length) return;
+
+    // set focus to first item after render so refs are populated
+    const t = setTimeout(() => {
+      try {
+        focusIndex(0);
+      } catch (e) {
+        logger.debug("ThemeSelectorMenu: focusIndex failed", e);
+      }
+    }, 0);
+
+    return () => clearTimeout(t);
+  }, [open, filteredThemes, focusIndex]);
+
+  // Global shortcut: Cmd/Ctrl+K opens the themes menu and focuses the search input.
+  useEffect(() => {
+    if (!isClient) return;
+
+    const onKey = (e: KeyboardEvent) => {
+      // ignore when typing in inputs or contenteditable areas
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const isMod = e.metaKey || e.ctrlKey;
+      if (isMod && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        try {
+          if (!open) onOpen();
+          // focus the search input after the dialog opens / render
+          setTimeout(() => {
+            inputRef.current?.focus();
+            // select existing text for quick replace
+            try {
+              inputRef.current?.select();
+            } catch (err) {
+              logger.debug("select on input failed", err);
+            }
+          }, 0);
+        } catch (err) {
+          logger.debug("Cmd/Ctrl+K handler failed", err);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isClient, onOpen, open]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!filteredThemes.length) return;
@@ -204,11 +266,11 @@ const ThemeSelectorMenu: React.FC = () => {
     try {
       await selectTheme(themeId);
       const sel = await getSelectedTheme();
-      console.debug("handleSelect: selected theme", sel);
+      logger.debug("handleSelect: selected theme", sel);
       setSelected(sel || null);
       // persist custom theme data and switch next-themes to 'custom'
       if (sel?.theme_data) {
-        console.debug("handleSelect: setting localStorage", sel.theme_data);
+        logger.debug("handleSelect: setting localStorage", sel.theme_data);
         if (isClient) {
           try {
             localStorage.setItem(
@@ -216,13 +278,13 @@ const ThemeSelectorMenu: React.FC = () => {
               JSON.stringify(sel.theme_data)
             );
           } catch (e) {
-            console.debug("localStorage set failed", e);
+            logger.debug("localStorage set failed", e);
           }
 
           try {
             setTheme("custom");
           } catch (e) {
-            console.debug("setTheme failed in test/SSR environment", e);
+            logger.debug("setTheme failed in test/SSR environment", e);
           }
 
           // notify chakra bridge in same tab that custom theme changed
@@ -233,7 +295,7 @@ const ThemeSelectorMenu: React.FC = () => {
               })
             );
           } catch (e) {
-            console.debug("shilka:customThemeChanged dispatch failed", e);
+            logger.debug("shilka:customThemeChanged dispatch failed", e);
           }
         }
       }
@@ -264,7 +326,6 @@ const ThemeSelectorMenu: React.FC = () => {
         as="button"
         onClick={() => handleSelect(t.id)}
         border="none"
-        width="full"
         textAlign="left"
         px={3}
         py={2}
@@ -360,23 +421,39 @@ const ThemeSelectorMenu: React.FC = () => {
             <Dialog.CloseTrigger />
             <Dialog.Header>
               <HStack gap={2} align="center" w="full">
-                <Input
-                  ref={inputRef}
-                  color="textColor"
-                  borderColor="textColor"
-                  placeholder="Поиск тем..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                      handleKeyDown(e);
-                    } else {
-                      e.stopPropagation();
-                    }
-                  }}
-                  size="sm"
-                  w="full"
-                />
+                <InputGroup
+                  startElement={
+                    <LuSearch color="var(--chakra-colors-text-color)" />
+                  }
+                  endElement={
+                    <Kbd
+                      variant="outline"
+                      color="textColor"
+                      borderColor="textColor"
+                    >
+                      ⌘K
+                    </Kbd>
+                  }
+                >
+                  <Input
+                    ref={inputRef}
+                    borderColor="textColor"
+                    placeholder="Поиск..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                        handleKeyDown(e);
+                      } else {
+                        e.stopPropagation();
+                      }
+                    }}
+                    size="sm"
+                    w="full"
+                    color="textColor"
+                    _placeholder={{ color: "textColor" }}
+                  />
+                </InputGroup>
               </HStack>
             </Dialog.Header>
             <Dialog.Body>

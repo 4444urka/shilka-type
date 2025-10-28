@@ -12,6 +12,7 @@ import { keyframes } from "./keyframes";
 import { semanticTokens as baseSemantic } from "./semanticTokens";
 import { tokens } from "./tokens";
 import { globalCss } from "./globalCss";
+import { logger } from "../utils/logger";
 
 const STORAGE_KEY = "shilka:customTheme";
 
@@ -83,10 +84,8 @@ const buildSystem = (customData: CustomData) => {
       }
     }
 
-    // debug: print generated semantic colors for troubleshooting
-    // (will appear in browser console when building in dev)
     // debug: print generated semantic colors for troubleshooting (dev only)
-    console.debug("ChakraWithNextTheme: generated semantic colors:", colors);
+    logger.debug("ChakraWithNextTheme: generated semantic colors:", colors);
 
     const config = defineConfig({
       globalCss,
@@ -143,7 +142,7 @@ const ChakraWithNextTheme: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const previewHandler = (e: CustomEvent<CustomData>) => {
-      console.debug("ChakraWithNextTheme: preview event received", e.detail);
+      logger.debug("ChakraWithNextTheme: preview event received", e.detail);
       setPreviewData(e.detail);
     };
     document.addEventListener(
@@ -165,7 +164,7 @@ const ChakraWithNextTheme: React.FC<{ children: React.ReactNode }> = ({
     const dataToUse =
       previewData ||
       (current === "custom" && rawStored ? JSON.parse(rawStored) : null);
-    console.debug(
+    logger.debug(
       "ChakraWithNextTheme: building system with dataToUse:",
       dataToUse,
       "previewData:",
@@ -194,7 +193,7 @@ const ChakraWithNextTheme: React.FC<{ children: React.ReactNode }> = ({
   }
 
   // debug current/providerKey
-  console.debug(
+  logger.debug(
     "ChakraWithNextTheme: current, providerKey:",
     current,
     providerKey
