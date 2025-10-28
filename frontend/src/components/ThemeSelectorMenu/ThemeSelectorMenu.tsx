@@ -329,6 +329,7 @@ const ThemeSelectorMenu: React.FC = () => {
         textAlign="left"
         px={3}
         py={2}
+        borderRadius="md"
         onFocus={() => {
           setFocusedIndex(idx);
         }}
@@ -354,19 +355,14 @@ const ThemeSelectorMenu: React.FC = () => {
       >
         <HStack justify="space-between" width="full">
           <HStack gap={3} align="center" w="full">
-            <VStack
-              align="start"
-              gap={0}
-              justifyContent="space-between"
-              w="full"
-            >
+            <HStack align="start" gap={2} w="full">
               <Text fontSize="sm" zIndex={1}>
                 {t.name}
               </Text>
               <Text fontSize="xs" opacity="0.6" zIndex={1}>
-                @{t.author_username}
+                by @{t.author_username}
               </Text>
-            </VStack>
+            </HStack>
             <ThemeSelectorSwatch
               bgColor={bg}
               primaryColor={primary}

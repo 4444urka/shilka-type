@@ -226,10 +226,11 @@ const ThemeUploader: React.FC<ThemeUploaderProps> = ({ onThemeCreated }) => {
                   placeholder="Название темы"
                   value={themeName}
                   onChange={(e) => setThemeName(e.target.value)}
-                  bg="bgCardColor"
+                  borderColor="textColor"
+                  _placeholder={{ color: "textMuted" }}
                 />
 
-                <Box bg="bgCardColor" borderRadius="md" p={2}>
+                <Box borderRadius="md" p={2}>
                   <CodeMirror
                     value={editorValue}
                     height="300px"
@@ -253,12 +254,13 @@ const ThemeUploader: React.FC<ThemeUploaderProps> = ({ onThemeCreated }) => {
                   )}
                 </Box>
                 <Text fontSize="sm">Пример:</Text>
-                <Box bg="bgCardColor" borderRadius="md" p={2}>
+                <Box borderRadius="md" p={2}>
                   <CodeMirror
                     value={JSON.stringify(exampleTheme, null, 2)}
                     theme={cmTheme}
                     height="300px"
                     extensions={[json(), EditorView.lineWrapping]}
+                    style={{ borderColor: "var(--chakra-styles-text-color)" }}
                   />
                 </Box>
 

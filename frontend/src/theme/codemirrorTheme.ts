@@ -45,8 +45,9 @@ export function createCmThemeFromTokens(tokens: TokenValues) {
     getCssColor("primaryColor", tokens.primary) || tokens.primary || "#000000";
   const text =
     getCssColor("textColor", tokens.text) || tokens.text || "#222222";
-  const bgCard =
-    getCssColor("bgCardColor", tokens.bgCard) || tokens.bgCard || "#ffffff";
+  // const bgCard =
+  //   getCssColor("bgCardColor", tokens.bgCard) || tokens.bgCard || "#ffffff";
+  const bgPage = getCssColor("bgPage", tokens.bgPage) || tokens.bgPage;
   const bgCardSecondary =
     getCssColor("bgCardSecondaryColor", tokens.bgCardSecondary) ||
     tokens.bgCardSecondary ||
@@ -58,12 +59,12 @@ export function createCmThemeFromTokens(tokens: TokenValues) {
   const base = createTheme({
     theme: "light",
     settings: {
-      background: bgCard,
+      background: bgPage,
       foreground: text,
       caret: primary,
       selection: bgCardSecondary,
       selectionMatch: bgCardSecondary,
-      gutterBackground: bgCard,
+      gutterBackground: bgPage,
       gutterForeground: text,
       gutterBorder: border,
       lineHighlight: bgCardSecondary,
@@ -83,6 +84,7 @@ export function readTokenValuesFromDOM(): TokenValues {
     primary: getCssColor("primaryColor") || undefined,
     text: getCssColor("textColor") || undefined,
     bgCard: getCssColor("bgCardColor") || undefined,
+    bgPage: getCssColor("bgPage") || undefined,
     bgCardSecondary: getCssColor("bgCardSecondaryColor") || undefined,
     border: getCssColor("borderColor") || undefined,
   };
