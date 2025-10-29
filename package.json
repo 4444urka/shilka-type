@@ -1,6 +1,6 @@
 {
   "name": "shilka-type",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Typing practice application with Russian and English support",
   "private": true,
   "scripts": {
