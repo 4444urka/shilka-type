@@ -19,16 +19,16 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
       w="100%"
       fontSize="20px"
       textStyle="body"
-      p={4}
+      pt={4}
       bg="bgCardColor"
       borderRadius="md"
       {...rest}
     >
-      <Text mb={4} color="primaryColor" fontSize="20px">
+      <Text mb={4} px={4} color="primaryColor" fontSize="20px">
         История сессий
       </Text>
-      <Flex direction="column" gap={3}>
-        {sessions.map((session) => {
+      <Flex direction="column">
+        {sessions.map((session, index) => {
           const modeDisplay = getModeDisplay(session.typing_mode);
           const languageDisplay = getLanguageDisplay(session.language);
           const testTypeDisplay = getTestTypeDisplay(session.test_type);
@@ -36,10 +36,9 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
           return (
             <Box
               key={session.id}
-              p={3}
+              bg={index % 2 === 0 ? "bgCardSecondaryColor" : "bgCardColor"}
+              p={1}
               px={4}
-              borderBottom="1px solid"
-              borderColor="gray.300"
             >
               <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
                 <Box
@@ -47,7 +46,6 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   flexDirection="row"
                   gap={4}
                   alignItems="center"
-                  mt={4}
                 >
                   <Text fontSize="md">
                     {new Date(
@@ -62,7 +60,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   <Flex gap={2}>
                     {session.test_type && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        bg="transparent"
                         variant="subtle"
                         color="textColor"
                         fontSize="sm"
@@ -74,7 +72,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     )}
                     {session.typing_mode && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        bg="transparent"
                         variant="subtle"
                         fontSize="sm"
                         color="textColor"
@@ -86,7 +84,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     )}
                     {session.language && (
                       <Badge
-                        bg="bgCardSecondaryColor"
+                        bg="transparent"
                         variant="subtle"
                         fontSize="sm"
                         color="textColor"
@@ -99,12 +97,12 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   </Flex>
                 </Box>
 
-                <Flex gap={6}>
+                <Flex gap={6} align="center" mb={2}>
                   <Box textAlign="center">
                     <Text fontSize="xs" color="gray.500">
                       WPM
                     </Text>
-                    <Text fontSize="lg" fontWeight="bold" color="primaryColor">
+                    <Text fontSize="md" fontWeight="bold" color="primaryColor">
                       {Number(session.wpm).toFixed(1)}
                     </Text>
                   </Box>
@@ -112,7 +110,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                     <Text fontSize="xs" color="gray.500">
                       Точность
                     </Text>
-                    <Text fontSize="lg" fontWeight="bold" color="primaryColor">
+                    <Text fontSize="md" fontWeight="bold" color="primaryColor">
                       {Number(session.accuracy).toFixed(1)}%
                     </Text>
                   </Box>
@@ -121,7 +119,7 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                       <Text fontSize="xs" color="gray.500">
                         Время
                       </Text>
-                      <Text fontSize="lg" fontWeight="bold">
+                      <Text fontSize="md" fontWeight="bold">
                         {session.duration}с
                       </Text>
                     </Box>
