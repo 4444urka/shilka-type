@@ -23,7 +23,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading }) => {
       transition={"0.3s ease-in-out"}
     >
       <Progress.Root width="300px" size="lg" value={null}>
-        <Progress.Track>
+        <Progress.Track bg="bgCardSecondaryColor">
           <Progress.Range bg="primaryColor" />
         </Progress.Track>
       </Progress.Root>

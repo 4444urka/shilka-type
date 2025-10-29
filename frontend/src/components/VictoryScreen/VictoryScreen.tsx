@@ -28,6 +28,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       if (shilkaCoins.value !== 0) {
         await addCoins(shilkaCoins.value);
         dispatch(addPoints(shilkaCoins.value));
+        // После обновления койнов триггерим обновление лидерборда
+        // (хук useFetchLeaderboard подписан на это событие)
+        window.dispatchEvent(new Event("leaderboard:reload"));
       }
     })();
   }, [shilkaCoins.value, isAuthed, dispatch]);

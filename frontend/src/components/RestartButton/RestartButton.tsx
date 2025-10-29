@@ -22,6 +22,7 @@ const RestartButton: React.FC<RestartButtonProps> = ({ onClick, ...rest }) => {
       onClick={handleClick}
       onMouseDown={(e) => e.preventDefault()}
       {...rest}
+      _hover={{ bg: "bgCardColor" }}
     >
       <VscDebugRestart />
     </IconButton>
