@@ -20,7 +20,9 @@ const useFetchLeaderboard = () => {
       if (mountedRef.current) setLeaderboard(filtered);
     } catch (err) {
       if (mountedRef.current)
-        setError(`Не удалось загрузить список лидеров: ${(err as Error).message}`);
+        setError(
+          `Не удалось загрузить список лидеров: ${(err as Error).message}`
+        );
     } finally {
       if (mountedRef.current) setIsLoading(false);
     }
