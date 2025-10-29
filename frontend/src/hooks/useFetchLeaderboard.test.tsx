@@ -42,7 +42,9 @@ describe("useFetchLeaderboard", () => {
     });
 
     expect(result.current.leaderboard).toEqual([]);
-    expect(result.current.error).toBe("Не удалось загрузить список лидеров");
+    expect(result.current.error).toBe(
+      "Не удалось загрузить список лидеров: Network error"
+    );
   });
 
   it("должен предоставлять функцию reload", async () => {
