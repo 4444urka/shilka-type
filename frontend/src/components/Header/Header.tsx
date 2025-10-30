@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = () => {
       justifyContent="space-between"
       bg="bgPage"
       py={5}
-      px="200px"
+      px={200}
       fontSize="3xl"
       fontWeight="bold"
       borderBottom={"1px solid"}
