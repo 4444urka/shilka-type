@@ -6,8 +6,10 @@ import json
 
 from ..database import get_db
 from ..auth import models as auth_models
+from .models import Theme
 from ..auth import utils as auth_utils
-from ..auth.schemas import ThemeCreate, ThemePublic, ThemeInDB
+from .schemas import ThemeCreate, ThemePublic, ThemeInDB
+from . import service as theme_service
 
 router = APIRouter()
 
@@ -19,24 +21,7 @@ async def create_theme(
     db: AsyncSession = Depends(get_db)
 ):
     """Создание новой темы"""
-    # Валидация JSON данных темы
-    try:
-        theme_data_json = json.dumps(theme.theme_data)
-    except (TypeError, ValueError):
-        raise HTTPException(status_code=400, detail="Invalid theme data format")
-    
-    # Создаем тему
-    db_theme = auth_models.Theme(
-        name=theme.name,
-        author_id=current_user.id,
-        theme_data=theme_data_json,
-        is_public=theme.is_public,
-    )
-    db.add(db_theme)
-    await db.commit()
-    await db.refresh(db_theme)
-    
-    # Возвращаем публичное представление
+    db_theme = await theme_service.create_theme(current_user, theme, db)
     return ThemePublic(
         id=db_theme.id,
         name=db_theme.name,
@@ -51,14 +36,9 @@ async def create_theme(
 @router.get("/", response_model=List[ThemePublic])
 async def get_public_themes(db: AsyncSession = Depends(get_db)):
     """Получение всех публичных тем"""
-    result = await db.execute(
-        select(auth_models.Theme, auth_models.User.username)
-        .join(auth_models.User, auth_models.Theme.author_id == auth_models.User.id)
-        .where(auth_models.Theme.is_public == True)
-    )
-    
+    rows = await theme_service.get_public_themes(db)
     themes = []
-    for theme, author_username in result:
+    for theme, author_username in rows:
         themes.append(ThemePublic(
             id=theme.id,
             name=theme.name,
@@ -68,7 +48,6 @@ async def get_public_themes(db: AsyncSession = Depends(get_db)):
             author_username=author_username,
             created_at=theme.created_at.isoformat(),
         ))
-    
     return themes
 
 
@@ -78,13 +57,9 @@ async def get_my_themes(
     db: AsyncSession = Depends(get_db)
 ):
     """Получение тем текущего пользователя"""
-    result = await db.execute(
-        select(auth_models.Theme)
-        .where(auth_models.Theme.author_id == current_user.id)
-    )
-    
+    themes_rows = await theme_service.get_my_themes(current_user, db)
     themes = []
-    for theme in result.scalars():
+    for theme in themes_rows:
         themes.append(ThemePublic(
             id=theme.id,
             name=theme.name,
@@ -94,7 +69,6 @@ async def get_my_themes(
             author_username=current_user.username,
             created_at=theme.created_at.isoformat(),
         ))
-    
     return themes
 
 
@@ -106,21 +80,7 @@ async def select_theme(
 ):
     """Выбор темы для текущего пользователя"""
     # Проверяем, существует ли тема и доступна ли она
-    result = await db.execute(
-        select(auth_models.Theme).where(auth_models.Theme.id == theme_id)
-    )
-    theme = result.scalar_one_or_none()
-    
-    if not theme:
-        raise HTTPException(status_code=404, detail="Theme not found")
-    
-    if not theme.is_public and theme.author_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Theme is not accessible")
-    
-    # Обновляем выбранную тему пользователя
-    current_user.selected_theme_id = theme_id
-    await db.commit()
-    
+    await theme_service.select_theme(current_user, theme_id, db)
     return {"detail": "Theme selected successfully"}
 
 
@@ -130,20 +90,10 @@ async def get_selected_theme(
     db: AsyncSession = Depends(get_db)
 ):
     """Получение выбранной темы текущего пользователя"""
-    if not current_user.selected_theme_id:
+    selected = await theme_service.get_selected_theme(current_user, db)
+    if not selected:
         return None
-    
-    result = await db.execute(
-        select(auth_models.Theme, auth_models.User.username)
-        .join(auth_models.User, auth_models.Theme.author_id == auth_models.User.id)
-        .where(auth_models.Theme.id == current_user.selected_theme_id)
-    )
-    
-    theme_data = result.first()
-    if not theme_data:
-        return None
-    
-    theme, author_username = theme_data
+    theme, author_username = selected
     return ThemePublic(
         id=theme.id,
         name=theme.name,

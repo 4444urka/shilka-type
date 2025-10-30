@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from pydantic import ConfigDict
 
 
 class AddCoinsRequest(BaseModel):
@@ -20,49 +21,12 @@ class WordHistoryPayload(BaseModel):
     mode: str | None = None  # режим набора (words, sentences, etc.)
     language: str | None = None  # язык (ru, en, etc.)
     test_type: str | None = Field(None, alias="testType")  # тип теста (time, words)
-    
-    class Config:
-        populate_by_name = True  # Позволяет использовать и alias, и имя поля
-
-    def calculate_wpm(self) -> float:
-        """Вычисляет слов в минуту (WPM) на основе истории (fallback если не передан с фронта)."""
-        if self.wpm is not None:
-            return self.wpm
-            
-        if not self.duration or self.duration == 0:
-            return 0.0
-        
-        # Считаем все правильные символы
-        correct_chars = sum(
-            sum(1 for char in word if char.correct)
-            for word in self.history
-        )
-        
-        # WPM = (правильные символы / 5) / (секунды / 60)
-        # 5 символов = среднее слово по стандарту
-        minutes = self.duration / 60.0
-        if minutes == 0:
-            return 0.0
-        
-        wpm = (correct_chars / 5.0) / minutes
-        return round(wpm, 2)
-    
-    def calculate_accuracy(self) -> float:
-        """Вычисляет точность набора (accuracy) в процентах (fallback если не передан с фронта)."""
-        if self.accuracy is not None:
-            return self.accuracy
-            
-        total_chars = sum(len(word) for word in self.history)
-        if total_chars == 0:
-            return 100.0
-        
-        correct_chars = sum(
-            sum(1 for char in word if char.correct)
-            for word in self.history
-        )
-        
-        accuracy = (correct_chars / total_chars) * 100.0
-        return round(accuracy, 2)
+    model_config = ConfigDict(populate_by_name=True)
+    # NOTE: business logic (WPM/accuracy computation) was moved to
+    # `src.stats.utils` to keep schemas pure (DTO). Use
+    # `src.stats.utils.compute_wpm` and `src.stats.utils.compute_accuracy`
+    # from services or other parts of the codebase when you need to
+    # calculate metrics based on the payload.
 
 
 class TypingSessionResponse(BaseModel):
@@ -74,9 +38,7 @@ class TypingSessionResponse(BaseModel):
     language: str | None
     test_type: str | None
     created_at: str
-    
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CharErrorStat(BaseModel):

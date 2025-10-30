@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 from src.database import Base
@@ -17,7 +17,7 @@ class TypingSession(Base):
     typing_mode = Column(Text, nullable=True)  # режим набора (words, sentences, etc.)
     language = Column(Text, nullable=True)  # язык (ru, en, etc.)
     test_type = Column(Text, nullable=True)  # тип теста (time, words)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Связь с пользователем
     user = relationship("User", back_populates="typing_sessions")
