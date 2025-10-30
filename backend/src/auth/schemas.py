@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
+from pydantic import ConfigDict
 import json
 
 class UserBase(BaseModel):
@@ -19,9 +20,7 @@ class UserInDB(UserBase):
     hashed_password: str
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserPublic(UserBase):
@@ -29,9 +28,7 @@ class UserPublic(UserBase):
     # Может прийти None из ORM, позволяем и даём дефолт 0
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     access_token: str
@@ -39,29 +36,3 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
-
-
-class ThemeBase(BaseModel):
-    name: str
-    theme_data: dict  # JSON объект с темой
-    is_public: bool = True
-
-class ThemeCreate(ThemeBase):
-    pass
-
-class ThemeInDB(ThemeBase):
-    id: int
-    author_id: int
-    created_at: str
-
-    class Config:
-        from_attributes = True
-
-class ThemePublic(ThemeBase):
-    id: int
-    author_id: int
-    author_username: str
-    created_at: str
-
-    class Config:
-        from_attributes = True
