@@ -30,7 +30,7 @@ const Stats = () => {
     <Box
       textStyle="body"
       p="20px"
-      px="200px"
+      px={200}
       display="grid"
       gridTemplateColumns="repeat(12, 1fr)"
       gridTemplateRows="auto"
