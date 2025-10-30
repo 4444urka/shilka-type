@@ -15,7 +15,12 @@ import { calculateTotalStats } from "../../lib/calculateTotalStats";
 const Stats = () => {
   const navigate = useNavigate();
   const { user, isLoading: isLoadingUser } = useFetchCurrentUser();
-  const { sessions, isLoading: isLoadingSessions } = useFetchSessions();
+  const {
+    sessions,
+    isLoading: isLoadingSessions,
+    loadMore: loadMoreSessions,
+    hasMore: hasMoreSessions,
+  } = useFetchSessions();
   const { leaderboard, isLoading: isLoadingLeaderboard } =
     useFetchLeaderboard();
   const totalStats = calculateTotalStats(sessions);
@@ -37,9 +42,7 @@ const Stats = () => {
       gap={4}
       minHeight="calc(100vh - 140px)"
     >
-      <LoadingScreen
-        isLoading={isLoadingLeaderboard || isLoadingUser || isLoadingSessions}
-      />
+      <LoadingScreen isLoading={isLoadingLeaderboard || isLoadingUser} />
 
       {/* ProfileInfoBar - на всю ширину */}
       <Box gridColumn="1 / -1">
@@ -63,7 +66,12 @@ const Stats = () => {
 
       {/* TypingHistory - на всю ширину внизу */}
       <Box gridColumn="1 / -1" gridRow={{ lg: "4" }}>
-        <TypingHistory sessions={sessions} />
+        <TypingHistory
+          sessions={sessions}
+          onLoadMore={loadMoreSessions}
+          hasMore={hasMoreSessions}
+          isLoading={isLoadingSessions}
+        />
       </Box>
     </Box>
   );

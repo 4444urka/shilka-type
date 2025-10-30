@@ -1,4 +1,11 @@
-import { Box, Text, Flex, Badge, type BoxProps } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Flex,
+  Badge,
+  Button,
+  type BoxProps,
+} from "@chakra-ui/react";
 import type { TypingSession } from "../../types/TypingSession";
 import {
   getModeDisplay,
@@ -8,10 +15,16 @@ import {
 
 export interface TypingHistoryProps extends BoxProps {
   sessions: TypingSession[];
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  isLoading?: boolean;
 }
 
 export const TypingHistory: React.FC<TypingHistoryProps> = ({
   sessions,
+  onLoadMore,
+  hasMore = false,
+  isLoading = false,
   ...rest
 }) => {
   return (
@@ -129,6 +142,20 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
             </Box>
           );
         })}
+        {hasMore && (
+          <Box w="full" textAlign="center">
+            <Button
+              w="full"
+              color="textSecondary"
+              bg="bgCardSecondaryColor"
+              onClick={onLoadMore}
+              disabled={isLoading}
+              _hover={{ bg: "primaryColor" }}
+            >
+              Загрузить ещё
+            </Button>
+          </Box>
+        )}
       </Flex>
     </Box>
   );
