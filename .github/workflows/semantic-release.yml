@@ -3,15 +3,20 @@ name: Semantic Release
 on:
   push:
     branches:
-      - main # Релизы только из main ветки
+      - main
+  workflow_dispatch: {}
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+    permissions: write-all
+
+    concurrency:
+      group: semantic-release-${{ github.ref }}
+      cancel-in-progress: true
+
+    env:
+      CI: "true"
 
     steps:
       - name: Checkout code
@@ -19,6 +24,13 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Debug: print event info"
+        run: |
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Ref: $GITHUB_REF"
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Run triggered by: $GITHUB_EVENT_NAME"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
