@@ -3,7 +3,8 @@ name: Semantic Release
 on:
   push:
     branches:
-      - main # Релизы только из main ветки
+      - main
+      - develop
 
 jobs:
   release:
