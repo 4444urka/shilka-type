@@ -42,7 +42,11 @@ export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
           <FaCrown size={24} />
         </Box>
       ) : (
-        <Avatar.Root size="sm" bg="bgCardSecondaryColor" color="textColor">
+        <Avatar.Root
+          size={{ base: "sm" }}
+          bg="bgCardSecondaryColor"
+          color="textColor"
+        >
           <Avatar.Fallback />
           <Avatar.Image />
         </Avatar.Root>

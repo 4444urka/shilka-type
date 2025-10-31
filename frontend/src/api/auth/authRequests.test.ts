@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { register, login, logout, fetchCurrentUser } from "./authRequests";
+import {
+  register,
+  login,
+  logout,
+  fetchCurrentUser,
+  updateUserSettings,
+} from "./authRequests";
 import { myapiInstance } from "../index";
 
 // Мокируем axios instance
@@ -109,6 +115,28 @@ describe("authRequests", () => {
       const result = await fetchCurrentUser();
 
       expect(myapiInstance.get).toHaveBeenCalledWith("/auth/me");
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
+  describe("updateUserSettings", () => {
+    it("должен отправлять PATCH запрос на /auth/settings с переданными полями", async () => {
+      const mockResponse = {
+        data: {
+          id: 1,
+          username: "testuser",
+          default_time: 60,
+        },
+      };
+      vi.mocked(myapiInstance.patch).mockResolvedValue(mockResponse);
+
+      const payload = { default_time: 60 };
+      const result = await updateUserSettings(payload);
+
+      expect(myapiInstance.patch).toHaveBeenCalledWith(
+        "/auth/settings",
+        payload
+      );
       expect(result).toEqual(mockResponse.data);
     });
   });

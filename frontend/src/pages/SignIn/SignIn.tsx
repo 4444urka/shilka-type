@@ -95,7 +95,11 @@ const SignIn = () => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" h="70vh">
-      <Box as="form" onSubmit={handleSubmit(onSubmit)} w="30%">
+      <Box
+        as="form"
+        onSubmit={handleSubmit(onSubmit)}
+        w={{ base: "90%", lg: "30%" }}
+      >
         <Stack gap={10} justifyContent="center" alignItems="center" w="100%">
           <ShilkaField
             placeholder="Имя пользователя"
@@ -125,7 +129,12 @@ const SignIn = () => {
           >
             Войти
           </Button>
-          <Text as="span" color="primaryColor" textStyle="input">
+          <Text
+            as="span"
+            color="primaryColor"
+            textStyle="input"
+            fontSize={{ base: "sm", md: "md" }}
+          >
             Нет аккаунта? <NavLink to="/signup">Зарегистрироваться</NavLink>
           </Text>
         </Stack>

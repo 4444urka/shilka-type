@@ -1,17 +1,20 @@
 import { Box } from "@chakra-ui/react";
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
+import { updateUserSettings } from "../../api/auth/authRequests";
 import TypingScreen from "../../components/TypingScreen/TypingScreen";
 import VictoryScreen from "../../components/VictoryScreen/VictoryScreen";
 import useGetRandomWords from "../../hooks/useGetRandomWords";
-import { useTypingSession } from "../../hooks/useTypingSession";
-import { useSessionDataSync } from "../../hooks/useSessionDataSync";
-import type { TypingSessionNew } from "../../types/TypingTypes";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
+import { useSessionDataSync } from "../../hooks/useSessionDataSync";
+import { useTypingSession } from "../../hooks/useTypingSession";
+import { useAppSelector } from "../../store";
+import type { TypingSessionNew } from "../../types/TypingTypes";
 
 const Homepage = () => {
   const isAuthed = useIsAuthed();
   const [showResults, setShowResults] = useState(false);
   const [shilkaCoins, setShilkaCoins] = useState({ value: 0 });
+  const user = useAppSelector((state) => state.user.user);
   const [selectedTime, setSelectedTime] = useState(30);
   const [selectedWords, setSelectedWords] = useState(25);
   const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ru">("en");
@@ -21,6 +24,15 @@ const Homepage = () => {
   const [selectedTestType, setSelectedTestType] = useState<"time" | "words">(
     "time"
   );
+
+  React.useEffect(() => {
+    if (!user) return;
+    setSelectedTime(user.default_time || 30);
+    setSelectedWords(user.default_words || 25);
+    setSelectedLanguage((user.default_language as "en" | "ru") || "en");
+    setSelectedMode((user.default_mode as "words" | "sentences") || "words");
+    setSelectedTestType((user.default_test_type as "time" | "words") || "time");
+  }, [user]);
 
   const { words, refreshWords } = useGetRandomWords(
     2,
@@ -85,8 +97,14 @@ const Homepage = () => {
       if (!session.isStarted) {
         resetSession();
       }
+      // Сохраняем настройку на сервере, если пользователь авторизован
+      if (isAuthed) {
+        void updateUserSettings({ default_time: time }).catch((err) =>
+          console.error("Failed to save settings:", err)
+        );
+      }
     },
-    [session.isStarted, resetSession]
+    [session.isStarted, resetSession, isAuthed]
   );
 
   const handleWordsChange = useCallback(
@@ -96,20 +114,38 @@ const Homepage = () => {
         resetSession();
         refreshWords();
       }
+      if (isAuthed) {
+        void updateUserSettings({ default_words: words }).catch((err) =>
+          console.error("Failed to save settings:", err)
+        );
+      }
     },
-    [session.isStarted, resetSession, refreshWords]
+    [session.isStarted, resetSession, refreshWords, isAuthed]
   );
 
-  const handleLanguageChange = useCallback((language: "en" | "ru") => {
-    setSelectedLanguage(language);
-  }, []);
+  const handleLanguageChange = useCallback(
+    (language: "en" | "ru") => {
+      setSelectedLanguage(language);
+      if (isAuthed) {
+        void updateUserSettings({ default_language: language }).catch((err) =>
+          console.error("Failed to save settings:", err)
+        );
+      }
+    },
+    [isAuthed]
+  );
 
   const handleModeChange = useCallback(
     (mode: "words" | "sentences") => {
       setSelectedMode(mode);
       refreshWords();
+      if (isAuthed) {
+        void updateUserSettings({ default_mode: mode }).catch((err) =>
+          console.error("Failed to save settings:", err)
+        );
+      }
     },
-    [refreshWords]
+    [refreshWords, isAuthed]
   );
 
   const handleTestTypeChange = useCallback(
@@ -117,14 +153,19 @@ const Homepage = () => {
       setSelectedTestType(testType);
       refreshWords();
       resetSession();
+      if (isAuthed) {
+        void updateUserSettings({ default_test_type: testType }).catch((err) =>
+          console.error("Failed to save settings:", err)
+        );
+      }
     },
-    [refreshWords, resetSession]
+    [refreshWords, resetSession, isAuthed]
   );
 
   return (
     <Box
       display="flex"
-      px="200px"
+      px={{ base: 4, md: 10, xl: 200 }}
       alignItems="center"
       justifyContent="center"
       flexDirection="column"

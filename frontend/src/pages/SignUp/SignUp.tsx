@@ -88,7 +88,11 @@ const SignUp = () => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" h="70vh">
-      <Box as="form" onSubmit={handleSubmit(onSubmit)} w="30%">
+      <Box
+        as="form"
+        onSubmit={handleSubmit(onSubmit)}
+        w={{ base: "90%", md: "30%" }}
+      >
         <Stack gap={10} justifyContent="center" alignItems="center" w="100%">
           <ShilkaField
             placeholder="Имя пользователя"

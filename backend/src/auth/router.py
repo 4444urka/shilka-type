@@ -57,6 +57,30 @@ async def read_users_me(current_user: models.User = Depends(utils.get_current_us
     return current_user
 
 
+@router.patch("/settings", response_model=schemas.UserPublic)
+async def update_settings(
+    settings: schemas.SettingsUpdate,
+    current_user: models.User = Depends(utils.get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Обновление пользовательских настроек по умолчанию"""
+    # Обновляем только поля, которые пришли не None
+    if settings.default_time is not None:
+        current_user.default_time = settings.default_time
+    if settings.default_words is not None:
+        current_user.default_words = settings.default_words
+    if settings.default_language is not None:
+        current_user.default_language = settings.default_language
+    if settings.default_mode is not None:
+        current_user.default_mode = settings.default_mode
+    if settings.default_test_type is not None:
+        current_user.default_test_type = settings.default_test_type
+
+    db.add(current_user)
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user
+
 @router.post("/logout")
 async def logout(response: Response):
     """Выход пользователя (удаление cookie)"""

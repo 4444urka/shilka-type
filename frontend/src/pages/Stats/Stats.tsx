@@ -15,7 +15,12 @@ import { calculateTotalStats } from "../../lib/calculateTotalStats";
 const Stats = () => {
   const navigate = useNavigate();
   const { user, isLoading: isLoadingUser } = useFetchCurrentUser();
-  const { sessions, isLoading: isLoadingSessions } = useFetchSessions();
+  const {
+    sessions,
+    isLoading: isLoadingSessions,
+    loadMore: loadMoreSessions,
+    hasMore: hasMoreSessions,
+  } = useFetchSessions();
   const { leaderboard, isLoading: isLoadingLeaderboard } =
     useFetchLeaderboard();
   const totalStats = calculateTotalStats(sessions);
@@ -30,16 +35,14 @@ const Stats = () => {
     <Box
       textStyle="body"
       p="20px"
-      px={200}
+      px={{ base: 0, md: 10, xl: 200 }}
       display="grid"
       gridTemplateColumns="repeat(12, 1fr)"
       gridTemplateRows="auto"
-      gap={4}
+      gap={{ base: 2, md: 4 }}
       minHeight="calc(100vh - 140px)"
     >
-      <LoadingScreen
-        isLoading={isLoadingLeaderboard || isLoadingUser || isLoadingSessions}
-      />
+      <LoadingScreen isLoading={isLoadingLeaderboard || isLoadingUser} />
 
       {/* ProfileInfoBar - на всю ширину */}
       <Box gridColumn="1 / -1">
@@ -53,17 +56,22 @@ const Stats = () => {
 
       {/* StatsChart - правая верхняя часть (9 из 12) */}
       <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} gridRow={{ lg: "2" }}>
-        <StatsChart sessions={[...sessions].reverse()} />
+        <StatsChart hideBelow="md" sessions={[...sessions].reverse()} />
       </Box>
 
       {/* Keyboard - правая средняя часть (9 из 12) */}
-      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} gridRow={{ lg: "3" }}>
+      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }}>
         <Keyboard />
       </Box>
 
       {/* TypingHistory - на всю ширину внизу */}
       <Box gridColumn="1 / -1" gridRow={{ lg: "4" }}>
-        <TypingHistory sessions={sessions} />
+        <TypingHistory
+          sessions={sessions}
+          onLoadMore={loadMoreSessions}
+          hasMore={hasMoreSessions}
+          isLoading={isLoadingSessions}
+        />
       </Box>
     </Box>
   );

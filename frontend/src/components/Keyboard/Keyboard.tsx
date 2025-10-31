@@ -51,14 +51,14 @@ const Keyboard = () => {
   };
 
   return (
-    <Box p={4} bg="bgCardColor" borderRadius="md" w="100%">
+    <Box hideBelow="md" p={4} bg="bgCardColor" borderRadius="md" w="100%">
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
         mb={4}
       >
-        <Text color="primaryColor" fontSize="20px">
+        <Text color="primaryColor" fontSize={{ base: "sm", xl: "lg" }}>
           Самые ошибочные символы
         </Text>
         <Box display="flex" gap={2}>

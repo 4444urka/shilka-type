@@ -24,4 +24,9 @@ export type Me = {
   id: number;
   username: string;
   shilka_coins: number;
+  default_time?: number;
+  default_words?: number;
+  default_language?: string;
+  default_mode?: string;
+  default_test_type?: string;
 };

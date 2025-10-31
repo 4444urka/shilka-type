@@ -37,3 +37,14 @@ export const fetchCurrentUser = async () => {
   const response = await myapiInstance.get(`/auth/me`);
   return response.data;
 };
+
+export const updateUserSettings = async (settings: {
+  default_time?: number;
+  default_words?: number;
+  default_language?: string;
+  default_mode?: string;
+  default_test_type?: string;
+}) => {
+  const response = await myapiInstance.patch(`/auth/settings`, settings);
+  return response.data;
+};

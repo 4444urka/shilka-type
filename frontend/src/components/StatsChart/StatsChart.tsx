@@ -1,5 +1,5 @@
 import { Chart, useChart } from "@chakra-ui/charts";
-import { Box, Text, useToken } from "@chakra-ui/react";
+import { Box, Text, useToken, type BoxProps } from "@chakra-ui/react";
 import React from "react";
 import {
   CartesianGrid,
@@ -12,11 +12,14 @@ import {
 } from "recharts";
 import type { TypingSession } from "../../types/TypingSession";
 
-export interface StatsChartProps {
+export interface StatsChartProps extends BoxProps {
   sessions: TypingSession[];
 }
 
-export const StatsChart: React.FC<StatsChartProps> = ({ sessions }) => {
+export const StatsChart: React.FC<StatsChartProps> = ({
+  sessions,
+  ...rest
+}) => {
   // Получаем реальные значения цветов из темы
   const [bgCardColor, borderColor, textColor] = useToken("colors", [
     "bgCardColor",
@@ -58,6 +61,7 @@ export const StatsChart: React.FC<StatsChartProps> = ({ sessions }) => {
       p={4}
       bg="bgCardColor"
       borderRadius="md"
+      {...rest}
     >
       <Text mb={4} color="primaryColor" fontSize="20px">
         Статистика
