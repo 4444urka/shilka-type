@@ -53,13 +53,6 @@
       }
     ],
     [
-      "@semantic-release/git",
-      {
-        "assets": ["package.json"],
-        "message": "chore(release): ${nextRelease.version} (${nextRelease.gitHead}) [skip ci]\n\n${nextRelease.notes}"
-      }
-    ],
-    [
       "@semantic-release/github",
       {
         "successComment": "🎉 Этот ${issue.pull_request ? 'PR' : 'issue'} включён в версию [${nextRelease.version}](${releases[0].url}) 🚀",
