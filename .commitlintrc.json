@@ -6,6 +6,7 @@
       "always",
       [
         "feat",
+        "minor-feat",
         "fix",
         "docs",
         "style",
