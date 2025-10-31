@@ -1,4 +1,11 @@
-import { Avatar, Text, Box, type BoxProps, IconButton } from "@chakra-ui/react";
+import {
+  Avatar,
+  Text,
+  Box,
+  Flex,
+  type BoxProps,
+  IconButton,
+} from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store";
@@ -24,48 +31,96 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
   const dispatch = useAppDispatch();
   return (
     <Box
-      flexDirection="row"
-      display="flex"
-      alignItems="center"
       bg="bgCardColor"
-      p={10}
+      p={{ base: 3, md: 4, xl: 6 }}
+      overflow="auto"
+      fontSize={{ base: "sm", md: "lg", lg: "xl", xl: "3xl" }}
       borderRadius="md"
-      justifyContent="space-between"
       w="100%"
     >
-      <Avatar.Root size="2xl" bg="bgCardSecondaryColor" color="textColor">
-        <Avatar.Fallback />
-        <Avatar.Image />
-      </Avatar.Root>
-      <Text>{user?.username}</Text>
-      <Text>|</Text>
-      <Text>shilkacoins:</Text>
-      <Text color="primaryColor">{user?.shilka_coins}</Text>
-      <Text>|</Text>
-      <Text>charsTyped:</Text>
-      <Text color="primaryColor">{totalStats.totalCharsTyped}</Text>
-      <Text>|</Text>
-      <Text>timeTyping:</Text>
-      <Text color="primaryColor">{formatTime(totalStats.totalTimeTyping)}</Text>
-      <IconButton
-        aria-label="Logout"
-        variant="ghost"
-        size="2xl"
-        color="textColor"
-        _hover={{ color: "primaryColor", bg: "bgCardSecondaryColor" }}
-        onClick={async () => {
-          try {
-            navigate("/");
-            await logout();
-          } catch {
-            // ignore
-          }
-          dispatch(clearUser());
-          window.location.reload();
-        }}
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        align={{ base: "flex-start", md: "center" }}
+        justify="space-between"
+        gap={{ base: 3, md: 6 }}
+        w="100%"
       >
-        <MdLogout />
-      </IconButton>
+        {/* Left: avatar + username */}
+        <Flex
+          align="center"
+          gap={{ base: 3, xl: 6 }}
+          minW={0}
+          justify="space-between"
+        >
+          <Avatar.Root
+            size={{ base: "xl", sm: "2xl", md: "2xl", lg: "2xl" }}
+            bg="bgCardSecondaryColor"
+            color="textColor"
+          >
+            <Avatar.Fallback />
+            <Avatar.Image />
+          </Avatar.Root>
+
+          <Box minW={0}>
+            <Text
+              fontWeight="semibold"
+              overflow="hidden"
+              fontSize={{ base: "xl", sm: "2xl" }}
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              maxW={{ base: "160px", md: "240px" }}
+            >
+              {user?.username}
+            </Text>
+          </Box>
+        </Flex>
+
+        <Flex align="center" gap={1} direction="row">
+          <Text>shilkacoins:</Text>
+          <Text color="primaryColor" fontWeight="bold">
+            {user?.shilka_coins}
+          </Text>
+        </Flex>
+
+        <Flex align="center" gap={1}>
+          <Text>charsTyped:</Text>
+          <Text color="primaryColor" fontWeight="bold">
+            {totalStats.totalCharsTyped}
+          </Text>
+        </Flex>
+
+        <Flex align="center" gap={1}>
+          <Text>timeTyping:</Text>
+          <Text color="primaryColor" fontWeight="bold">
+            {formatTime(totalStats.totalTimeTyping)}
+          </Text>
+        </Flex>
+
+        {/* Right: logout */}
+        <IconButton
+          position={{ base: "absolute", md: "static" }}
+          aria-label="Logout"
+          variant="ghost"
+          size={{ base: "sm", md: "lg" }}
+          color="textColor"
+          _hover={{ color: "primaryColor", bg: "bgCardSecondaryColor" }}
+          onClick={async () => {
+            try {
+              navigate("/");
+              await logout();
+            } catch {
+              // ignore
+            }
+            dispatch(clearUser());
+            window.location.reload();
+          }}
+          order={{ base: -1, md: 0 }}
+          alignSelf={{ base: "flex-end", md: "center" }}
+          mb={{ base: 2, md: 0 }}
+        >
+          <MdLogout />
+        </IconButton>
+      </Flex>
     </Box>
   );
 };

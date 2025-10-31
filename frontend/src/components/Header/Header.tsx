@@ -43,9 +43,9 @@ const Header: React.FC<HeaderProps> = () => {
       alignItems="center"
       justifyContent="space-between"
       bg="bgPage"
-      py={5}
-      px={200}
-      fontSize="3xl"
+      py={{ base: 3, md: 5 }}
+      px={{ base: 4, md: 10, xl: 200 }}
+      fontSize={{ base: "2xl", md: "2xl", lg: "3xl" }}
       fontWeight="bold"
       borderBottom={"1px solid"}
       borderColor={"borderColor"}

@@ -32,12 +32,12 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
       w="100%"
       fontSize="20px"
       textStyle="body"
-      pt={4}
       bg="bgCardColor"
       borderRadius="md"
+      pt={4}
       {...rest}
     >
-      <Text mb={4} px={4} color="primaryColor" fontSize="20px">
+      <Text mb={4} px={4} color="primaryColor" fontSize={{ base: "md" }}>
         История сессий
       </Text>
       <Flex direction="column">
@@ -56,11 +56,11 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
               <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
                 <Box
                   display="flex"
-                  flexDirection="row"
+                  flexDirection={{ base: "column", md: "row" }}
                   gap={4}
                   alignItems="center"
                 >
-                  <Text fontSize="md">
+                  <Text hideBelow={"md"} fontSize={{ base: "sm" }}>
                     {new Date(
                       session.created_at +
                         (session.created_at.endsWith("Z") ? "" : "Z")
@@ -70,14 +70,14 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   </Text>
 
                   {/* Бейджи для режима, языка и типа теста */}
-                  <Flex gap={2}>
+                  <Flex gap={{ base: 0, md: 2 }} flexWrap="wrap">
                     {session.test_type && (
                       <Badge
                         bg="transparent"
                         variant="subtle"
                         color="textColor"
                         fontSize="sm"
-                        px={2}
+                        px={{ base: 0, md: 2 }}
                         py={1}
                       >
                         {testTypeDisplay.icon} {testTypeDisplay.label}
@@ -110,33 +110,55 @@ export const TypingHistory: React.FC<TypingHistoryProps> = ({
                   </Flex>
                 </Box>
 
-                <Flex gap={6} align="center" mb={2}>
-                  <Box textAlign="center">
-                    <Text fontSize="xs" color="gray.500">
-                      WPM
-                    </Text>
-                    <Text fontSize="md" fontWeight="bold" color="primaryColor">
-                      {Number(session.wpm).toFixed(1)}
-                    </Text>
-                  </Box>
-                  <Box textAlign="center">
-                    <Text fontSize="xs" color="gray.500">
-                      Точность
-                    </Text>
-                    <Text fontSize="md" fontWeight="bold" color="primaryColor">
-                      {Number(session.accuracy).toFixed(1)}%
-                    </Text>
-                  </Box>
-                  {session.duration && (
+                <Flex
+                  w={{ base: "full", md: "auto" }}
+                  align="center"
+                  justifyContent="space-between"
+                >
+                  <Flex gap={{ base: 2, md: 6 }} align="center" mb={2}>
                     <Box textAlign="center">
                       <Text fontSize="xs" color="gray.500">
-                        Время
+                        WPM
                       </Text>
-                      <Text fontSize="md" fontWeight="bold">
-                        {session.duration}с
+                      <Text
+                        fontSize={{ base: "sm" }}
+                        fontWeight="bold"
+                        color="primaryColor"
+                      >
+                        {Number(session.wpm).toFixed(1)}
                       </Text>
                     </Box>
-                  )}
+                    <Box textAlign="center">
+                      <Text fontSize="xs" color="gray.500">
+                        Точность
+                      </Text>
+                      <Text
+                        fontSize={{ base: "sm" }}
+                        fontWeight="bold"
+                        color="primaryColor"
+                      >
+                        {Number(session.accuracy).toFixed(1)}%
+                      </Text>
+                    </Box>
+                    {session.duration && (
+                      <Box textAlign="center">
+                        <Text fontSize="xs" color="gray.500">
+                          Время
+                        </Text>
+                        <Text fontSize={{ base: "sm" }} fontWeight="bold">
+                          {session.duration}с
+                        </Text>
+                      </Box>
+                    )}
+                  </Flex>
+                  <Text hideFrom={"md"} mt={2} fontSize={{ base: "sm" }}>
+                    {new Date(
+                      session.created_at +
+                        (session.created_at.endsWith("Z") ? "" : "Z")
+                    )
+                      .toLocaleString("ru-RU")
+                      .slice(0, -3)}
+                  </Text>
                 </Flex>
               </Flex>
             </Box>

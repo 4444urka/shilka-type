@@ -38,12 +38,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       borderRadius="md"
       flexDirection="column"
       alignItems="flex-start"
-      fontSize="18px"
+      fontSize={{ base: "sm", md: "md", lg: "lg" }}
       gap={4}
       w="100%"
       {...rest}
     >
-      <Text color="primaryColor" textAlign="left" fontSize="20px">
+      <Text color="primaryColor" textAlign="left" fontSize="lg">
         Список лидеров
       </Text>
       <Box

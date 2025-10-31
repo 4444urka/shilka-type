@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Input } from "@chakra-ui/react";
 import React from "react";
 import { TypingWordComponent } from "../TypingWordComponent/TypingWordComponent";
 import { TypingScreenStats } from "../TypingScreenStats/TypingScreenStats";
@@ -44,19 +44,25 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   onTestTypeChange,
 }) => {
   const pressedKeysRef = React.useRef<Set<string>>(new Set());
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Обработка клавиатуры вынесена в родительский компонент
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Игнорируем события клавиатуры, если активен фокус на кнопках или других интерактивных элементах
-      const activeElement = document.activeElement;
-      if (
-        activeElement &&
-        (activeElement.tagName === "BUTTON" ||
+      // Игнорируем глобальные события, если фокус на интерактивных элементах
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (activeElement) {
+        const tag = activeElement.tagName;
+        if (
+          tag === "BUTTON" ||
           activeElement.getAttribute("role") === "button" ||
-          activeElement.getAttribute("tabindex") !== null)
-      ) {
-        return;
+          activeElement.getAttribute("tabindex") !== null ||
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          activeElement.isContentEditable
+        ) {
+          return;
+        }
       }
 
       // Предотвращаем повторные нажатия (зажатие клавиш)
@@ -106,12 +112,79 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
     };
   }, [onKeyPress]);
 
+  // Фокусируем скрытое input при старте сессии, чтобы вызвать экранную клавиатуру на мобильных
+  React.useEffect(() => {
+    if (inputRef.current && session.isStarted) {
+      try {
+        inputRef.current.focus();
+      } catch {
+        // ignore
+      }
+    }
+  }, [session.isStarted]);
+
+  const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (!val) return;
+    // отправляем каждый символ отдельно
+    for (const ch of val) {
+      onKeyPress(ch);
+    }
+    // очистим поле, чтобы следующий ввод был читаемым
+    e.target.value = "";
+  };
+
+  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const key = e.key;
+    // Обработаем Backspace и служебные клавиши
+    if (
+      key === "Backspace" ||
+      key === "Enter" ||
+      key === "Tab" ||
+      key === " " ||
+      key.startsWith("Arrow")
+    ) {
+      e.preventDefault();
+      onKeyPress(key === " " ? " " : key);
+    }
+  };
+
   if (isLoading || session.words.length === 0) {
     return <LoadingScreen />;
   }
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" gap={10}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      gap={10}
+      position="relative"
+      onClick={() => inputRef.current?.focus()}
+    >
+      {/* Скрытое поле для вызова экранной клавиатуры на мобильных */}
+      <Input
+        ref={inputRef}
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        aria-label="typing-input"
+        position="absolute"
+        top={2}
+        right={2}
+        w="1px"
+        h="1px"
+        opacity={0}
+        zIndex={0}
+        border={0}
+        p={0}
+        bg="transparent"
+        onChange={handleMobileInput}
+        onKeyDown={handleMobileKeyDown}
+      />
       {session.isStarted ? (
         <TypingScreenStats
           stats={session.stats}
@@ -120,6 +193,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
         />
       ) : (
         <SettingsBar
+          hideBelow="md"
           isVisible={!session.isStarted}
           selectedTime={selectedTime}
           selectedWords={selectedWords}
@@ -133,7 +207,13 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
           onTestTypeChange={onTestTypeChange}
         />
       )}
-      <Box display="flex" flexDirection="column" alignItems="center" gap={6}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        gap={6}
+        maxW="100%"
+      >
         {!isLoading && session.words.length > 0 && (
           <Box
             display="flex"
@@ -147,6 +227,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
               textStyle="body"
               height="200px"
               display="block"
+              overflowY="scroll"
               width="100%"
               textAlign="justify"
               position="relative"

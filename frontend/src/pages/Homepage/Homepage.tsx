@@ -124,7 +124,7 @@ const Homepage = () => {
   return (
     <Box
       display="flex"
-      px="200px"
+      px={{ base: 4, md: 10, xl: 200 }}
       alignItems="center"
       justifyContent="center"
       flexDirection="column"

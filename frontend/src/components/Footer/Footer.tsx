@@ -19,7 +19,15 @@ const Footer: React.FC<FooterProps> = () => {
   }, []);
 
   return (
-    <Box as="footer" textStyle="body" bg="bgPage" py={6} px="200px" mt="auto">
+    <Box
+      as="footer"
+      textStyle="body"
+      fontSize={{ base: "sm", md: "md" }}
+      bg="bgPage"
+      py={{ base: 4, md: 6 }}
+      px={{ base: 10, xl: 200 }}
+      mt="auto"
+    >
       <Flex
         direction={{ base: "column", md: "row" }}
         justify="space-between"
@@ -28,11 +36,12 @@ const Footer: React.FC<FooterProps> = () => {
       >
         <Box
           opacity={0.6}
-          fontSize="md"
           textAlign="center"
           display="flex"
-          flexDirection="row"
+          flexDirection={{ base: "column", md: "row" }}
           gap={2}
+          alignItems="center"
+          justifyContent="center"
         >
           <Text>&copy; shilkagod {new Date().getFullYear()}</Text>
           <Text animation="fadeIn 1s ease-in-out">{version}</Text>
