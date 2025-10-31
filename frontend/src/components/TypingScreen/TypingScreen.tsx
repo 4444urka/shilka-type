@@ -45,6 +45,8 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
 }) => {
   const pressedKeysRef = React.useRef<Set<string>>(new Set());
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
+  const wordRefs = React.useRef<Array<HTMLElement | null>>([]);
 
   // Обработка клавиатуры вынесена в родительский компонент
   React.useEffect(() => {
@@ -122,6 +124,25 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
       }
     }
   }, [session.isStarted]);
+
+  // Автоскролл к текущему слову: прокручиваем контейнер, чтобы текущее слово было видно
+  React.useEffect(() => {
+    const idx = session.currentWordIndex;
+    const container = scrollContainerRef.current;
+    const target = wordRefs.current[idx];
+    if (container && target) {
+      const containerTop = container.scrollTop;
+      const containerBottom = containerTop + container.clientHeight;
+      const targetTop = target.offsetTop;
+      const targetBottom = targetTop + target.clientHeight;
+
+      if (targetTop < containerTop || targetBottom > containerBottom) {
+        // Прокручиваем так, чтобы элемент оказался в центре контейнера
+        const scrollTo = targetTop - container.clientHeight / 2 + target.clientHeight / 2;
+        container.scrollTo({ top: scrollTo, behavior: "smooth" });
+      }
+    }
+  }, [session.currentWordIndex, session.words.length]);
 
   const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -224,30 +245,41 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
             key={session.words.map((w) => w.text).join("-")}
           >
             <Box
+              ref={scrollContainerRef}
               textStyle="body"
               height="200px"
               display="block"
-              overflowY="scroll"
+              overflowY="auto"
               width="100%"
               textAlign="justify"
               position="relative"
               css={{
                 textAlignLast: "justify",
                 hyphens: "none",
+                // allow normal wrapping and inline flow
+                whiteSpace: "normal",
               }}
             >
               {session.words.map((word, wordIndex) => (
-                <TypingWordComponent
-                  key={`word-${wordIndex}`}
-                  word={word}
-                  wordIndex={wordIndex}
-                  currentCharIndex={
-                    wordIndex === session.currentWordIndex
-                      ? session.currentCharIndex
-                      : -1
-                  }
-                  isCurrentWord={wordIndex === session.currentWordIndex}
-                />
+                <Box
+                  as="span"
+                  key={`word-wrapper-${wordIndex}`}
+                  ref={(el: HTMLElement | null) => (wordRefs.current[wordIndex] = el)}
+                  display="inline-block"
+                  mr={2}
+                >
+                  <TypingWordComponent
+                    key={`word-${wordIndex}`}
+                    word={word}
+                    wordIndex={wordIndex}
+                    currentCharIndex={
+                      wordIndex === session.currentWordIndex
+                        ? session.currentCharIndex
+                        : -1
+                    }
+                    isCurrentWord={wordIndex === session.currentWordIndex}
+                  />
+                </Box>
               ))}
             </Box>
             <RestartButton onClick={onRestart} />
