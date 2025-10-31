@@ -138,7 +138,8 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
 
       if (targetTop < containerTop || targetBottom > containerBottom) {
         // Прокручиваем так, чтобы элемент оказался в центре контейнера
-        const scrollTo = targetTop - container.clientHeight / 2 + target.clientHeight / 2;
+        const scrollTo =
+          targetTop - container.clientHeight / 2 + target.clientHeight / 2;
         container.scrollTo({ top: scrollTo, behavior: "smooth" });
       }
     }
@@ -264,7 +265,9 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
                 <Box
                   as="span"
                   key={`word-wrapper-${wordIndex}`}
-                  ref={(el: HTMLElement | null) => (wordRefs.current[wordIndex] = el)}
+                  ref={(el: HTMLElement | null) =>
+                    (wordRefs.current[wordIndex] = el)
+                  }
                   display="inline-block"
                   mr={2}
                 >
