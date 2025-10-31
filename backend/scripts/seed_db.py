@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import AsyncSessionLocal, engine, Base
 from src.auth.models import User
+from src.theme.models import Theme
 from src.stats.models import TypingSession
 from src.auth.utils import get_password_hash
 
@@ -121,6 +122,13 @@ async def seed_users(db: AsyncSession, count: int = 10) -> list[User]:
             username=username,
             hashed_password=get_password_hash("password123"),  # Простой пароль для тестов
             shilka_coins=random.randint(0, 1000)
+            ,
+            # Значения по умолчанию для настроек
+            default_time=30,
+            default_words=25,
+            default_language="en",
+            default_mode="words",
+            default_test_type="time",
         )
         
         db.add(user)
@@ -135,21 +143,52 @@ async def seed_users(db: AsyncSession, count: int = 10) -> list[User]:
     return users
 
 
+async def seed_themes(db: AsyncSession, users: list[User], count: int = 5) -> list[Theme]:
+    """Создаёт несколько тестовых тем и назначает авторов"""
+    themes = []
+    sample_theme_data = {
+        "colors": {"bg": "#ffffff", "text": "#000000", "primary": "#ff6600"},
+        "font": "Inter",
+    }
+
+    for i in range(count):
+        author = random.choice(users)
+        theme = Theme(
+            name=f"Theme {i+1}",
+            author_id=author.id,
+            theme_data=json.dumps(sample_theme_data),
+            is_public=True,
+            created_at=datetime.utcnow(),
+        )
+        db.add(theme)
+        themes.append(theme)
+
+    await db.commit()
+    for t in themes:
+        await db.refresh(t)
+
+    return themes
+
+
 async def seed_sessions(db: AsyncSession, users: list[User], sessions_per_user: int = 20):
     """Создает тестовые сессии печати для пользователей"""
+    total_created = 0
     for user in users:
+        created_for_user = 0
         for day in range(sessions_per_user):
             # Генерируем от 1 до 3 сессий за день
             sessions_today = random.randint(1, 3)
-            
+
             for _ in range(sessions_today):
                 session = generate_typing_session(user.id, days_ago=day)
                 db.add(session)
-        
-        print(f"✓ Создано {sessions_per_user * 2} сессий для пользователя {user.username}")
-    
+                created_for_user += 1
+
+        total_created += created_for_user
+        print(f"✓ Создано {created_for_user} сессий для пользователя {user.username}")
+
     await db.commit()
-    print(f"\n✓ Всего создано {sessions_per_user * 2 * len(users)} сессий")
+    print(f"\n✓ Всего создано {total_created} сессий")
 
 
 async def main():
@@ -167,6 +206,18 @@ async def main():
             print("👥 Создаем тестовых пользователей...")
             users = await seed_users(db, count=10)
             print(f"✓ Создано {len(users)} пользователей\n")
+            # Создаём тестовые темы и связываем некоторые с пользователями
+            print("🎨 Создаём тестовые темы...")
+            themes = await seed_themes(db, users, count=5)
+            print(f"✓ Создано {len(themes)} тем\n")
+
+            # Назначаем случайные выбранные темы пользователям (примерно половине)
+            for user in users:
+                if themes and random.random() > 0.5:
+                    chosen = random.choice(themes)
+                    user.selected_theme_id = chosen.id
+                    db.add(user)
+            await db.commit()
             
             # Генерируем сессии печати
             print("⌨️  Создаем тестовые сессии печати...")

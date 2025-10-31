@@ -20,6 +20,11 @@ class UserInDB(UserBase):
     hashed_password: str
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None
+    default_time: int | None = 30
+    default_words: int | None = 25
+    default_language: str | None = "en"
+    default_mode: str | None = "words"
+    default_test_type: str | None = "time"
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -28,7 +33,20 @@ class UserPublic(UserBase):
     # Может прийти None из ORM, позволяем и даём дефолт 0
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None
+    default_time: int | None = 30
+    default_words: int | None = 25
+    default_language: str | None = "en"
+    default_mode: str | None = "words"
+    default_test_type: str | None = "time"
     model_config = ConfigDict(from_attributes=True)
+
+
+class SettingsUpdate(BaseModel):
+    default_time: int | None = None
+    default_words: int | None = None
+    default_language: str | None = None
+    default_mode: str | None = None
+    default_test_type: str | None = None
 
 class Token(BaseModel):
     access_token: str
