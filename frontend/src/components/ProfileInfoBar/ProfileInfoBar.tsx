@@ -65,7 +65,6 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
             <Text
               fontWeight="semibold"
               overflow="hidden"
-              fontSize={{ base: "xl", sm: "2xl" }}
               whiteSpace="nowrap"
               textOverflow="ellipsis"
               maxW={{ base: "160px", md: "240px" }}

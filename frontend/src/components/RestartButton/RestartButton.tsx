@@ -17,12 +17,20 @@ const RestartButton: React.FC<RestartButtonProps> = ({ onClick, ...rest }) => {
       aria-label="Restart"
       variant="ghost"
       alignSelf="center"
-      size="lg"
+      size={{ base: "md", md: "lg" }}
+      minW={{ base: "44px", md: "48px" }}
+      minH={{ base: "44px", md: "48px" }}
       color="primaryColor"
+      fontSize={{ base: "20px", md: "24px" }}
       onClick={handleClick}
       onMouseDown={(e) => e.preventDefault()}
       {...rest}
       _hover={{ bg: "bgCardColor" }}
+      _active={{ transform: "scale(0.95)" }}
+      css={{
+        WebkitTapHighlightColor: "transparent",
+        touchAction: "manipulation",
+      }}
     >
       <VscDebugRestart />
     </IconButton>

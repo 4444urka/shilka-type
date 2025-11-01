@@ -63,8 +63,8 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         return response
 
 
-app.add_middleware(RequestLoggingMiddleware)
-
+# ВАЖНО: CORS middleware должен быть добавлен ПЕРВЫМ (последним в коде),
+# чтобы обрабатывать preflight OPTIONS запросы до других middleware
 origins = os.getenv("ALLOW_ORIGINS", "").split(",")
 
 app.add_middleware(
@@ -73,7 +73,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# RequestLoggingMiddleware добавляется после CORS
+app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(stats_router, prefix="/api/stats", tags=["stats"])

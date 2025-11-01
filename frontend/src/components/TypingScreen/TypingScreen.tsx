@@ -242,18 +242,19 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
             flexDirection="column"
             alignItems="center"
             gap={10}
-            animation="fadeIn 0.5s ease-in-out"
             key={session.words.map((w) => w.text).join("-")}
           >
             <Box
               ref={scrollContainerRef}
               textStyle="body"
-              height="200px"
+              height={{ base: "150px", sm: "180px", md: "200px" }}
               display="block"
               overflowY="auto"
+              overflowX="visible"
               width="100%"
               textAlign="justify"
               position="relative"
+              fontSize={{ base: "lg", sm: "xl", md: "2xl" }}
               css={{
                 textAlignLast: "justify",
                 hyphens: "none",

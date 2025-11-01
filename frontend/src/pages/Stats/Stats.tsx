@@ -34,12 +34,12 @@ const Stats = () => {
   return (
     <Box
       textStyle="body"
-      p="20px"
-      px={{ base: 0, md: 10, xl: 200 }}
+      p={{ base: "10px", sm: "15px", md: "20px" }}
+      px={{ base: 2, sm: 4, md: 10, xl: 200 }}
       display="grid"
       gridTemplateColumns="repeat(12, 1fr)"
       gridTemplateRows="auto"
-      gap={{ base: 2, md: 4 }}
+      gap={{ base: 2, sm: 3, md: 4 }}
       minHeight="calc(100vh - 140px)"
     >
       <LoadingScreen isLoading={isLoadingLeaderboard || isLoadingUser} />
@@ -49,8 +49,11 @@ const Stats = () => {
         <ProfileInfoBar user={user} totalStats={totalStats} />
       </Box>
 
-      {/* Leaderboard - левая колонка (3 из 12) */}
-      <Box gridColumn={{ base: "1 / -1", lg: "1 / 4" }} gridRow="2 / 4">
+      {/* Leaderboard - левая колонка (3 из 12) на десктопе, полная ширина на мобильных */}
+      <Box
+        gridColumn={{ base: "1 / -1", lg: "1 / 4" }}
+        gridRow={{ base: "auto", lg: "2 / 4" }}
+      >
         <Leaderboard leaderboard={leaderboard} />
       </Box>
 
@@ -59,8 +62,8 @@ const Stats = () => {
         <StatsChart hideBelow="md" sessions={[...sessions].reverse()} />
       </Box>
 
-      {/* Keyboard - правая средняя часть (9 из 12) */}
-      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }}>
+      {/* Keyboard - правая средняя часть (9 из 12), скрываем на маленьких экранах */}
+      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} hideBelow="md">
         <Keyboard />
       </Box>
 
