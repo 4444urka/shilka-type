@@ -22,3 +22,16 @@ class TypingSession(Base):
     # Связь с пользователем
     user = relationship("User", back_populates="typing_sessions")
     
+
+class CoinTransaction(Base):
+    __tablename__ = "coin_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    typing_session_id = Column(Integer, ForeignKey("typing_sessions.id"), nullable=True, unique=True)
+    amount = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Связи (опционально)
+    user = relationship("User")
+    typing_session = relationship("TypingSession")

@@ -3,6 +3,9 @@ import type { TypingSessionNew } from "../types/TypingTypes";
 import { postWordHistory } from "../api/stats/statsRequests";
 import { convertSessionToPayload } from "../utils/sessionDataConverter";
 import { logger } from "../utils/logger";
+import { fetchCurrentUser } from "../api/auth/authRequests";
+import { useDispatch } from "react-redux";
+import { setPoints } from "../slices/shilkaCoinsSlice";
 
 interface UseSessionDataSyncProps {
   enabled?: boolean;
@@ -21,6 +24,7 @@ export const useSessionDataSync = ({
   testType,
 }: UseSessionDataSyncProps = {}) => {
   const dataSentRef = useRef<boolean>(false);
+  const dispatch = useDispatch();
 
   const sendSessionData = useCallback(
     async (session: TypingSessionNew) => {
@@ -63,12 +67,25 @@ export const useSessionDataSync = ({
 
         await postWordHistory(payload);
         logger.log("Данные сессии успешно отправлены на сервер");
+
+        // Обновляем баланс на фронте: забираем актуального пользователя и ставим значение shilka_coins
+        try {
+          const me = await fetchCurrentUser();
+          if (me && typeof me.shilka_coins === "number") {
+            dispatch(setPoints(me.shilka_coins));
+            logger.log("Баланс обновлён из ответа сервера", {
+              shilka_coins: me.shilka_coins,
+            });
+          }
+        } catch (err) {
+          logger.warn("Не удалось обновить баланс после отправки сессии", err);
+        }
       } catch (error) {
         logger.error("Ошибка при отправке данных сессии:", error);
         dataSentRef.current = false; // Сбрасываем флаг при ошибке
       }
     },
-    [enabled, mode, language, testType]
+    [enabled, mode, language, testType, dispatch]
   );
 
   const resetSyncState = useCallback(() => {

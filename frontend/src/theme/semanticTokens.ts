@@ -5,8 +5,8 @@ export const semanticTokens = defineSemanticTokens({
     // Primary color - основной акцентный цвет
     primaryColor: {
       value: {
-        _light: "{colors.cyan.500}",
-        _dark: "{colors.cyan.400}",
+        _light: "{colors.purple.500}",
+        _dark: "{colors.purple.400}",
       },
     },
 

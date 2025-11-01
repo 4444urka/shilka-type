@@ -11,8 +11,8 @@ from .schemas import UserCreate
 
 
 async def register_user(user: UserCreate, db: AsyncSession):
-    """Register a new user. Raises HTTPException on error."""
-    # Check existing
+    """Зарегистрировать нового пользователя. В случае ошибки вызывает HTTPException."""
+    # Проверяем существование пользователя
     result = await db.execute(
         select(models.User).filter(models.User.username == user.username)
     )
