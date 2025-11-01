@@ -17,7 +17,7 @@ const useFetchLeaderboard = () => {
           setIsLoading(false);
         })
         .catch((err) => {
-          setError(err.message || "Ошибка при загрузке лидерборда");
+          setError(`Не удалось загрузить список лидеров: ${err.message}`);
           setIsLoading(false);
         });
     };

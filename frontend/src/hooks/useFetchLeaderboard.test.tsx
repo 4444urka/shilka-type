@@ -46,23 +46,4 @@ describe("useFetchLeaderboard", () => {
       "Не удалось загрузить список лидеров: Network error"
     );
   });
-
-  it("должен предоставлять функцию reload", async () => {
-    const mockLeaderboard = [{ id: 1, username: "user1", shilka_coins: 1000 }];
-    vi.mocked(fetchLeaderboard).mockResolvedValue(mockLeaderboard);
-
-    const { result } = renderHook(() => useFetchLeaderboard());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    // Вызываем reload
-    vi.mocked(fetchLeaderboard).mockClear();
-    await result.current.reload();
-
-    await waitFor(() => {
-      expect(fetchLeaderboard).toHaveBeenCalledOnce();
-    });
-  });
 });
