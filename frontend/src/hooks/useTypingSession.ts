@@ -13,6 +13,8 @@ interface UseTypingSessionProps {
   wordsCount: number;
   onComplete?: (session: TypingSessionNew) => void;
   onTimeUp?: (session: TypingSessionNew) => void;
+  onNeedMoreWords?: () => void;
+  settingsKey?: string; // Ключ для отслеживания изменения настроек
 }
 
 export const useTypingSession = ({
@@ -22,6 +24,8 @@ export const useTypingSession = ({
   wordsCount,
   onComplete,
   onTimeUp,
+  onNeedMoreWords,
+  settingsKey,
 }: UseTypingSessionProps) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [timeLeft, setTimeLeft] = useState(initialTime);
@@ -63,6 +67,26 @@ export const useTypingSession = ({
     },
     [initialTime, wordsCount, testType]
   );
+
+  const addMoreWords = useCallback((newWords: string[]) => {
+    setSession((prevSession) => {
+      const newTypingWords: TypingWord[] = newWords.map((word) => ({
+        text: word,
+        chars: word.split("").map((char) => ({
+          char,
+          correct: false,
+          typed: false,
+        })),
+        completed: false,
+        active: false,
+      }));
+
+      return {
+        ...prevSession,
+        words: [...prevSession.words, ...newTypingWords],
+      };
+    });
+  }, []);
 
   const [session, setSession] = useState<TypingSessionNew>(() =>
     initializeSession(words)
@@ -167,6 +191,16 @@ export const useTypingSession = ({
               newSession.currentWordIndex,
               newSession.currentCharIndex
             );
+
+            // Проверяем, нужно ли подгрузить новые слова (для режима "time")
+            // Загружаем, когда осталось меньше 2 слов
+            if (
+              testType === "time" &&
+              onNeedMoreWords &&
+              newSession.words.length - newSession.currentWordIndex <= 2
+            ) {
+              onNeedMoreWords();
+            }
           }
         } else if (key.length === 1) {
           if (currentChar) {
@@ -181,9 +215,17 @@ export const useTypingSession = ({
             if (newSession.currentCharIndex === currentWord.chars.length) {
               currentWord.completed = true;
               if (newSession.currentWordIndex === newSession.words.length - 1) {
-                newSession.isCompleted = true;
-                newSession.endTime = Date.now();
-                currentWord.active = false;
+                // В режиме "words" завершаем сессию
+                if (testType === "words") {
+                  newSession.isCompleted = true;
+                  newSession.endTime = Date.now();
+                  currentWord.active = false;
+                } else {
+                  // В режиме "time" подгружаем новые слова
+                  if (onNeedMoreWords) {
+                    onNeedMoreWords();
+                  }
+                }
               }
             }
           }
@@ -193,8 +235,17 @@ export const useTypingSession = ({
         return newSession;
       });
     },
-    [session.isCompleted, updateCursorPosition, calculateStats]
+    [
+      session.isCompleted,
+      updateCursorPosition,
+      calculateStats,
+      testType,
+      onNeedMoreWords,
+    ]
   );
+
+  // Флаг для отслеживания инициализации сессии
+  const isInitializedRef = useRef(false);
 
   const resetSession = useCallback(() => {
     if (intervalRef.current) {
@@ -204,6 +255,7 @@ export const useTypingSession = ({
     setCursorPosition({ wordIndex: 0, charIndex: 0, x: 0, y: 0 });
     setTimeLeft(initialTime);
     setElapsedTime(0);
+    isInitializedRef.current = true;
   }, [initializeSession, words, initialTime]);
 
   useEffect(() => {
@@ -257,11 +309,33 @@ export const useTypingSession = ({
     session.isStarted,
   ]);
 
+  // Отслеживаем изменения настроек и слов
+  const prevSettingsKeyRef = useRef(settingsKey);
+  const prevWordsFirstRef = useRef(words[0]);
+
+  // Инициализируем сессию только при первой загрузке слов или изменении настроек
   useEffect(() => {
-    if (words.length > 0) {
+    const settingsChanged = settingsKey !== prevSettingsKeyRef.current;
+    const wordsChanged =
+      words.length > 0 && words[0] !== prevWordsFirstRef.current;
+
+    // Сбрасываем сессию только если:
+    // 1. Еще не инициализирована И есть слова
+    // 2. ИЛИ настройки изменились И слова тоже обновились И сессия не начата
+    const shouldReset =
+      (words.length > 0 && !isInitializedRef.current) ||
+      (settingsChanged && wordsChanged && !session.isStarted);
+
+    if (shouldReset) {
       resetSession();
+      isInitializedRef.current = true;
+      prevSettingsKeyRef.current = settingsKey;
+      prevWordsFirstRef.current = words[0];
+    } else if (wordsChanged && !settingsChanged) {
+      // Если только слова изменились (подгрузка), обновляем ссылку
+      prevWordsFirstRef.current = words[0];
     }
-  }, [words, resetSession]);
+  }, [words, resetSession, settingsKey, session.isStarted]);
 
   return {
     session,
@@ -269,5 +343,6 @@ export const useTypingSession = ({
     timeLeft: testType === "time" ? timeLeft : elapsedTime,
     handleKeyPress,
     resetSession,
+    addMoreWords,
   };
 };

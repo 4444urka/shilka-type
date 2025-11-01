@@ -242,7 +242,6 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
             flexDirection="column"
             alignItems="center"
             gap={10}
-            animation="fadeIn 0.5s ease-in-out"
             key={session.words.map((w) => w.text).join("-")}
           >
             <Box

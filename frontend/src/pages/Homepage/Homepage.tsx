@@ -34,13 +34,13 @@ const Homepage = () => {
     setSelectedTestType((user.default_test_type as "time" | "words") || "time");
   }, [user]);
 
-  const { words, refreshWords } = useGetRandomWords(
-    2,
-    5,
-    250,
-    selectedLanguage,
-    selectedMode
-  );
+  const {
+    words,
+    refreshWords,
+    addMoreWords: addMoreWordsToList,
+  } = useGetRandomWords(2, 5, 170, selectedLanguage, selectedMode);
+
+  const [isLoadingMoreWords, setIsLoadingMoreWords] = useState(false);
 
   // Хук для отправки данных на сервер
   const { sendSessionData, resetSyncState } = useSessionDataSync({
@@ -66,14 +66,30 @@ const Homepage = () => {
     [sendSessionData]
   );
 
-  const { session, timeLeft, handleKeyPress, resetSession } = useTypingSession({
-    words,
-    initialTime: selectedTime,
-    onComplete: handleTypingComplete,
-    onTimeUp: handleTimeUp,
-    testType: selectedTestType,
-    wordsCount: selectedWords,
-  });
+  const handleNeedMoreWords = useCallback(() => {
+    if (!isLoadingMoreWords && selectedTestType === "time") {
+      setIsLoadingMoreWords(true);
+      // Загружаем дополнительные слова (80 символов вместо 250)
+      void addMoreWordsToList(30).finally(() => {
+        setIsLoadingMoreWords(false);
+      });
+    }
+  }, [isLoadingMoreWords, addMoreWordsToList, selectedTestType]);
+
+  // Создаём ключ настроек для отслеживания их изменений
+  const settingsKey = `${selectedLanguage}-${selectedMode}-${selectedTestType}-${selectedWords}-${selectedTime}`;
+
+  const { session, timeLeft, handleKeyPress, resetSession, addMoreWords } =
+    useTypingSession({
+      words,
+      initialTime: selectedTime,
+      onComplete: handleTypingComplete,
+      onTimeUp: handleTimeUp,
+      testType: selectedTestType,
+      wordsCount: selectedWords,
+      onNeedMoreWords: handleNeedMoreWords,
+      settingsKey,
+    });
 
   React.useEffect(() => {
     if (session.isCompleted) {
@@ -82,6 +98,29 @@ const Homepage = () => {
       setShilkaCoins({ value: earnedCoins });
     }
   }, [session]);
+
+  // Добавляем новые слова в сессию, когда они загружаются
+  const prevWordsLengthRef = React.useRef(words.length);
+  React.useEffect(() => {
+    if (
+      session.isStarted &&
+      !session.isCompleted &&
+      words.length > prevWordsLengthRef.current &&
+      selectedTestType === "time"
+    ) {
+      const newWords = words.slice(prevWordsLengthRef.current);
+      if (newWords.length > 0) {
+        addMoreWords(newWords);
+      }
+    }
+    prevWordsLengthRef.current = words.length;
+  }, [
+    words,
+    session.isStarted,
+    session.isCompleted,
+    selectedTestType,
+    addMoreWords,
+  ]);
 
   const handleRestart = useCallback(() => {
     setShowResults(false);
@@ -126,6 +165,7 @@ const Homepage = () => {
   const handleLanguageChange = useCallback(
     (language: "en" | "ru") => {
       setSelectedLanguage(language);
+      // refreshWords не нужен - изменение selectedLanguage автоматически обновит слова
       if (isAuthed) {
         void updateUserSettings({ default_language: language }).catch((err) =>
           console.error("Failed to save settings:", err)
