@@ -2,8 +2,6 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 from src.database import Base
-from sqlalchemy import Column, DateTime
-from datetime import datetime
 
 
 class TypingSession(Base):
