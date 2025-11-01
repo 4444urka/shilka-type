@@ -1,4 +1,3 @@
-import json
 import pytest
 
 from src.stats import utils as stats_utils
