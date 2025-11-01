@@ -63,10 +63,7 @@ const Stats = () => {
       </Box>
 
       {/* Keyboard - правая средняя часть (9 из 12), скрываем на маленьких экранах */}
-      <Box
-        gridColumn={{ base: "1 / -1", lg: "4 / -1" }}
-        hideBelow="md"
-      >
+      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} hideBelow="md">
         <Keyboard />
       </Box>
 
