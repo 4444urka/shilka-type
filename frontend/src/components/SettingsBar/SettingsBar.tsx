@@ -91,19 +91,28 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         bg="bgCardColor"
         exit={{ opacity: 0, y: -20 }}
         display="flex"
+        flexDirection={{ base: "column", md: "row" }}
         alignItems="center"
         justifyContent="center"
-        gap={8}
+        gap={{ base: 3, md: 8 }}
         mb={4}
-        py={2}
-        px={4}
+        py={{ base: 3, md: 2 }}
+        px={{ base: 3, md: 4 }}
         borderRadius="lg"
         backdropFilter="blur(16px)"
         textStyle="input"
+        maxW="100%"
+        overflowX={{ base: "auto", md: "visible" }}
       >
         {/* Переключатель типа теста */}
-        <Box display="flex" alignItems="center" gap={3}>
-          <Box display="flex" gap={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={{ base: 2, md: 3 }}
+          flexWrap="wrap"
+          justifyContent="center"
+        >
+          <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
             {testTypeOptions.map((testType) => {
               const IconComponent = testType.icon;
               return (
@@ -116,24 +125,43 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   }
                   onClick={() => handleTestTypeChange(testType.code)}
                   onMouseDown={(e) => e.preventDefault()}
+                  fontSize={{ base: "sm", md: "md" }}
+                  px={{ base: 2, md: 3 }}
+                  py={{ base: 1, md: 2 }}
                 >
                   <IconComponent />
-                  {testType.name}
+                  <Box display={{ base: "none", sm: "inline" }}>
+                    {testType.name}
+                  </Box>
                 </SettingsBarButton>
               );
             })}
           </Box>
         </Box>
-        <Box width="1px" height="32px" bg="primaryColor" />
+        <Box
+          width={{ base: "100%", md: "1px" }}
+          height={{ base: "1px", md: "32px" }}
+          bg="primaryColor"
+          display={{ base: "none", md: "block" }}
+        />
         {/* Настройка времени или количества слов */}
         {selectedTestType === "time" ? (
-          <Box display="flex" alignItems="center" gap={3}>
-            <Box display="flex" gap={2}>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={{ base: 2, md: 3 }}
+            flexWrap="wrap"
+            justifyContent="center"
+          >
+            <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
               {timeOptions.map((time) => (
                 <SettingsBarButton
                   key={time}
                   color={selectedTime === time ? "primaryColor" : "textColor"}
                   onClick={() => handleTimeChange(time)}
+                  fontSize={{ base: "sm", md: "md" }}
+                  px={{ base: 2, md: 3 }}
+                  py={{ base: 1, md: 2 }}
                 >
                   {time}с
                 </SettingsBarButton>
@@ -141,13 +169,22 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
             </Box>
           </Box>
         ) : (
-          <Box display="flex" alignItems="center" gap={3}>
-            <Box display="flex" gap={2}>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={{ base: 2, md: 3 }}
+            flexWrap="wrap"
+            justifyContent="center"
+          >
+            <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
               {wordsOptions.map((words) => (
                 <SettingsBarButton
                   key={words}
                   color={selectedWords === words ? "primaryColor" : "textColor"}
                   onClick={() => handleWordsChange(words)}
+                  fontSize={{ base: "sm", md: "md" }}
+                  px={{ base: 2, md: 3 }}
+                  py={{ base: 1, md: 2 }}
                 >
                   {words}
                 </SettingsBarButton>
@@ -156,10 +193,21 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           </Box>
         )}
         {/* Разделитель */}
-        <Box width="1px" height="32px" bg="primaryColor" />
+        <Box
+          width={{ base: "100%", md: "1px" }}
+          height={{ base: "1px", md: "32px" }}
+          bg="primaryColor"
+          display={{ base: "none", md: "block" }}
+        />
         {/* Настройка режима */}
-        <Box display="flex" alignItems="center" gap={3}>
-          <Box display="flex" gap={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={{ base: 2, md: 3 }}
+          flexWrap="wrap"
+          justifyContent="center"
+        >
+          <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
             {modeOptions.map((mode) => {
               const IconComponent = mode.icon;
               return (
@@ -169,19 +217,35 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                     selectedMode === mode.code ? "primaryColor" : "textColor"
                   }
                   onClick={() => handleModeChange(mode.code)}
+                  fontSize={{ base: "sm", md: "md" }}
+                  px={{ base: 2, md: 3 }}
+                  py={{ base: 1, md: 2 }}
                 >
                   <IconComponent />
-                  {mode.name}
+                  <Box display={{ base: "none", sm: "inline" }}>
+                    {mode.name}
+                  </Box>
                 </SettingsBarButton>
               );
             })}
           </Box>
         </Box>
         {/* Разделитель */}
-        <Box width="1px" height="32px" bg="primaryColor" />
+        <Box
+          width={{ base: "100%", md: "1px" }}
+          height={{ base: "1px", md: "32px" }}
+          bg="primaryColor"
+          display={{ base: "none", md: "block" }}
+        />
         {/* Настройка языка */}
-        <Box display="flex" alignItems="center" gap={3}>
-          <Box display="flex" gap={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={{ base: 2, md: 3 }}
+          flexWrap="wrap"
+          justifyContent="center"
+        >
+          <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
             {languageOptions.map((language) => (
               <SettingsBarButton
                 key={language.code}
@@ -191,6 +255,9 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                     : "textColor"
                 }
                 onClick={() => handleLanguageChange(language.code)}
+                fontSize={{ base: "sm", md: "md" }}
+                px={{ base: 2, md: 3 }}
+                py={{ base: 1, md: 2 }}
               >
                 {language.name}
               </SettingsBarButton>

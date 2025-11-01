@@ -41,10 +41,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
     >
       <Text
         textStyle="body"
-        fontSize={"3xl"}
+        fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
         display="flex"
         gap={2}
         flexDirection="row"
+        flexWrap="wrap"
+        justifyContent="center"
       >
         {testType == "time" ? (
           <Text as="span">Время: {session.initialTime}с</Text>
@@ -54,10 +56,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       </Text>
       <Text
         textStyle="body"
-        fontSize={"3xl"}
+        fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
         display="flex"
         gap={2}
         flexDirection="row"
+        flexWrap="wrap"
+        justifyContent="center"
       >
         WPM:
         <Text as="span" color="primaryColor">
@@ -67,10 +71,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
       <Text
         textStyle="body"
-        fontSize={"3xl"}
+        fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
         display="flex"
         gap={2}
         flexDirection="row"
+        flexWrap="wrap"
+        justifyContent="center"
       >
         Accuracy:
         <Text as="span" color="gray.400">
@@ -80,10 +86,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
       <Text
         textStyle="body"
-        fontSize={"3xl"}
+        fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
         display="flex"
         gap={2}
         flexDirection="row"
+        flexWrap="wrap"
+        justifyContent="center"
       >
         Символы:
         <Text fontWeight="bold" color="successColor">
@@ -98,12 +106,12 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       {isAuthed ? (
         <Box
           position="fixed"
-          top="90px "
+          top={{ base: "70px", md: "90px" }}
           textStyle="body"
-          fontSize="18px"
+          fontSize={{ base: "16px", md: "18px" }}
           color="primaryColor"
           opacity="0"
-          right="209px"
+          right={{ base: "20px", md: "100px", xl: "209px" }}
           animation="counterAnimation 2s ease-in-out"
         >
           {shilkaCoins.value > 0 ? "+" : ""}
