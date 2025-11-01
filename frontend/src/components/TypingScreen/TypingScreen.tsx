@@ -250,6 +250,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
               height="200px"
               display="block"
               overflowY="auto"
+              overflowX="visible"
               width="100%"
               textAlign="justify"
               position="relative"
