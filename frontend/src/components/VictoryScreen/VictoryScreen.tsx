@@ -2,10 +2,7 @@ import { Box, Text, type BoxProps } from "@chakra-ui/react";
 import React from "react";
 import RestartButton from "../RestartButton/RestartButton";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
-import { addCoins } from "../../api/stats/statsRequests";
 import type { TypingSessionNew } from "../../types/TypingTypes";
-import { useAppDispatch } from "../../store";
-import { addPoints } from "../../slices/shilkaCoinsSlice";
 
 export interface VictoryScreenProps extends BoxProps {
   session: TypingSessionNew;
@@ -20,20 +17,19 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
   shilkaCoins,
   testType,
 }) => {
-  const dispatch = useAppDispatch();
+  // dispatch not needed here; balance обновляется через useSessionDataSync
   const isAuthed = useIsAuthed();
   React.useEffect(() => {
     if (!isAuthed) return;
     (async () => {
+      // Награда теперь вычисляется на сервере при отправке typing-session.
+      // Здесь просто триггерим обновление лидерборда (баланс обновится из ответа сервера
+      // в useSessionDataSync, который делает fetchCurrentUser после postWordHistory).
       if (shilkaCoins.value !== 0) {
-        await addCoins(shilkaCoins.value);
-        dispatch(addPoints(shilkaCoins.value));
-        // После обновления койнов триггерим обновление лидерборда
-        // (хук useFetchLeaderboard подписан на это событие)
         window.dispatchEvent(new Event("leaderboard:reload"));
       }
     })();
-  }, [shilkaCoins.value, isAuthed, dispatch]);
+  }, [shilkaCoins.value, isAuthed]);
 
   return (
     <Box

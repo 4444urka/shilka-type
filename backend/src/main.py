@@ -1,7 +1,12 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+import time
+import logging
+
+from .logging_config import configure_logging
 
 from .auth.router import router as auth_router
 from .stats.router import router as stats_router
@@ -12,6 +17,8 @@ from .redis_client import redis_client
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Configure logging once during startup
+    configure_logging()
     """Управление жизненным циклом приложения"""
     # Startup: Создание таблиц (только для разработки, в prod используйте миграции)
     async with engine.begin() as conn:
@@ -36,6 +43,27 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        logger = logging.getLogger("app.request")
+        start = time.time()
+        try:
+            response = await call_next(request)
+            status_code = getattr(response, "status_code", None)
+        except Exception as exc:
+            # Log exception with traceback
+            logger.exception("Unhandled error while processing request %s %s", request.method, request.url.path)
+            raise
+        finally:
+            elapsed = (time.time() - start) * 1000.0
+            client = request.client.host if request.client else None
+            logger.info("%s %s %s %.2fms client=%s", request.method, request.url.path, status_code, elapsed, client)
+        return response
+
+
+app.add_middleware(RequestLoggingMiddleware)
 
 origins = os.getenv("ALLOW_ORIGINS", "").split(",")
 

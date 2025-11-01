@@ -22,11 +22,6 @@ class WordHistoryPayload(BaseModel):
     language: str | None = None  # язык (ru, en, etc.)
     test_type: str | None = Field(None, alias="testType")  # тип теста (time, words)
     model_config = ConfigDict(populate_by_name=True)
-    # NOTE: business logic (WPM/accuracy computation) was moved to
-    # `src.stats.utils` to keep schemas pure (DTO). Use
-    # `src.stats.utils.compute_wpm` and `src.stats.utils.compute_accuracy`
-    # from services or other parts of the codebase when you need to
-    # calculate metrics based on the payload.
 
 
 class TypingSessionResponse(BaseModel):

@@ -1,5 +1,7 @@
 import json
-from fastapi import APIRouter, Depends
+import logging
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+import os
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -13,20 +15,9 @@ from ..redis_client import redis_client
 
 
 router = APIRouter()
-
-
-@router.post("/add-coins", response_model=auth_schemas.UserPublic)
-async def add_coins(
-    payload: schemas.AddCoinsRequest,
-    current_user: auth_models.User = Depends(auth_utils.get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Добавить монеты пользователю"""
-    return await stats_service.add_coins(current_user, payload.amount, db)
-
+logger = logging.getLogger(__name__)
 
 @router.get("/leaderboard", response_model=list[auth_schemas.UserPublic])
-@cache(expire=60)  # Кэширование на 60 секунд
 async def get_leaderboard(db: AsyncSession = Depends(get_db)):
     """Получить таблицу лидеров по монетам (кэшируется на 60 сек)"""
     return await stats_service.get_leaderboard(db)

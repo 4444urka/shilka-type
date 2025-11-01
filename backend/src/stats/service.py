@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -7,9 +8,10 @@ from fastapi_cache.decorator import cache
 from ..auth import models as auth_models
 from . import models as stats_models
 from . import schemas as stats_schemas
-from .utils import compute_wpm, compute_accuracy
+from .utils import compute_wpm, compute_accuracy, compute_reward, compute_reward_from_history
 from ..redis_client import redis_client
 
+logger = logging.getLogger(__name__)
 
 async def add_coins(current_user: auth_models.User, amount: int, db: AsyncSession):
     current_user.shilka_coins = (current_user.shilka_coins or 0) + amount
@@ -33,7 +35,7 @@ async def get_leaderboard(db: AsyncSession):
 
 
 async def create_typing_session(current_user: auth_models.User, payload: stats_schemas.WordHistoryPayload, db: AsyncSession):
-    # use stat utility functions instead of methods on the schema
+    # Используем утилитные функции статистики вместо методов в схемах
     wpm = compute_wpm(payload.words, payload.history, payload.duration, payload.wpm)
     accuracy = compute_accuracy(payload.history, payload.accuracy)
 
@@ -59,8 +61,47 @@ async def create_typing_session(current_user: auth_models.User, payload: stats_s
     await db.commit()
     await db.refresh(typing_session)
 
+    # Начисление монет происходит на сервере (идемпотентно): создаём запись CoinTransaction, связанную с typing_session
+    # Если для этой сессии уже есть транзакция, повторно не начисляем.
+    existing = await db.execute(
+        select(stats_models.CoinTransaction).filter(stats_models.CoinTransaction.typing_session_id == typing_session.id)
+    )
+    txn = existing.scalars().first()
+    if not txn:
+        # Вычисляем дельту по истории: +1 за правильный символ, -1 за неправильный
+        try:
+            # Сохраняем историю в JSON в typing_session.history; парсим её и считаем награду по ней.
+            history = json.loads(typing_session.history)
+        except Exception:
+            # Резервный вариант: приблизительно вычисляем по wpm/accuracy (маловероятный путь)
+            coins = compute_reward(typing_session.wpm, typing_session.accuracy, typing_session.duration, typing_session.test_type)
+        else:
+            coins = compute_reward_from_history(history)
+
+        # Гарантируем, что баланс пользователя не уйдёт ниже нуля
+        current_balance = int(current_user.shilka_coins or 0)
+        applied = coins
+        if current_balance + applied < 0:
+            # Ограничиваем отрицательное изменение так, чтобы баланс стал ровно 0
+            applied = -current_balance
+
+        # Обновляем баланс пользователя
+        current_user.shilka_coins = current_balance + applied
+        db.add(current_user)
+
+        txn = stats_models.CoinTransaction(
+            user_id=current_user.id,
+            typing_session_id=typing_session.id,
+            amount=applied,
+        )
+        logger.info(f"Awarding {applied} coins to user {current_user.id} for typing session {typing_session.id}")
+        db.add(txn)
+        await db.commit()
+        await db.refresh(current_user)
+
     await redis_client.invalidate_pattern(f"fastapi-cache:get_typing_sessions*")
     await redis_client.invalidate_pattern(f"fastapi-cache:get_char_error_stats*")
+    await redis_client.invalidate_pattern("fastapi-cache:get_leaderboard*")
 
     return typing_session
 
