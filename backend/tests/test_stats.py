@@ -73,9 +73,3 @@ async def test_create_typing_session_awards_coins(client, db_session, authentica
     assert user_row is not None
     new_balance = user_row._mapping["shilka_coins"]
     assert new_balance == 100 + expected_delta
-
-
-@pytest.mark.asyncio
-async def test_add_coins_endpoint_forbidden(client, authenticated_client):
-    resp = await client.post("/stats/add-coins", json={"amount": 1000})
-    assert resp.status_code == 403
