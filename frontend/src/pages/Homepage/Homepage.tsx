@@ -27,13 +27,6 @@ const Homepage = () => {
 
   React.useEffect(() => {
     if (!user) return;
-    console.log("[Homepage] User settings loaded:", {
-      time: user.default_time,
-      words: user.default_words,
-      language: user.default_language,
-      mode: user.default_mode,
-      testType: user.default_test_type,
-    });
     setSelectedTime(user.default_time || 30);
     setSelectedWords(user.default_words || 25);
     setSelectedLanguage((user.default_language as "en" | "ru") || "en");
