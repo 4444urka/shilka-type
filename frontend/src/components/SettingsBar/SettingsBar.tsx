@@ -130,7 +130,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   py={{ base: 1, md: 2 }}
                 >
                   <IconComponent />
-                  <Box display={{ base: "none", sm: "inline" }}>
+                  <Box as="span" hideBelow="sm">
                     {testType.name}
                   </Box>
                 </SettingsBarButton>
@@ -142,7 +142,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           width={{ base: "100%", md: "1px" }}
           height={{ base: "1px", md: "32px" }}
           bg="primaryColor"
-          display={{ base: "none", md: "block" }}
+          hideBelow="md"
         />
         {/* Настройка времени или количества слов */}
         {selectedTestType === "time" ? (
@@ -197,7 +197,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           width={{ base: "100%", md: "1px" }}
           height={{ base: "1px", md: "32px" }}
           bg="primaryColor"
-          display={{ base: "none", md: "block" }}
+          hideBelow="md"
         />
         {/* Настройка режима */}
         <Box
@@ -222,7 +222,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   py={{ base: 1, md: 2 }}
                 >
                   <IconComponent />
-                  <Box display={{ base: "none", sm: "inline" }}>
+                  <Box as="span" hideBelow="sm">
                     {mode.name}
                   </Box>
                 </SettingsBarButton>
@@ -235,7 +235,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           width={{ base: "100%", md: "1px" }}
           height={{ base: "1px", md: "32px" }}
           bg="primaryColor"
-          display={{ base: "none", md: "block" }}
+          hideBelow="md"
         />
         {/* Настройка языка */}
         <Box
