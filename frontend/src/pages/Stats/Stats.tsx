@@ -51,19 +51,23 @@ const Stats = () => {
 
       {/* Leaderboard - левая колонка (3 из 12) на десктопе, полная ширина на мобильных */}
       <Box
-        gridColumn={{ base: "1 / -1", lg: "1 / 4" }}
+        gridColumn={{ base: "1 / -1", lg: "1 / 5" }}
         gridRow={{ base: "auto", lg: "2 / 4" }}
       >
         <Leaderboard leaderboard={leaderboard} />
       </Box>
 
       {/* StatsChart - правая верхняя часть (9 из 12) */}
-      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} gridRow={{ lg: "2" }}>
+      <Box gridColumn={{ base: "1 / -1", lg: "5 / -1" }} gridRow={{ lg: "2" }}>
         <StatsChart hideBelow="md" sessions={[...sessions].reverse()} />
       </Box>
 
       {/* Keyboard - правая средняя часть (9 из 12), скрываем на маленьких экранах */}
-      <Box gridColumn={{ base: "1 / -1", lg: "4 / -1" }} hideBelow="md">
+      <Box
+        gridColumn={{ base: "1 / -1", lg: "5 / -1" }}
+        gridRow={{ base: "3", lg: "3" }}
+        hideBelow="md"
+      >
         <Keyboard />
       </Box>
 

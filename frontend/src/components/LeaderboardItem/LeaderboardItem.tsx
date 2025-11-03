@@ -13,14 +13,24 @@ export interface LeaderboardItemProps extends BoxProps {
 }
 
 export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
-  ({ user, index, isCurrentUser, positionChange, coinsChanged, coinsIncreased, ...rest }) => {
+  ({
+    user,
+    index,
+    isCurrentUser,
+    positionChange,
+    coinsChanged,
+    coinsIncreased,
+    ...rest
+  }) => {
     const hasPositionChange =
       positionChange !== undefined && positionChange !== 0;
     const isPositionUp = positionChange && positionChange > 0;
-    
+
     // Определяем какую анимацию использовать
-    const coinsAnimation = coinsChanged 
-      ? (coinsIncreased ? "coinsAdded 1.5s ease-in-out" : "coinsRemoved 1.5s ease-in-out")
+    const coinsAnimation = coinsChanged
+      ? coinsIncreased
+        ? "coinsAdded 1.5s ease-in-out"
+        : "coinsRemoved 1.5s ease-in-out"
       : undefined;
 
     return (
