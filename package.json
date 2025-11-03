@@ -28,7 +28,7 @@
   "homepage": "https://github.com/4444urka/shilka-type#readme",
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
-    "@commitlint/config-conventional": "^19.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^12.0.0",
     "@semantic-release/github": "^10.0.0",
