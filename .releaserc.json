@@ -13,7 +13,7 @@
           { "type": "revert", "release": "patch" },
           { "type": "docs", "scope": "README", "release": "patch" },
           { "type": "refactor", "release": "patch" },
-          { "type": "style", "release": false },
+          { "type": "style", "release": "patch" },
           { "type": "chore", "release": false },
           { "type": "test", "release": false },
           { "scope": "no-release", "release": false }
@@ -42,6 +42,9 @@
             { "type": "ci", "section": "CI/CD" },
             { "type": "chore", "section": "Прочее", "hidden": true }
           ]
+        },
+        "writerOpts": {
+          "commitsSort": ["subject", "scope"]
         }
       }
     ],
