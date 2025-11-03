@@ -51,7 +51,17 @@ const Keyboard = () => {
   };
 
   return (
-    <Box hideBelow="md" p={4} bg="bgCardColor" borderRadius="md" w="100%">
+    <Box
+      hideBelow="md"
+      p={4}
+      bg="bgCardColor"
+      borderRadius="md"
+      w="100%"
+      h="100%"
+      minH={0}
+      display="flex"
+      flexDirection="column"
+    >
       <Box
         display="flex"
         justifyContent="space-between"
@@ -98,63 +108,72 @@ const Keyboard = () => {
           </Button>
         </Box>
       </Box>
-      {keyboardLayout.map((row, rowIndex) => (
-        <Box key={rowIndex} display="flex" justifyContent="center" mb={2}>
-          {row.map((key, keyIndex) => (
-            <Box
-              key={`${selectedLanguage}-${rowIndex}-${keyIndex}-${key}`}
-              boxSize={"60px"}
-              animation="fadeIn 1s ease-in-out"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px solid"
-              borderColor="gray.300"
-              borderRadius="md"
-              marginX="2px"
-              fontSize="1.5rem"
-              textTransform="uppercase"
-              userSelect="none"
-              transition="all 0.3s ease"
-              position="relative"
-              overflow="hidden"
-              _hover={{
-                borderColor: "primaryColor",
-                color: "primaryColor",
-                boxShadow: "sm",
-              }}
-              _before={{
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bg: "primaryColor",
-                opacity: getOpacityForChar(key),
-                borderRadius: "inherit",
-                zIndex: 0,
-              }}
-            >
-              <Box position="relative" zIndex={1}>
-                {key}
+      {/* Контейнер для рядов клавиш: растягивается, чтобы занимать оставшееся пространство */}
+      <Box
+        flex={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        overflowY="auto"
+      >
+        {keyboardLayout.map((row, rowIndex) => (
+          <Box key={rowIndex} display="flex" justifyContent="center" mb={2}>
+            {row.map((key, keyIndex) => (
+              <Box
+                key={`${selectedLanguage}-${rowIndex}-${keyIndex}-${key}`}
+                boxSize={"60px"}
+                animation="fadeIn 1s ease-in-out"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                border="1px solid"
+                borderColor="gray.300"
+                borderRadius="md"
+                marginX="2px"
+                fontSize="1.5rem"
+                textTransform="uppercase"
+                userSelect="none"
+                transition="all 0.3s ease"
+                position="relative"
+                overflow="hidden"
+                _hover={{
+                  borderColor: "primaryColor",
+                  color: "primaryColor",
+                  boxShadow: "sm",
+                }}
+                _before={{
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  bg: "primaryColor",
+                  opacity: getOpacityForChar(key),
+                  borderRadius: "inherit",
+                  zIndex: 0,
+                }}
+              >
+                <Box position="relative" zIndex={1}>
+                  {key}
+                </Box>
+                {/* Насечки на клавишах F и J (English) или А и О (Russian) */}
+                {(key === "f" || key === "j" || key === "а" || key === "о") && (
+                  <Box
+                    data-testid="key-notch"
+                    position="absolute"
+                    bottom="8px"
+                    width="8px"
+                    height="2px"
+                    bg="currentColor"
+                    zIndex={1}
+                  />
+                )}
               </Box>
-              {/* Насечки на клавишах F и J (English) или А и О (Russian) */}
-              {(key === "f" || key === "j" || key === "а" || key === "о") && (
-                <Box
-                  data-testid="key-notch"
-                  position="absolute"
-                  bottom="8px"
-                  width="8px"
-                  height="2px"
-                  bg="currentColor"
-                  zIndex={1}
-                />
-              )}
-            </Box>
-          ))}
-        </Box>
-      ))}
+            ))}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };

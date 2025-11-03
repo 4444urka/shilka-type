@@ -107,15 +107,52 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
         <Box
           position="fixed"
           top={{ base: "70px", md: "90px" }}
+          right={{ base: "20px", md: "100px", xl: "209px" }}
           textStyle="body"
           fontSize={{ base: "16px", md: "18px" }}
-          color="primaryColor"
-          opacity="0"
-          right={{ base: "20px", md: "100px", xl: "209px" }}
-          animation="counterAnimation 2s ease-in-out"
+          display="flex"
+          flexDirection="column"
+          alignItems="flex-end"
+          gap={1}
         >
-          {shilkaCoins.value > 0 ? "+" : ""}
-          {shilkaCoins.value}
+          {/* Заработано (зелёные) - плавно появляется и исчезает */}
+          <Text
+            color="successColor"
+            fontWeight="medium"
+            opacity="0"
+            animation="coinsDetailsAnimation 2s ease-in-out"
+          >
+            +{session.stats.correctChars}
+          </Text>
+          {/* Отнято (красные) - плавно появляется и исчезает */}
+          <Text
+            color="errorColor"
+            fontWeight="medium"
+            opacity="0"
+            animation="coinsDetailsAnimation 2s ease-in-out"
+          >
+            -{session.stats.incorrectChars}
+          </Text>
+          {/* Разделитель - плавно появляется и исчезает */}
+          <Box
+            width="100%"
+            height="1px"
+            bg="primaryColor"
+            my={1}
+            opacity="0"
+            animation="coinsDetailsAnimation 2s ease-in-out"
+          />
+          {/* Итоговый результат - появляется и улетает вверх */}
+          <Text
+            color="primaryColor"
+            fontWeight="bold"
+            fontSize={{ base: "18px", md: "20px" }}
+            opacity="0"
+            animation="counterAnimation 2.5s ease-in-out"
+          >
+            {shilkaCoins.value > 0 ? "+" : ""}
+            {shilkaCoins.value}
+          </Text>
         </Box>
       ) : null}
     </Box>

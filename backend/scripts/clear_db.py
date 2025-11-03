@@ -4,19 +4,36 @@
     python -m scripts.clear_db
 """
 import asyncio
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import AsyncSessionLocal
 from src.auth.models import User
-from src.stats.models import TypingSession
+from src.stats.models import TypingSession, CoinTransaction
+from src.theme.models import Theme
 
 
 async def clear_all_data(db: AsyncSession):
-    """Удаляет все данные из таблиц"""
-    print("🗑️  Удаляем все сессии печати...")
+    """Удаляет все данные из таблиц в правильном порядке (учитывая Foreign Keys)"""
+    # Удаляем в порядке зависимостей: сначала зависимые таблицы, потом родительские
+    
+    print("🗑️  Удаляем транзакции монет...")
+    result = await db.execute(delete(CoinTransaction))
+    print(f"✓ Удалено {result.rowcount} транзакций")
+    
+    print("\n🗑️  Удаляем сессии печати...")
     result = await db.execute(delete(TypingSession))
     print(f"✓ Удалено {result.rowcount} сессий")
+    
+    print("\n🗑️  Обнуляем selected_theme_id у всех пользователей...")
+    result = await db.execute(
+        update(User).values(selected_theme_id=None)
+    )
+    print(f"✓ Обновлено {result.rowcount} пользователей")
+    
+    print("\n🗑️  Удаляем темы...")
+    result = await db.execute(delete(Theme))
+    print(f"✓ Удалено {result.rowcount} тем")
     
     print("\n🗑️  Удаляем всех пользователей...")
     result = await db.execute(delete(User))
@@ -26,9 +43,7 @@ async def clear_all_data(db: AsyncSession):
 
 
 async def clear_test_data(db: AsyncSession):
-    """Удаляет только тестовые данные (пользователи с паролем password123)"""
-    print("🗑️  Удаляем тестовые сессии печати...")
-    
+    """Удаляет только тестовые данные (пользователи с характерными именами)"""
     # Получаем ID тестовых пользователей
     result = await db.execute(
         select(User).filter(
@@ -40,27 +55,65 @@ async def clear_test_data(db: AsyncSession):
             User.username.like('%wizard%') |
             User.username.like('%champion%') |
             User.username.like('%swift%') |
-            User.username.like('%blazing%')
+            User.username.like('%blazing%') |
+            User.username.like('%keys%')
         )
     )
     test_users = result.scalars().all()
     test_user_ids = [user.id for user in test_users]
     
-    if test_user_ids:
-        result = await db.execute(
-            delete(TypingSession).filter(
-                TypingSession.user_id.in_(test_user_ids)
-            )
-        )
-        print(f"✓ Удалено {result.rowcount} тестовых сессий")
-        
-        print("\n🗑️  Удаляем тестовых пользователей...")
-        result = await db.execute(
-            delete(User).filter(User.id.in_(test_user_ids))
-        )
-        print(f"✓ Удалено {result.rowcount} тестовых пользователей")
-    else:
+    if not test_user_ids:
         print("ℹ️  Тестовые данные не найдены")
+        return
+    
+    print(f"📝 Найдено {len(test_user_ids)} тестовых пользователей")
+    
+    # Удаляем в правильном порядке (сначала зависимые записи)
+    
+    print("\n🗑️  Удаляем транзакции монет тестовых пользователей...")
+    result = await db.execute(
+        delete(CoinTransaction).filter(
+            CoinTransaction.user_id.in_(test_user_ids)
+        )
+    )
+    print(f"✓ Удалено {result.rowcount} транзакций")
+    
+    print("\n🗑️  Удаляем сессии печати тестовых пользователей...")
+    result = await db.execute(
+        delete(TypingSession).filter(
+            TypingSession.user_id.in_(test_user_ids)
+        )
+    )
+    print(f"✓ Удалено {result.rowcount} сессий")
+    
+    # Получаем ID тем, созданных тестовыми пользователями
+    theme_result = await db.execute(
+        select(Theme.id).filter(Theme.author_id.in_(test_user_ids))
+    )
+    test_theme_ids = [theme_id for (theme_id,) in theme_result.all()]
+    
+    if test_theme_ids:
+        print("\n🗑️  Обнуляем selected_theme_id у пользователей, использующих тестовые темы...")
+        result = await db.execute(
+            update(User)
+            .where(User.selected_theme_id.in_(test_theme_ids))
+            .values(selected_theme_id=None)
+        )
+        print(f"✓ Обновлено {result.rowcount} пользователей")
+    
+    print("\n🗑️  Удаляем темы, созданные тестовыми пользователями...")
+    result = await db.execute(
+        delete(Theme).filter(
+            Theme.author_id.in_(test_user_ids)
+        )
+    )
+    print(f"✓ Удалено {result.rowcount} тем")
+    
+    print("\n🗑️  Удаляем тестовых пользователей...")
+    result = await db.execute(
+        delete(User).filter(User.id.in_(test_user_ids))
+    )
+    print(f"✓ Удалено {result.rowcount} пользователей")
     
     await db.commit()
 

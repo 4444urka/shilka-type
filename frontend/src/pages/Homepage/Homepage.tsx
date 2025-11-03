@@ -5,9 +5,16 @@ import TypingScreen from "../../components/TypingScreen/TypingScreen";
 import VictoryScreen from "../../components/VictoryScreen/VictoryScreen";
 import useGetRandomWords from "../../hooks/useGetRandomWords";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
+import { useAppSelector, useAppDispatch } from "../../store";
+import {
+  setTime as setTimeAction,
+  setWords as setWordsAction,
+  setLanguage as setLanguageAction,
+  setMode as setModeAction,
+  setTestType as setTestTypeAction,
+} from "../../slices/settingsSlice";
 import { useSessionDataSync } from "../../hooks/useSessionDataSync";
 import { useTypingSession } from "../../hooks/useTypingSession";
-import { useAppSelector } from "../../store";
 import type { TypingSessionNew } from "../../types/TypingTypes";
 
 const Homepage = () => {
@@ -15,24 +22,44 @@ const Homepage = () => {
   const [showResults, setShowResults] = useState(false);
   const [shilkaCoins, setShilkaCoins] = useState({ value: 0 });
   const user = useAppSelector((state) => state.user.user);
-  const [selectedTime, setSelectedTime] = useState(30);
-  const [selectedWords, setSelectedWords] = useState(25);
-  const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ru">("en");
-  const [selectedMode, setSelectedMode] = useState<"words" | "sentences">(
-    "words"
-  );
-  const [selectedTestType, setSelectedTestType] = useState<"time" | "words">(
-    "time"
-  );
+  const dispatch = useAppDispatch();
+
+  const selectedTime = useAppSelector((s) => s.settings.selectedTime);
+  const selectedWords = useAppSelector((s) => s.settings.selectedWords);
+  const selectedLanguage = useAppSelector(
+    (s) => s.settings.selectedLanguage
+  ) as "en" | "ru";
+  const selectedMode = useAppSelector((s) => s.settings.selectedMode) as
+    | "words"
+    | "sentences";
+  const selectedTestType = useAppSelector(
+    (s) => s.settings.selectedTestType
+  ) as "time" | "words";
 
   React.useEffect(() => {
     if (!user) return;
-    setSelectedTime(user.default_time || 30);
-    setSelectedWords(user.default_words || 25);
-    setSelectedLanguage((user.default_language as "en" | "ru") || "en");
-    setSelectedMode((user.default_mode as "words" | "sentences") || "words");
-    setSelectedTestType((user.default_test_type as "time" | "words") || "time");
-  }, [user]);
+    // Если в localStorage уже есть сохранённые настройки, не перезаписываем их.
+    try {
+      const existing = localStorage.getItem("shilka_settings");
+      if (!existing) {
+        dispatch(setTimeAction(user.default_time || 30));
+        dispatch(setWordsAction(user.default_words || 25));
+        dispatch(
+          setLanguageAction((user.default_language as "en" | "ru") || "en")
+        );
+        dispatch(
+          setModeAction((user.default_mode as "words" | "sentences") || "words")
+        );
+        dispatch(
+          setTestTypeAction(
+            (user.default_test_type as "time" | "words") || "time"
+          )
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, [user, dispatch]);
 
   const {
     words,
@@ -132,7 +159,7 @@ const Homepage = () => {
   // Обработчики настроек
   const handleTimeChange = useCallback(
     (time: number) => {
-      setSelectedTime(time);
+      dispatch(setTimeAction(time));
       if (!session.isStarted) {
         resetSession();
       }
@@ -143,12 +170,12 @@ const Homepage = () => {
         );
       }
     },
-    [session.isStarted, resetSession, isAuthed]
+    [session.isStarted, resetSession, isAuthed, dispatch]
   );
 
   const handleWordsChange = useCallback(
     (words: number) => {
-      setSelectedWords(words);
+      dispatch(setWordsAction(words));
       if (!session.isStarted) {
         resetSession();
         refreshWords();
@@ -159,12 +186,12 @@ const Homepage = () => {
         );
       }
     },
-    [session.isStarted, resetSession, refreshWords, isAuthed]
+    [session.isStarted, resetSession, refreshWords, isAuthed, dispatch]
   );
 
   const handleLanguageChange = useCallback(
     (language: "en" | "ru") => {
-      setSelectedLanguage(language);
+      dispatch(setLanguageAction(language));
       // refreshWords не нужен - изменение selectedLanguage автоматически обновит слова
       if (isAuthed) {
         void updateUserSettings({ default_language: language }).catch((err) =>
@@ -172,12 +199,12 @@ const Homepage = () => {
         );
       }
     },
-    [isAuthed]
+    [isAuthed, dispatch]
   );
 
   const handleModeChange = useCallback(
     (mode: "words" | "sentences") => {
-      setSelectedMode(mode);
+      dispatch(setModeAction(mode));
       refreshWords();
       if (isAuthed) {
         void updateUserSettings({ default_mode: mode }).catch((err) =>
@@ -185,12 +212,12 @@ const Homepage = () => {
         );
       }
     },
-    [refreshWords, isAuthed]
+    [refreshWords, isAuthed, dispatch]
   );
 
   const handleTestTypeChange = useCallback(
     (testType: "time" | "words") => {
-      setSelectedTestType(testType);
+      dispatch(setTestTypeAction(testType));
       refreshWords();
       resetSession();
       if (isAuthed) {
@@ -199,7 +226,7 @@ const Homepage = () => {
         );
       }
     },
-    [refreshWords, resetSession, isAuthed]
+    [refreshWords, resetSession, isAuthed, dispatch]
   );
 
   return (

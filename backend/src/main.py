@@ -11,6 +11,7 @@ from .logging_config import configure_logging
 from .auth.router import router as auth_router
 from .stats.router import router as stats_router
 from .theme.router import router as theme_router
+from .websocket.router import router as websocket_router
 from .database import Base, engine
 from .redis_client import redis_client
 
@@ -31,9 +32,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️ Redis connection failed: {e}. Running without cache.")
     
+    # Запускаем слушатель Redis для WebSocket
+    from .websocket_manager import leaderboard_manager
+    await leaderboard_manager.start_redis_listener()
+    
     yield
     
     # Shutdown: Закрытие соединений
+    leaderboard_manager.stop_redis_listener()
     await redis_client.disconnect()
     await engine.dispose()
 
@@ -82,6 +88,7 @@ app.add_middleware(RequestLoggingMiddleware)
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(stats_router, prefix="/api/stats", tags=["stats"])
 app.include_router(theme_router, prefix="/api/themes", tags=["themes"])
+app.include_router(websocket_router, prefix="/ws", tags=["websocket"])
 
 
 @app.get("/health")

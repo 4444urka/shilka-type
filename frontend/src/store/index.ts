@@ -6,11 +6,13 @@ import {
 } from "react-redux";
 import shilkaCoinsReducer from "../slices/shilkaCoinsSlice";
 import userReducer from "../slices/userSlice";
+import settingsReducer from "../slices/settingsSlice";
 
 export const store = configureStore({
   reducer: {
     shilkaCoins: shilkaCoinsReducer,
     user: userReducer,
+    settings: settingsReducer,
   },
 });
 

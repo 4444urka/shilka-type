@@ -15,5 +15,5 @@ class Theme(Base):
     is_public = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Связь с автором
-    author = relationship("User", back_populates="themes", foreign_keys=[author_id])
+    # Связь с автором (без back_populates чтобы избежать циклической зависимости)
+    author = relationship("User", foreign_keys=[author_id])
