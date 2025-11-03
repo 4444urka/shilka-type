@@ -18,6 +18,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
     Map<number, number>
   >(new Map());
 
+  // Храним предыдущие значения монет для анимации
+  const previousCoinsRef = React.useRef<Map<number, number>>(new Map());
+  const [coinsChanged, setCoinsChanged] = React.useState<Set<number>>(
+    new Set()
+  );
+  // Храним информацию о направлении изменения монет (true = прибавились, false = убавились)
+  const [coinsIncreased, setCoinsIncreased] = React.useState<
+    Map<number, boolean>
+  >(new Map());
+
   // Используем useMemo для оптимизации вычислений
   const { topUsers, currentUserIndex, showCurrentUser } = React.useMemo(() => {
     const userIndex = leaderboard.findIndex((u) => u.id === currentUser?.id);
@@ -37,17 +47,43 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
     };
   }, [leaderboard, currentUser]);
 
-  // Отслеживаем изменения позиций
+  // Отслеживаем изменения позиций и монет
   React.useEffect(() => {
     const changes = new Map<number, number>();
+    const coinsChangedSet = new Set<number>();
+    const coinsIncreasedMap = new Map<number, boolean>();
 
     topUsers.forEach((user, newIndex) => {
+      // Проверяем изменение позиции
       const previousPosition = previousPositionsRef.current.get(user.id);
       if (previousPosition !== undefined && previousPosition !== newIndex) {
         // Положительное значение = движение вверх (улучшение позиции)
         changes.set(user.id, previousPosition - newIndex);
       }
+
+      // Проверяем изменение монет
+      const previousCoins = previousCoinsRef.current.get(user.id);
+      const currentCoins = user.shilka_coins ?? 0;
+      if (previousCoins !== undefined && previousCoins !== currentCoins) {
+        coinsChangedSet.add(user.id);
+        // Определяем направление изменения
+        coinsIncreasedMap.set(user.id, currentCoins > previousCoins);
+      }
+
+      // Обновляем сохранённые монеты
+      previousCoinsRef.current.set(user.id, currentCoins);
     });
+
+    // Также проверяем текущего пользователя, если он не в топе
+    if (showCurrentUser) {
+      const previousCoins = previousCoinsRef.current.get(showCurrentUser.id);
+      const currentCoins = showCurrentUser.shilka_coins ?? 0;
+      if (previousCoins !== undefined && previousCoins !== currentCoins) {
+        coinsChangedSet.add(showCurrentUser.id);
+        coinsIncreasedMap.set(showCurrentUser.id, currentCoins > previousCoins);
+      }
+      previousCoinsRef.current.set(showCurrentUser.id, currentCoins);
+    }
 
     // Обновляем текущие позиции
     const newPositions = new Map<number, number>();
@@ -66,7 +102,20 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
 
       return () => clearTimeout(timeout);
     }
-  }, [topUsers]);
+
+    if (coinsChangedSet.size > 0) {
+      setCoinsChanged(coinsChangedSet);
+      setCoinsIncreased(coinsIncreasedMap);
+
+      // Очищаем индикаторы изменения монет через 1500ms
+      const timeout = setTimeout(() => {
+        setCoinsChanged(new Set());
+        setCoinsIncreased(new Map());
+      }, 1500);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [topUsers, showCurrentUser]);
   return (
     <Box
       display="flex"
@@ -104,6 +153,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
             user={user}
             index={index}
             positionChange={positionChanges.get(user.id)}
+            coinsChanged={coinsChanged.has(user.id)}
+            coinsIncreased={coinsIncreased.get(user.id)}
           />
         ))}
 
@@ -119,6 +170,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
               user={showCurrentUser}
               index={currentUserIndex}
               isCurrentUser
+              coinsChanged={coinsChanged.has(showCurrentUser.id)}
+              coinsIncreased={coinsIncreased.get(showCurrentUser.id)}
             />
           </>
         )}

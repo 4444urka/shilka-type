@@ -30,14 +30,14 @@ export const useLeaderboardWebSocket = (
 
   const getWebSocketUrl = useCallback(() => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-    
+
     // Если URL относительный (начинается с /), используем текущий хост
     if (apiUrl.startsWith("/")) {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const host = window.location.host;
       return `${protocol}//${host}/ws/leaderboard`;
     }
-    
+
     // Если абсолютный URL, преобразуем HTTP → WS
     const wsUrl = apiUrl
       .replace(/^http/, "ws")

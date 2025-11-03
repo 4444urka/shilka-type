@@ -8,13 +8,20 @@ export interface LeaderboardItemProps extends BoxProps {
   index: number;
   isCurrentUser?: boolean;
   positionChange?: number; // Положительное = вверх, отрицательное = вниз
+  coinsChanged?: boolean; // Флаг что монеты изменились
+  coinsIncreased?: boolean; // true = прибавились, false = убавились
 }
 
 export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
-  ({ user, index, isCurrentUser, positionChange, ...rest }) => {
+  ({ user, index, isCurrentUser, positionChange, coinsChanged, coinsIncreased, ...rest }) => {
     const hasPositionChange =
       positionChange !== undefined && positionChange !== 0;
     const isPositionUp = positionChange && positionChange > 0;
+    
+    // Определяем какую анимацию использовать
+    const coinsAnimation = coinsChanged 
+      ? (coinsIncreased ? "coinsAdded 1.5s ease-in-out" : "coinsRemoved 1.5s ease-in-out")
+      : undefined;
 
     return (
       <Box
@@ -106,13 +113,16 @@ export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
         <Text flexShrink={0} fontWeight={isCurrentUser ? "bold" : undefined}>
           {user.username}
         </Text>
-        <Text
-          color="primaryColor"
+        <Box
           ml="auto"
-          fontWeight={isCurrentUser ? "bold" : undefined}
+          display="inline-flex"
+          overflow="visible"
+          position="relative"
+          height="1.2em"
+          animation={coinsAnimation}
         >
-          {Number(user.shilka_coins ?? 0)}
-        </Text>
+          {user?.shilka_coins || 0}
+        </Box>
       </Box>
     );
   }
