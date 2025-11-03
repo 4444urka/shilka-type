@@ -13,12 +13,50 @@ from ..redis_client import redis_client
 
 logger = logging.getLogger(__name__)
 
+
+async def broadcast_leaderboard_update(db: AsyncSession):
+    """Отправить обновление лидерборда всем WebSocket клиентам через Redis Pub/Sub"""
+    try:
+        logger.info("Preparing leaderboard update for Redis broadcast")
+        
+        # Получаем актуальный лидерборд
+        leaderboard_data = await get_leaderboard(db)
+        
+        # Преобразуем в JSON-совместимый формат
+        leaderboard_json = [
+            {
+                "id": user.id,
+                "username": user.username,
+                "shilka_coins": user.shilka_coins or 0,
+                "default_time": user.default_time,
+                "default_words": user.default_words,
+                "default_language": user.default_language,
+                "default_mode": user.default_mode,
+                "default_test_type": user.default_test_type,
+            }
+            for user in leaderboard_data
+        ]
+        
+        logger.info(f"Publishing leaderboard update to Redis with {len(leaderboard_json)} users")
+        
+        # Публикуем в Redis
+        await redis_client.publish("leaderboard_update", json.dumps(leaderboard_json))
+        
+        logger.info("Leaderboard update published to Redis successfully")
+        
+    except Exception as e:
+        logger.error(f"Error in broadcast_leaderboard_update: {e}", exc_info=True)
+
 async def add_coins(current_user: auth_models.User, amount: int, db: AsyncSession):
     current_user.shilka_coins = (current_user.shilka_coins or 0) + amount
     db.add(current_user)
     await db.commit()
     await db.refresh(current_user)
     await redis_client.invalidate_pattern("fastapi-cache:get_leaderboard*")
+    
+    # Отправляем обновление лидерборда через WebSocket
+    await broadcast_leaderboard_update(db)
+    
     return current_user
 
 
@@ -102,6 +140,9 @@ async def create_typing_session(current_user: auth_models.User, payload: stats_s
     await redis_client.invalidate_pattern(f"fastapi-cache:get_typing_sessions*")
     await redis_client.invalidate_pattern(f"fastapi-cache:get_char_error_stats*")
     await redis_client.invalidate_pattern("fastapi-cache:get_leaderboard*")
+
+    # Отправляем обновление лидерборда через WebSocket
+    await broadcast_leaderboard_update(db)
 
     return typing_session
 

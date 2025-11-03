@@ -60,6 +60,19 @@ class RedisClient:
             keys = await self.redis.keys(pattern)
             if keys:
                 await self.redis.delete(*keys)
+    
+    async def publish(self, channel: str, message: str):
+        """Опубликовать сообщение в Redis Pub/Sub канал"""
+        if self.redis:
+            await self.redis.publish(channel, message)
+    
+    async def subscribe(self, channel: str):
+        """Подписаться на Redis Pub/Sub канал"""
+        if self.redis:
+            pubsub = self.redis.pubsub()
+            await pubsub.subscribe(channel)
+            return pubsub
+        return None
 
 
 # Глобальный экземпляр Redis клиента

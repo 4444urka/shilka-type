@@ -12,6 +12,12 @@ export interface LeaderboardProps extends BoxProps {
 const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
   const currentUser = useAppSelector((state) => state.user.user);
 
+  // Храним предыдущие позиции пользователей для анимации
+  const previousPositionsRef = React.useRef<Map<number, number>>(new Map());
+  const [positionChanges, setPositionChanges] = React.useState<
+    Map<number, number>
+  >(new Map());
+
   // Используем useMemo для оптимизации вычислений
   const { topUsers, currentUserIndex, showCurrentUser } = React.useMemo(() => {
     const userIndex = leaderboard.findIndex((u) => u.id === currentUser?.id);
@@ -30,6 +36,37 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       showCurrentUser: isUserBelowTop && currentUser,
     };
   }, [leaderboard, currentUser]);
+
+  // Отслеживаем изменения позиций
+  React.useEffect(() => {
+    const changes = new Map<number, number>();
+
+    topUsers.forEach((user, newIndex) => {
+      const previousPosition = previousPositionsRef.current.get(user.id);
+      if (previousPosition !== undefined && previousPosition !== newIndex) {
+        // Положительное значение = движение вверх (улучшение позиции)
+        changes.set(user.id, previousPosition - newIndex);
+      }
+    });
+
+    // Обновляем текущие позиции
+    const newPositions = new Map<number, number>();
+    topUsers.forEach((user, index) => {
+      newPositions.set(user.id, index);
+    });
+    previousPositionsRef.current = newPositions;
+
+    if (changes.size > 0) {
+      setPositionChanges(changes);
+
+      // Очищаем индикаторы через 3 секунды
+      const timeout = setTimeout(() => {
+        setPositionChanges(new Map());
+      }, 3000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [topUsers]);
   return (
     <Box
       display="flex"
@@ -43,9 +80,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       w="100%"
       {...rest}
     >
-      <Text color="primaryColor" textAlign="left" fontSize="lg">
-        Список лидеров
-      </Text>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        w="100%"
+      >
+        <Text color="primaryColor" textAlign="left" fontSize="lg">
+          Список лидеров
+        </Text>
+      </Box>
       <Box
         display="flex"
         gap={showCurrentUser ? 6 : 7}
@@ -55,7 +99,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, ...rest }) => {
       >
         {/* Топ пользователей */}
         {topUsers.map((user, index) => (
-          <LeaderboardItem key={user.id} user={user} index={index} />
+          <LeaderboardItem
+            key={user.id}
+            user={user}
+            index={index}
+            positionChange={positionChanges.get(user.id)}
+          />
         ))}
 
         {/* Разделитель и позиция текущего пользователя, если он не в топе */}
