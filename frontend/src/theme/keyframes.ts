@@ -3,8 +3,16 @@ import { defineKeyframes } from "@chakra-ui/react";
 export const keyframes = defineKeyframes({
   counterAnimation: {
     "0%": { transform: "translateY(0)", opacity: "0%" },
-    "75%": { transform: "translateY(0)", opacity: "100%" },
+    "25%": { transform: "translateY(0)", opacity: "100%" },
+    "90%": { transform: "translateY(0)", opacity: "100%" },
     "100%": { transform: "translateY(-80px)", opacity: "0%" },
+  },
+
+  coinsDetailsAnimation: {
+    "0%": { opacity: "0%" },
+    "25%": { opacity: "100%" },
+    "75%": { opacity: "100%" },
+    "100%": { opacity: "0%" },
   },
 
   blink: {
