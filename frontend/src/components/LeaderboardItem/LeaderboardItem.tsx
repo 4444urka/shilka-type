@@ -129,6 +129,7 @@ export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
           overflow="visible"
           position="relative"
           height="1.2em"
+          color="primaryColor"
           animation={coinsAnimation}
         >
           {user?.shilka_coins || 0}
