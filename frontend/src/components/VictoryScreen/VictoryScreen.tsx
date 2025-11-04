@@ -9,6 +9,8 @@ export interface VictoryScreenProps extends BoxProps {
   shilkaCoins: {
     value: number;
   };
+  wpm: number;
+  accuracy: number;
   testType?: "time" | "words";
 }
 
@@ -16,6 +18,9 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
   session,
   shilkaCoins,
   testType,
+  wpm,
+  accuracy,
+  ...rest
 }) => {
   // dispatch not needed here; balance обновляется через useSessionDataSync
   const isAuthed = useIsAuthed();
@@ -38,6 +43,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       flexDirection="column"
       alignItems="center"
       gap={4}
+      {...rest}
     >
       <Text
         textStyle="body"
@@ -65,7 +71,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       >
         WPM:
         <Text as="span" color="primaryColor">
-          {session.stats.wpm}
+          {wpm}
         </Text>
       </Text>
 
@@ -80,7 +86,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
       >
         Accuracy:
         <Text as="span" color="gray.400">
-          {session.stats.accuracy.toFixed(0)}%
+          {accuracy.toFixed(0)}%
         </Text>
       </Text>
 

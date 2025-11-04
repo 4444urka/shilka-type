@@ -54,7 +54,6 @@ export const LeaderboardItem: React.FC<LeaderboardItemProps> = React.memo(
         position="relative"
         borderRadius="md"
         p={2}
-        ml={-2}
         css={{
           animation: positionChange
             ? "slideIn 0.5s ease-out, highlight 3s ease-out"

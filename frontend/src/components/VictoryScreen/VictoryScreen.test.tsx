@@ -46,6 +46,8 @@ describe("VictoryScreen", () => {
     testType: "time" as const,
     typingMode: "words",
     language: "en",
+    wpm: 75,
+    accuracy: 95.5,
   };
 
   it("должен отображать время сессии для типа 'time'", () => {
@@ -141,6 +143,8 @@ describe("VictoryScreen", () => {
         session={mockSession}
         shilkaCoins={{ value: 0 }}
         testType={undefined}
+        wpm={75}
+        accuracy={95.5}
       />
     );
     // Когда testType не передан, отображается количество слов

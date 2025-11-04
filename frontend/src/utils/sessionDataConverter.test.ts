@@ -53,8 +53,7 @@ describe("sessionDataConverter", () => {
     expect(payload.words).toEqual(["hello", "world"]);
 
     // Проверяем метрики
-    expect(payload.wpm).toBe(60);
-    expect(payload.accuracy).toBe(90);
+    // WPM и accuracy теперь считаются только на сервере, поэтому их нет в payload
     expect(payload.duration).toBe(30);
     expect(payload.mode).toBe("words");
     expect(payload.language).toBe("en");

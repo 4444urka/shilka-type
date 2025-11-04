@@ -6,6 +6,11 @@ import { fetchLeaderboard } from "../api/stats/statsRequests";
 // Мокируем API запросы
 vi.mock("../api/stats/statsRequests");
 
+// Мокируем WebSocket хук, чтобы он не мешал тестам
+vi.mock("./useLeaderboardWebSocket", () => ({
+  useLeaderboardWebSocket: () => ({ isConnected: false }),
+}));
+
 describe("useFetchLeaderboard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -18,7 +23,9 @@ describe("useFetchLeaderboard", () => {
     ];
     vi.mocked(fetchLeaderboard).mockResolvedValue(mockLeaderboard);
 
-    const { result } = renderHook(() => useFetchLeaderboard());
+    const { result } = renderHook(() =>
+      useFetchLeaderboard({ enableWebSocket: false })
+    );
 
     // Изначально должен быть isLoading
     expect(result.current.isLoading).toBe(true);
@@ -35,7 +42,9 @@ describe("useFetchLeaderboard", () => {
   it("должен обрабатывать ошибку при загрузке", async () => {
     vi.mocked(fetchLeaderboard).mockRejectedValue(new Error("Network error"));
 
-    const { result } = renderHook(() => useFetchLeaderboard());
+    const { result } = renderHook(() =>
+      useFetchLeaderboard({ enableWebSocket: false })
+    );
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);

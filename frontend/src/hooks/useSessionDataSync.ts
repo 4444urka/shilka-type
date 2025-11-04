@@ -56,8 +56,6 @@ export const useSessionDataSync = ({
         logger.log("Отправляем данные сессии на сервер:", {
           duration,
           wordsCount: payload.words.length,
-          wpm: session.stats.wpm,
-          accuracy: session.stats.accuracy,
           mode: payload.mode,
           language: payload.language,
           testType: payload.testType,
@@ -65,8 +63,8 @@ export const useSessionDataSync = ({
 
         logger.log("Полный payload:", JSON.stringify(payload, null, 2));
 
-        await postWordHistory(payload);
-        logger.log("Данные сессии успешно отправлены на сервер");
+        const response = await postWordHistory(payload);
+        logger.log("Данные сессии успешно отправлены на сервер", response);
 
         // Обновляем баланс на фронте: забираем актуального пользователя и ставим значение shilka_coins
         try {
@@ -80,6 +78,12 @@ export const useSessionDataSync = ({
         } catch (err) {
           logger.warn("Не удалось обновить баланс после отправки сессии", err);
         }
+
+        // Возвращаем WPM и accuracy с сервера
+        return {
+          wpm: response.wpm,
+          accuracy: response.accuracy,
+        };
       } catch (error) {
         logger.error("Ошибка при отправке данных сессии:", error);
         dataSentRef.current = false; // Сбрасываем флаг при ошибке

@@ -11,42 +11,39 @@ def _is_correct(char_item: Any) -> bool:
     return bool(getattr(char_item, "correct", False))
 
 
-def compute_wpm(words: Iterable, history: Iterable[Iterable[Any]], duration: int | None, wpm_override: float | None = None) -> float:
+def compute_wpm(words: Iterable, history: Iterable[Iterable[Any]], duration: int | None) -> float:
     """Вычислить WPM (words per minute) по истории и длительности.
 
-    Если задан `wpm_override` (значение с фронтенда), оно возвращается без изменений.
+    WPM считается как количество полностью правильно набранных слов, делённое на время в минутах.
     Элементы `history` могут быть списками словарей (JSON) или объектами Pydantic.
     """
-    if wpm_override is not None:
-        return float(wpm_override)
-
     if not duration or duration == 0:
         return 0.0
 
-    # Подсчитать правильные символы по всем словам
-    correct_chars = 0
+    correct_words = 0
     for word in history:
-        # word может быть списком объектов символов или словарей
+        all_correct = True
+        has_chars = False
         for c in word:
-            if _is_correct(c):
-                correct_chars += 1
+            has_chars = True
+            if not _is_correct(c):
+                all_correct = False
+                break
+        
+        # Считаем слово только если в нём есть символы и все правильные
+        if has_chars and all_correct:
+            correct_words += 1
 
     minutes = duration / 60.0
     if minutes == 0:
         return 0.0
 
-    wpm = (correct_chars / 5.0) / minutes
+    wpm = correct_words / minutes
     return round(wpm, 2)
 
 
-def compute_accuracy(history: Iterable[Iterable[Any]], accuracy_override: float | None = None) -> float:
-    """Вычислить процент точности (accuracy) по истории.
-
-    Если задан `accuracy_override` (значение с фронтенда), оно возвращается без изменений.
-    """
-    if accuracy_override is not None:
-        return float(accuracy_override)
-
+def compute_accuracy(history: Iterable[Iterable[Any]]) -> float:
+    """Вычислить процент точности (accuracy) по истории."""
     total_chars = 0
     correct_chars = 0
     for word in history:

@@ -16,8 +16,6 @@ class WordHistoryPayload(BaseModel):
     words: list[str]
     history: list[list[TypingChar]]
     duration: int | None = None
-    wpm: float | None = None  # WPM с фронтенда
-    accuracy: float | None = None  # Точность с фронтенда
     mode: str | None = None  # режим набора (words, sentences, etc.)
     language: str | None = None  # язык (ru, en, etc.)
     test_type: str | None = Field(None, alias="testType")  # тип теста (time, words)
