@@ -56,6 +56,7 @@ export const StatsChart: React.FC<StatsChartProps> = ({
   return (
     <Box
       w="100%"
+      h="100%"
       fontSize="20px"
       textStyle="body"
       p={4}

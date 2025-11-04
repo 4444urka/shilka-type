@@ -34,7 +34,7 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
       bg="bgCardColor"
       p={{ base: 3, md: 4, xl: 6 }}
       overflow="auto"
-      fontSize={{ base: "sm", md: "lg", lg: "xl", xl: "3xl" }}
+      fontSize={{ base: "sm", md: "lg", lg: "xl", xl: "2xl" }}
       borderRadius="md"
       w="100%"
     >

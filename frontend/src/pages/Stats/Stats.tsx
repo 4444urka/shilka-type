@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Grid, GridItem } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Keyboard from "../../components/Keyboard/Keyboard";
@@ -32,55 +32,52 @@ const Stats = () => {
   }, [user, isLoadingUser, navigate]);
 
   return (
-    <Box
+    <Grid
       textStyle="body"
       p={{ base: "10px", sm: "15px", md: "20px" }}
       px={{ base: 2, sm: 4, md: 10, xl: 200 }}
       display="grid"
-      gridTemplateColumns="repeat(12, 1fr)"
-      gridTemplateRows="auto"
+      templateColumns="repeat(12, 1fr)"
+      templateRows="auto"
       gap={{ base: 2, sm: 3, md: 4 }}
       minHeight="calc(100vh - 140px)"
     >
       <LoadingScreen isLoading={isLoadingLeaderboard || isLoadingUser} />
 
       {/* ProfileInfoBar - на всю ширину */}
-      <Box gridColumn="1 / -1">
+      <GridItem colSpan={12} rowSpan={1}>
         <ProfileInfoBar user={user} totalStats={totalStats} />
-      </Box>
+      </GridItem>
 
       {/* Leaderboard - левая колонка (3 из 12) на десктопе, полная ширина на мобильных */}
-      <Box
-        gridColumn={{ base: "1 / -1", lg: "1 / 5" }}
-        gridRow={{ base: "auto", lg: "2 / 4" }}
-      >
+      <GridItem colSpan={{ base: 12, lg: 4 }} rowSpan={{ base: "auto", lg: 2 }}>
         <Leaderboard leaderboard={leaderboard} />
-      </Box>
+      </GridItem>
 
       {/* StatsChart - правая верхняя часть (9 из 12) */}
-      <Box gridColumn={{ base: "1 / -1", lg: "5 / -1" }} gridRow={{ lg: "2" }}>
+      <GridItem colSpan={{ base: 12, lg: 8 }} rowSpan={{ lg: 1 }}>
         <StatsChart hideBelow="md" sessions={[...sessions].reverse()} />
-      </Box>
+      </GridItem>
 
       {/* Keyboard - правая средняя часть (9 из 12), скрываем на маленьких экранах */}
-      <Box
-        gridColumn={{ base: "1 / -1", lg: "5 / -1" }}
-        gridRow={{ base: "3", lg: "3" }}
+      <GridItem
+        colSpan={{ base: 12, lg: 8 }}
+        rowSpan={{ lg: 1 }}
         hideBelow="md"
       >
         <Keyboard />
-      </Box>
+      </GridItem>
 
       {/* TypingHistory - на всю ширину внизу */}
-      <Box gridColumn="1 / -1" gridRow={{ lg: "4" }}>
+      <GridItem colSpan={12} rowSpan={{ lg: 4 }}>
         <TypingHistory
           sessions={sessions}
           onLoadMore={loadMoreSessions}
           hasMore={hasMoreSessions}
           isLoading={isLoadingSessions}
         />
-      </Box>
-    </Box>
+      </GridItem>
+    </Grid>
   );
 };
 
