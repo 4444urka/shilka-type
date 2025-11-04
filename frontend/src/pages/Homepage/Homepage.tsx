@@ -278,8 +278,8 @@ const Homepage = () => {
           session={session}
           shilkaCoins={shilkaCoins}
           testType={selectedTestType}
-          wpm={results?.wpm || session.stats.wpm}
-          accuracy={results?.accuracy || session.stats.accuracy}
+          wpm={results?.wpm ?? session.stats.wpm ?? 0}
+          accuracy={results?.accuracy ?? session.stats.accuracy ?? 0}
         />
       )}
     </Box>

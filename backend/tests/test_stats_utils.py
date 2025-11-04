@@ -8,10 +8,6 @@ class CharObj:
         self.correct = correct
 
 
-def test_compute_wpm_override():
-    assert compute_wpm([], [], 10, wpm_override=42) == 42.0
-
-
 def test_compute_wpm_zero_duration():
     history = [[{"char": "a", "correct": True, "time": 1}]]
     assert compute_wpm(["a"], history, 0) == 0.0
@@ -19,19 +15,40 @@ def test_compute_wpm_zero_duration():
 
 def test_compute_wpm_json_history():
     words = ["hello"]
-    history = [[{"char": "h", "correct": True, "time": 1}, {"char": "e", "correct": True, "time": 1}]]
-    # 2 correct chars, duration=60 -> WPM = (2/5)/1 = 0.4
-    assert compute_wpm(words, history, 60) == 0.4
+    # Полностью правильное слово "hello" (5 букв, все правильные)
+    history = [
+        [
+            {"char": "h", "correct": True, "time": 1},
+            {"char": "e", "correct": True, "time": 1},
+            {"char": "l", "correct": True, "time": 1},
+            {"char": "l", "correct": True, "time": 1},
+            {"char": "o", "correct": True, "time": 1},
+        ]
+    ]
+    # 1 правильное слово, duration=60s -> WPM = 1 слово / 1 минута = 1.0
+    assert compute_wpm(words, history, 60) == 1.0
 
 
 def test_compute_wpm_object_history():
-    history = [[CharObj(True), CharObj(False), CharObj(True)]]  # 2 correct
-    # duration=30s -> minutes=0.5 -> (2/5)/0.5 = 0.8
-    assert compute_wpm([], history, 30) == 0.8
+    # 1 слово с 3 буквами, все правильные
+    history = [[CharObj(True), CharObj(True), CharObj(True)]]
+    # duration=30s -> minutes=0.5 -> 1 слово / 0.5 мин = 2.0
+    assert compute_wpm(["abc"], history, 30) == 2.0
 
 
-def test_compute_accuracy_override():
-    assert compute_accuracy([], accuracy_override=12.345) == 12.345
+def test_compute_wpm_partial_word():
+    # Слово с ошибкой - не должно засчитываться
+    words = ["test"]
+    history = [
+        [
+            {"char": "t", "correct": True, "time": 1},
+            {"char": "e", "correct": False, "time": 1},  # ошибка
+            {"char": "s", "correct": True, "time": 1},
+            {"char": "t", "correct": True, "time": 1},
+        ]
+    ]
+    # 0 правильных слов -> WPM = 0
+    assert compute_wpm(words, history, 60) == 0.0
 
 
 def test_compute_accuracy_empty_history():
