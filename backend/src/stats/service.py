@@ -73,9 +73,8 @@ async def get_leaderboard(db: AsyncSession):
 
 
 async def create_typing_session(current_user: auth_models.User, payload: stats_schemas.WordHistoryPayload, db: AsyncSession):
-    # Используем утилитные функции статистики вместо методов в схемах
-    wpm = compute_wpm(payload.words, payload.history, payload.duration, payload.wpm)
-    accuracy = compute_accuracy(payload.history, payload.accuracy)
+    wpm = compute_wpm(payload.words, payload.history, payload.duration)
+    accuracy = compute_accuracy(payload.history)
 
     words_json = json.dumps(payload.words)
     history_json = json.dumps([

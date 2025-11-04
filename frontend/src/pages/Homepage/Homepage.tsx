@@ -20,6 +20,10 @@ import type { TypingSessionNew } from "../../types/TypingTypes";
 const Homepage = () => {
   const isAuthed = useIsAuthed();
   const [showResults, setShowResults] = useState(false);
+  const [results, setResults] = useState<{
+    wpm: number;
+    accuracy: number;
+  } | null>(null);
   const [shilkaCoins, setShilkaCoins] = useState({ value: 0 });
   const user = useAppSelector((state) => state.user.user);
   const dispatch = useAppDispatch();
@@ -79,7 +83,13 @@ const Homepage = () => {
 
   const handleTypingComplete = useCallback(
     async (session: TypingSessionNew) => {
-      await sendSessionData(session);
+      const response = await sendSessionData(session);
+      if (response) {
+        setResults({
+          wpm: response.wpm,
+          accuracy: response.accuracy,
+        });
+      }
       setShowResults(true);
     },
     [sendSessionData]
@@ -87,7 +97,13 @@ const Homepage = () => {
 
   const handleTimeUp = useCallback(
     async (session: TypingSessionNew) => {
-      await sendSessionData(session);
+      const response = await sendSessionData(session);
+      if (response) {
+        setResults({
+          wpm: response.wpm,
+          accuracy: response.accuracy,
+        });
+      }
       setShowResults(true);
     },
     [sendSessionData]
@@ -262,6 +278,8 @@ const Homepage = () => {
           session={session}
           shilkaCoins={shilkaCoins}
           testType={selectedTestType}
+          wpm={results?.wpm || session.stats.wpm}
+          accuracy={results?.accuracy || session.stats.accuracy}
         />
       )}
     </Box>

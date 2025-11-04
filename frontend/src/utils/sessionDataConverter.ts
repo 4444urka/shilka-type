@@ -27,10 +27,8 @@ export const convertSessionToPayload = (
     words,
     history,
     duration,
-    wpm: session.stats.wpm, // Передаем WPM с фронтенда
-    accuracy: session.stats.accuracy, // Передаем accuracy с фронтенда
-    mode, // Добавляем режим
-    language, // Добавляем язык
-    testType, // Добавляем тип теста
+    mode,
+    language,
+    testType,
   };
 };

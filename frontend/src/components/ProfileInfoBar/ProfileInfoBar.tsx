@@ -53,7 +53,7 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
           justify="space-between"
         >
           <Avatar.Root
-            size={{ base: "xl", sm: "2xl", md: "2xl", lg: "2xl" }}
+            size={{ base: "xl", sm: "2xl", md: "2xl", lg: "xl" }}
             bg="bgCardSecondaryColor"
             color="textColor"
           >
