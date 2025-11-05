@@ -98,6 +98,12 @@ export const useTypingSession = ({
     y: 0,
   });
 
+  // Используем ref для отслеживания isCompleted, чтобы не пересоздавать handleKeyPress
+  const sessionRef = useRef(session);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+
   const calculateStats = useCallback(
     (currentSession: TypingSessionNew): TypingStats => {
       const allChars = currentSession.words.flatMap((word) => word.chars);
@@ -145,7 +151,8 @@ export const useTypingSession = ({
 
   const handleKeyPress = useCallback(
     (key: string) => {
-      if (session.isCompleted) return;
+      // Используем ref вместо прямой зависимости от session
+      if (sessionRef.current.isCompleted) return;
 
       setSession((prevSession) => {
         const newSession = { ...prevSession };
@@ -235,13 +242,7 @@ export const useTypingSession = ({
         return newSession;
       });
     },
-    [
-      session.isCompleted,
-      updateCursorPosition,
-      calculateStats,
-      testType,
-      onNeedMoreWords,
-    ]
+    [updateCursorPosition, calculateStats, testType, onNeedMoreWords]
   );
 
   // Флаг для отслеживания инициализации сессии

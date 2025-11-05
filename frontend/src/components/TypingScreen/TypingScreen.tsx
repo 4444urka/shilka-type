@@ -51,22 +51,30 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   // Обработка клавиатуры вынесена в родительский компонент
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Игнорируем глобальные события, если фокус на интерактивных элементах
-      const activeElement = document.activeElement as HTMLElement | null;
-      if (activeElement) {
-        const tag = activeElement.tagName;
+      // Игнорируем события, если фокус на интерактивном элементе (input/textarea/button/a)
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName) {
+        const tag = activeElement.tagName.toUpperCase();
+        // Проверяем, не является ли активный элемент нашим скрытым инпутом для мобильных
+        const isOurInput = activeElement === inputRef.current;
+
         if (
-          tag === "BUTTON" ||
+          tag === "A" ||
           activeElement.getAttribute("role") === "button" ||
           activeElement.getAttribute("tabindex") !== null ||
-          tag === "INPUT" ||
+          (tag === "INPUT" && !isOurInput) || // Игнорируем все инпуты, кроме нашего скрытого
           tag === "TEXTAREA" ||
-          activeElement.isContentEditable
+          (activeElement as HTMLElement).isContentEditable
         ) {
           return;
         }
-      }
 
+        // Если фокус на нашем скрытом инпуте, пропускаем window обработчик
+        // потому что событие обработается через onChange/onKeyDown инпута
+        if (isOurInput) {
+          return;
+        }
+      }
       // Предотвращаем повторные нажатия (зажатие клавиш)
       if (pressedKeysRef.current.has(event.key)) {
         event.preventDefault();
@@ -150,7 +158,10 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
     if (!val) return;
     // отправляем каждый символ отдельно
     for (const ch of val) {
-      onKeyPress(ch);
+      // Проверяем, не была ли эта клавиша уже обработана через window keydown
+      if (!pressedKeysRef.current.has(ch)) {
+        onKeyPress(ch);
+      }
     }
     // очистим поле, чтобы следующий ввод был читаемым
     e.target.value = "";
@@ -167,7 +178,11 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
       key.startsWith("Arrow")
     ) {
       e.preventDefault();
-      onKeyPress(key === " " ? " " : key);
+      const keyToSend = key === " " ? " " : key;
+      // Проверяем, не была ли эта клавиша уже обработана через window keydown
+      if (!pressedKeysRef.current.has(keyToSend)) {
+        onKeyPress(keyToSend);
+      }
     }
   };
 
