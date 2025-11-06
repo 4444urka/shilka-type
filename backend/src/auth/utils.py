@@ -79,3 +79,13 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
         print(f"User not found in database: {token_data.username}")
         raise credentials_exception
     return user
+
+
+async def get_current_admin(current_user: User = Depends(get_current_user)):
+    """Проверка, что текущий пользователь - администратор"""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user

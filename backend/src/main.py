@@ -12,6 +12,7 @@ from .auth.router import router as auth_router
 from .stats.router import router as stats_router
 from .theme.router import router as theme_router
 from .websocket.router import router as websocket_router
+from .admin.router import router as admin_router
 from .database import Base, engine
 from .redis_client import redis_client
 
@@ -55,6 +56,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         logger = logging.getLogger("app.request")
         start = time.time()
+        # Инициализируем переменные, чтобы избежать UnboundLocalError в finally
+        response = None
+        status_code = None
         try:
             response = await call_next(request)
             status_code = getattr(response, "status_code", None)
@@ -89,6 +93,7 @@ app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(stats_router, prefix="/api/stats", tags=["stats"])
 app.include_router(theme_router, prefix="/api/themes", tags=["themes"])
 app.include_router(websocket_router, prefix="/ws", tags=["websocket"])
+app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
 
 @app.get("/health")

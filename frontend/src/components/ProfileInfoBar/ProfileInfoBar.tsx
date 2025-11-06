@@ -14,6 +14,7 @@ import { formatTime } from "../../lib/formatTime";
 import { logout } from "../../api/auth/authRequests";
 import { clearUser } from "../../slices/userSlice";
 import { MdLogout } from "react-icons/md";
+import AdminPanel from "../AdminPanel/AdminPanel";
 
 export interface ProfileInfoBarProps extends BoxProps {
   user: Me | null;
@@ -95,7 +96,9 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
           </Text>
         </Flex>
 
-        {/* Right: logout */}
+        {/* Right: Admin panel (if admin) + logout */}
+        {user?.role === "admin" && <AdminPanel />}
+        
         <IconButton
           position={{ base: "absolute", md: "static" }}
           aria-label="Logout"

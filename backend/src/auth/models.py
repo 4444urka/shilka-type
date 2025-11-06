@@ -10,6 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    role = Column(String, default="user")  # "user" или "admin"
     shilka_coins = Column(Integer, default=0)
     # Настройки пользователя по умолчанию
     default_time = Column(Integer, default=30)
