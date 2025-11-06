@@ -24,7 +24,8 @@ async def test_admin_can_list_users_and_user_cannot(client, db_session, test_use
     client.cookies.set("access_token", token, path="/")
 
     # as admin should be able to list users
-    resp = await client.get("/admin/admin/users")
+    # client base_url includes /api, router mounts admin under /api/admin
+    resp = await client.get("/admin/users")
     assert resp.status_code == 200
     data = resp.json()
     assert isinstance(data, list)
@@ -37,7 +38,7 @@ async def test_admin_can_list_users_and_user_cannot(client, db_session, test_use
     client.cookies.set("access_token", token, path="/")
 
     # normal user should be forbidden
-    resp = await client.get("/admin/admin/users")
+    resp = await client.get("/admin/users")
     assert resp.status_code == 403
 
 
@@ -92,11 +93,11 @@ async def test_admin_delete_user_and_cleanup_relations(client, db_session):
     client.cookies.set("access_token", token, path="/")
 
     # delete target user
-    resp = await client.delete(f"/admin/admin/users/{target.id}")
+    resp = await client.delete(f"/admin/users/{target.id}")
     assert resp.status_code in (200, 204)
 
     # ensure user is gone
-    resp = await client.get(f"/admin/admin/users/{target.id}")
+    resp = await client.get(f"/admin/users/{target.id}")
     assert resp.status_code == 404
 
     # ensure no typing sessions or coin transactions remain for that user
