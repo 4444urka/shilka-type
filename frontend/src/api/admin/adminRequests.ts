@@ -28,7 +28,10 @@ export interface TypingSession {
 
 export const adminApi = {
   // Пользователи
-  getAllUsers: async (skip: number = 0, limit: number = 100): Promise<User[]> => {
+  getAllUsers: async (
+    skip: number = 0,
+    limit: number = 100
+  ): Promise<User[]> => {
     const response = await myapiInstance.get(`/admin/users`, {
       params: { skip, limit },
     });
@@ -40,7 +43,10 @@ export const adminApi = {
     return response.data;
   },
 
-  updateUser: async (userId: number, data: UserUpdateRequest): Promise<User> => {
+  updateUser: async (
+    userId: number,
+    data: UserUpdateRequest
+  ): Promise<User> => {
     const response = await myapiInstance.patch(`/admin/users/${userId}`, data);
     return response.data;
   },
@@ -58,7 +64,10 @@ export const adminApi = {
   },
 
   // Сессии
-  getAllSessions: async (skip: number = 0, limit: number = 100): Promise<TypingSession[]> => {
+  getAllSessions: async (
+    skip: number = 0,
+    limit: number = 100
+  ): Promise<TypingSession[]> => {
     const response = await myapiInstance.get(`/admin/sessions`, {
       params: { skip, limit },
     });

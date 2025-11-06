@@ -98,7 +98,7 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
 
         {/* Right: Admin panel (if admin) + logout */}
         {user?.role === "admin" && <AdminPanel />}
-        
+
         <IconButton
           position={{ base: "absolute", md: "static" }}
           aria-label="Logout"
