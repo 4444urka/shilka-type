@@ -8,13 +8,14 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import type { Me } from "../../types/User";
 import { formatTime } from "../../lib/formatTime";
 import { logout } from "../../api/auth/authRequests";
 import { clearUser } from "../../slices/userSlice";
 import { MdLogout } from "react-icons/md";
 import AdminPanel from "../AdminPanel/AdminPanel";
+import ContentUploadModal from "../ContentUploadModal/ContentUploadModal";
 
 export interface ProfileInfoBarProps extends BoxProps {
   user: Me | null;
@@ -30,6 +31,8 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const selectedLanguage = useAppSelector((s) => s.settings.selectedLanguage);
+
   return (
     <Box
       bg="bgCardColor"
@@ -96,8 +99,14 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
           </Text>
         </Flex>
 
-        {/* Right: Admin panel (if admin) + logout */}
-        {user?.role === "admin" && <AdminPanel />}
+        {/* Right: Admin panel (if admin) + Content upload (if moder/admin) + logout */}
+        {user?.role?.toUpperCase() === "ADMIN" && <AdminPanel />}
+        {(user?.role?.toUpperCase() === "ADMIN" ||
+          user?.role?.toUpperCase() === "MODER") && (
+          <ContentUploadModal
+            defaultLanguage={selectedLanguage as "ru" | "en"}
+          />
+        )}
 
         <IconButton
           position={{ base: "absolute", md: "static" }}

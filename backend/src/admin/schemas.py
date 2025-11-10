@@ -13,7 +13,7 @@ class UserAdminUpdate(BaseModel):
     # email historically existed but current User model doesn't have it; keep optional for future
     email: str | None = None
     coins: int | None = None
-    role: str | None = Field(None, pattern="^(user|admin)$")
+    role: str | None = Field(None, pattern="^(USER|MODER|ADMIN)$")
     is_active: bool | None = None
 
 

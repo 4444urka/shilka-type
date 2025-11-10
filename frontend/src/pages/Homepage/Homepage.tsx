@@ -3,6 +3,7 @@ import React, { useCallback, useState } from "react";
 import { updateUserSettings } from "../../api/auth/authRequests";
 import TypingScreen from "../../components/TypingScreen/TypingScreen";
 import VictoryScreen from "../../components/VictoryScreen/VictoryScreen";
+import SettingsBar from "../../components/SettingsBar/SettingsBar";
 import useGetRandomWords from "../../hooks/useGetRandomWords";
 import { useIsAuthed } from "../../hooks/useIsAuthed";
 import { useAppSelector, useAppDispatch } from "../../store";
@@ -69,7 +70,9 @@ const Homepage = () => {
     words,
     refreshWords,
     addMoreWords: addMoreWordsToList,
-  } = useGetRandomWords(2, 5, 170, selectedLanguage, selectedMode);
+    isLoading,
+    error,
+  } = useGetRandomWords(2, 5, 80, selectedLanguage, selectedMode);
 
   const [isLoadingMoreWords, setIsLoadingMoreWords] = useState(false);
 
@@ -255,24 +258,35 @@ const Homepage = () => {
       minHeight="75vh"
       animation="fadeIn 0.5s ease-in-out"
     >
+      {error && (
+        <Box color="errorColor" textStyle="body" mb={4}>
+          {error}
+        </Box>
+      )}
       {!showResults ? (
-        <TypingScreen
-          session={session}
-          timeLeft={timeLeft}
-          isLoading={words.length === 0}
-          onKeyPress={handleKeyPress}
-          onRestart={handleRestart}
-          selectedTime={selectedTime}
-          selectedWords={selectedWords}
-          selectedLanguage={selectedLanguage}
-          selectedMode={selectedMode}
-          selectedTestType={selectedTestType}
-          onTimeChange={handleTimeChange}
-          onWordsChange={handleWordsChange}
-          onLanguageChange={handleLanguageChange}
-          onModeChange={handleModeChange}
-          onTestTypeChange={handleTestTypeChange}
-        />
+        <>
+          {/* SettingsBar теперь в Homepage - не зависит от перерендеров TypingScreen */}
+          <SettingsBar
+            isVisible={!session.isStarted}
+            selectedTime={selectedTime}
+            selectedWords={selectedWords}
+            selectedLanguage={selectedLanguage}
+            selectedMode={selectedMode}
+            selectedTestType={selectedTestType}
+            onTimeChange={handleTimeChange}
+            onWordsChange={handleWordsChange}
+            onLanguageChange={handleLanguageChange}
+            onModeChange={handleModeChange}
+            onTestTypeChange={handleTestTypeChange}
+          />
+          <TypingScreen
+            session={session}
+            timeLeft={timeLeft}
+            isLoading={isLoading || words.length === 0}
+            onKeyPress={handleKeyPress}
+            onRestart={handleRestart}
+          />
+        </>
       ) : (
         <VictoryScreen
           session={session}

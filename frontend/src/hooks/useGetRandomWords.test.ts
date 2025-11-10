@@ -2,25 +2,55 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import useGetRandomWords from "./useGetRandomWords";
 
-// Мокируем сервисы
-vi.mock("../utils/getRandomRussianWords", () => ({
-  getRandomRussianWords: vi.fn(() => ["тест", "слово", "проверка", "функция"]),
-}));
-
-vi.mock("../utils/getRandomRussianSentences", () => ({
-  getRandomRussianSentences: vi.fn(() => [
-    "Это тестовое предложение для проверки.",
-    "Ещё одно предложение здесь.",
-  ]),
-}));
-
-vi.mock("../services/randomWordsService", () => ({
-  getRandomLengthWords: vi.fn(async () => [
-    "test",
-    "word",
-    "check",
-    "function",
-  ]),
+// Мокируем API модуль
+vi.mock("../api/content/contentRequests", () => ({
+  getRandomWords: vi.fn(async (language: string) => {
+    if (language === "en") {
+      return [
+        { id: 1, text: "test", language: "en", is_active: true },
+        { id: 2, text: "word", language: "en", is_active: true },
+        { id: 3, text: "check", language: "en", is_active: true },
+        { id: 4, text: "function", language: "en", is_active: true },
+      ];
+    } else {
+      return [
+        { id: 5, text: "тест", language: "ru", is_active: true },
+        { id: 6, text: "слово", language: "ru", is_active: true },
+        { id: 7, text: "проверка", language: "ru", is_active: true },
+        { id: 8, text: "функция", language: "ru", is_active: true },
+      ];
+    }
+  }),
+  getRandomSentences: vi.fn(async (language: string) => {
+    if (language === "ru") {
+      return [
+        {
+          id: 1,
+          text: "Это тестовое предложение для проверки.",
+          language: "ru",
+          word_count: 5,
+          is_active: true,
+        },
+        {
+          id: 2,
+          text: "Ещё одно предложение здесь.",
+          language: "ru",
+          word_count: 4,
+          is_active: true,
+        },
+      ];
+    } else {
+      return [
+        {
+          id: 3,
+          text: "This is a test sentence here.",
+          language: "en",
+          word_count: 6,
+          is_active: true,
+        },
+      ];
+    }
+  }),
 }));
 
 describe("useGetRandomWords", () => {
@@ -74,7 +104,9 @@ describe("useGetRandomWords", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.words).toHaveLength(4);
+        expect(result.current.words.length).toBeGreaterThan(0);
+        // В режиме sentences для английского получаем слова из предложения
+        expect(result.current.words).toContain("This");
         expect(result.current.words).toContain("test");
       });
     });
@@ -149,8 +181,9 @@ describe("useGetRandomWords", () => {
       rerender({ mode: "sentences" as "words" | "sentences" });
 
       await waitFor(() => {
-        // В режиме предложений должно быть больше слов
-        expect(result.current.words.length).toBeGreaterThan(4);
+        // В режиме предложений слова извлекаются из предложений
+        expect(result.current.words.length).toBeGreaterThan(0);
+        expect(result.current.words).toContain("Это");
       });
     });
 

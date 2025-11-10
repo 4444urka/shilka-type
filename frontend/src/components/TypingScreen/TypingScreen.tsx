@@ -1,8 +1,8 @@
 import { Box, Input } from "@chakra-ui/react";
+import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { TypingWordComponent } from "../TypingWordComponent/TypingWordComponent";
 import { TypingScreenStats } from "../TypingScreenStats/TypingScreenStats";
-import SettingsBar from "../SettingsBar/SettingsBar";
 import RestartButton from "../RestartButton/RestartButton";
 import type { TypingSessionNew } from "../../types/TypingTypes";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
@@ -13,17 +13,6 @@ interface TypingScreenProps {
   isLoading: boolean;
   onKeyPress: (key: string) => void;
   onRestart: () => void;
-  // Пропсы для настроек
-  selectedTime: number;
-  selectedWords: number;
-  selectedLanguage: "en" | "ru";
-  selectedMode: "words" | "sentences";
-  selectedTestType: "time" | "words";
-  onTimeChange: (time: number) => void;
-  onWordsChange: (words: number) => void;
-  onLanguageChange: (language: "en" | "ru") => void;
-  onModeChange: (mode: "words" | "sentences") => void;
-  onTestTypeChange: (testType: "time" | "words") => void;
 }
 
 const TypingScreen: React.FC<TypingScreenProps> = ({
@@ -32,16 +21,6 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   isLoading,
   onKeyPress,
   onRestart,
-  selectedTime,
-  selectedWords,
-  selectedLanguage,
-  selectedMode,
-  selectedTestType,
-  onTimeChange,
-  onWordsChange,
-  onLanguageChange,
-  onModeChange,
-  onTestTypeChange,
 }) => {
   const pressedKeysRef = React.useRef<Set<string>>(new Set());
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -186,10 +165,6 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
     }
   };
 
-  if (isLoading || session.words.length === 0) {
-    return <LoadingScreen />;
-  }
-
   return (
     <Box
       display="flex"
@@ -198,6 +173,8 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
       gap={10}
       position="relative"
       onClick={() => inputRef.current?.focus()}
+      minH={{ base: "250px", sm: "280px", md: "320px" }} // Гарантируем минимальную высоту
+      width="100%"
     >
       {/* Скрытое поле для вызова экранной клавиатуры на мобильных */}
       <Input
@@ -215,95 +192,122 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
         w="1px"
         h="1px"
         opacity={0}
-        zIndex={0}
+        zIndex={-1} // Убираем под основной контент
         border={0}
         p={0}
         bg="transparent"
         onChange={handleMobileInput}
         onKeyDown={handleMobileKeyDown}
       />
-      {session.isStarted ? (
+
+      {/* Статистика появляется только после начала сессии и когда нет загрузки */}
+      {session.isStarted && !isLoading ? (
         <TypingScreenStats
           stats={session.stats}
           displayTime={timeLeft}
           isVisible={session.isStarted}
         />
       ) : (
-        <SettingsBar
-          hideBelow="md"
-          isVisible={!session.isStarted}
-          selectedTime={selectedTime}
-          selectedWords={selectedWords}
-          selectedLanguage={selectedLanguage}
-          selectedMode={selectedMode}
-          selectedTestType={selectedTestType}
-          onTimeChange={onTimeChange}
-          onWordsChange={onWordsChange}
-          onLanguageChange={onLanguageChange}
-          onModeChange={onModeChange}
-          onTestTypeChange={onTestTypeChange}
-        />
+        // Пустой блок-заполнитель для статистики, чтобы сохранить высоту
+        <Box height={{ base: "24px", md: "28px" }} />
       )}
+
+      {/* 
+        Основной контейнер для слов или экрана загрузки.
+        Используем AnimatePresence для создания эффекта кросс-фейда.
+      */}
       <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        gap={6}
-        maxW="100%"
+        width="100%"
+        height={{ base: "200px", sm: "220px", md: "250px" }}
+        position="relative"
       >
-        {!isLoading && session.words.length > 0 && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap={10}
-            key={session.words.map((w) => w.text).join("-")}
-          >
-            <Box
-              ref={scrollContainerRef}
-              textStyle="body"
-              height={{ base: "150px", sm: "180px", md: "200px" }}
-              display="block"
-              overflowY="auto"
-              overflowX="visible"
-              width="100%"
-              textAlign="justify"
-              position="relative"
-              fontSize={{ base: "lg", sm: "xl", md: "2xl" }}
-              css={{
-                textAlignLast: "justify",
-                hyphens: "none",
-                // allow normal wrapping and inline flow
-                whiteSpace: "normal",
+        <AnimatePresence>
+          {isLoading || session.words.length === 0 ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {session.words.map((word, wordIndex) => (
-                <Box
-                  as="span"
-                  key={`word-wrapper-${wordIndex}`}
-                  ref={(el: HTMLElement | null) =>
-                    (wordRefs.current[wordIndex] = el)
-                  }
-                  display="inline-block"
-                  mr={2}
-                >
-                  <TypingWordComponent
-                    key={`word-${wordIndex}`}
-                    word={word}
-                    wordIndex={wordIndex}
-                    currentCharIndex={
-                      wordIndex === session.currentWordIndex
-                        ? session.currentCharIndex
-                        : -1
+              <LoadingScreen />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="words"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <Box
+                ref={scrollContainerRef}
+                textStyle="body"
+                height="100%"
+                display="block"
+                overflowY="auto"
+                overflowX="visible"
+                width="100%"
+                textAlign="justify"
+                fontSize={{ base: "lg", sm: "xl", md: "2xl" }}
+                css={{
+                  textAlignLast: "justify",
+                  hyphens: "none",
+                  whiteSpace: "normal",
+                }}
+              >
+                {session.words.map((word, wordIndex) => (
+                  <Box
+                    as="span"
+                    key={`word-wrapper-${wordIndex}`}
+                    ref={(el: HTMLElement | null) =>
+                      (wordRefs.current[wordIndex] = el)
                     }
-                    isCurrentWord={wordIndex === session.currentWordIndex}
-                  />
-                </Box>
-              ))}
-            </Box>
-            <RestartButton onClick={onRestart} />
-          </Box>
-        )}
+                    display="inline-block"
+                    mr={2}
+                  >
+                    <TypingWordComponent
+                      key={`word-${wordIndex}`}
+                      word={word}
+                      wordIndex={wordIndex}
+                      currentCharIndex={
+                        wordIndex === session.currentWordIndex
+                          ? session.currentCharIndex
+                          : -1
+                      }
+                      isCurrentWord={wordIndex === session.currentWordIndex}
+                    />
+                  </Box>
+                ))}
+              </Box>
+              <RestartButton onClick={onRestart} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Box>
     </Box>
   );

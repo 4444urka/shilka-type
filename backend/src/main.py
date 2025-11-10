@@ -13,6 +13,7 @@ from .stats.router import router as stats_router
 from .theme.router import router as theme_router
 from .websocket.router import router as websocket_router
 from .admin.router import router as admin_router
+from .content.router import router as content_router
 from .database import Base, engine
 from .redis_client import redis_client
 
@@ -94,6 +95,7 @@ app.include_router(stats_router, prefix="/api/stats", tags=["stats"])
 app.include_router(theme_router, prefix="/api/themes", tags=["themes"])
 app.include_router(websocket_router, prefix="/ws", tags=["websocket"])
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
+app.include_router(content_router, prefix="/api/content", tags=["content"])
 
 
 @app.get("/health")

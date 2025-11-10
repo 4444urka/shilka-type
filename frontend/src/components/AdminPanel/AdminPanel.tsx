@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { MdBallot } from "react-icons/md";
-import { FaTrash, FaCoins } from "react-icons/fa";
+import { FaTrash, FaCoins, FaUserShield } from "react-icons/fa";
 import { adminApi, type User } from "../../api/admin/adminRequests";
 
 const AdminPanel: React.FC = () => {
@@ -31,6 +31,10 @@ const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [coinsAmount, setCoinsAmount] = useState<number>(0);
+  const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(
+    null
+  );
+  const [newRole, setNewRole] = useState<string>("");
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -70,6 +74,24 @@ const AdminPanel: React.FC = () => {
       setCoinsAmount(0);
     } catch (error) {
       console.error("Failed to add coins", error);
+    }
+  };
+
+  const handleChangeRole = async () => {
+    if (!selectedUserForRole || !newRole) return;
+    try {
+      const updated = await adminApi.updateUser(selectedUserForRole.id, {
+        role: newRole,
+      });
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === updated.id ? { ...u, role: updated.role } : u
+        )
+      );
+      setSelectedUserForRole(null);
+      setNewRole("");
+    } catch (error) {
+      console.error("Failed to change role", error);
     }
   };
 
@@ -158,6 +180,22 @@ const AdminPanel: React.FC = () => {
                                 </Text>
                               </Box>
                               <HStack gap={2}>
+                                <IconButton
+                                  aria-label="Edit role"
+                                  size="sm"
+                                  variant="ghost"
+                                  color="textColor"
+                                  _hover={{
+                                    color: "primaryColor",
+                                    bg: "bgCardColor",
+                                  }}
+                                  onClick={() => {
+                                    setSelectedUserForRole(user);
+                                    setNewRole(user.role);
+                                  }}
+                                >
+                                  <FaUserShield />
+                                </IconButton>
                                 <IconButton
                                   aria-label="Edit coins"
                                   size="sm"
@@ -255,6 +293,72 @@ const AdminPanel: React.FC = () => {
                   color="bgCardColor"
                   _hover={{ opacity: 0.8 }}
                   onClick={handleAddCoins}
+                >
+                  Применить
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </DialogPositioner>
+        </Portal>
+      </DialogRoot>
+
+      {/* Modal for changing role */}
+      <DialogRoot
+        open={!!selectedUserForRole}
+        onOpenChange={(e) => !e.open && setSelectedUserForRole(null)}
+      >
+        <Portal>
+          <DialogBackdrop />
+          <DialogPositioner>
+            <DialogContent bg="bgCardColor" color="textColor">
+              <DialogHeader>
+                <DialogTitle color="primaryColor">
+                  Изменить роль для {selectedUserForRole?.username}
+                </DialogTitle>
+              </DialogHeader>
+              <DialogCloseTrigger />
+              <DialogBody>
+                <VStack gap={3} align="stretch">
+                  <Text fontSize="sm" opacity={0.8}>
+                    Текущая роль: {selectedUserForRole?.role}
+                  </Text>
+                  <HStack gap={2} justify="center">
+                    {["USER", "MODER", "ADMIN"].map((role) => (
+                      <Button
+                        key={role}
+                        size="sm"
+                        variant={newRole === role ? "solid" : "outline"}
+                        bg={newRole === role ? "primaryColor" : "transparent"}
+                        color={newRole === role ? "bgCardColor" : "textColor"}
+                        borderColor="borderColor"
+                        _hover={{
+                          bg:
+                            newRole === role
+                              ? "primaryColor"
+                              : "bgCardSecondaryColor",
+                          opacity: 0.8,
+                        }}
+                        onClick={() => setNewRole(role)}
+                      >
+                        {role === "USER" && "User"}
+                        {role === "MODER" && "Moderator"}
+                        {role === "ADMIN" && "Admin"}
+                      </Button>
+                    ))}
+                  </HStack>
+                </VStack>
+              </DialogBody>
+              <DialogFooter gap={2}>
+                <DialogActionTrigger asChild>
+                  <Button variant="outline" color="textColor">
+                    Отмена
+                  </Button>
+                </DialogActionTrigger>
+                <Button
+                  bg="primaryColor"
+                  color="bgCardColor"
+                  _hover={{ opacity: 0.8 }}
+                  onClick={handleChangeRole}
                 >
                   Применить
                 </Button>
