@@ -32,19 +32,25 @@ def upgrade() -> None:
     op.drop_index(op.f('ix_sentences_language_active'), table_name='sentences', if_exists=True)
     op.drop_table('sentences', if_exists=True)
     
-    # Шаг 1: Убираем старый default
+    # Шаг 1: Убираем default
     op.execute("ALTER TABLE users ALTER COLUMN role DROP DEFAULT")
     
-    # Шаг 2: Удаляем старый ENUM тип если существует (может остаться от предыдущих миграций)
-    op.execute("DROP TYPE IF EXISTS role CASCADE")
+    # Шаг 2: Преобразуем колонку во временный VARCHAR
+    op.execute("ALTER TABLE users ALTER COLUMN role TYPE VARCHAR USING role::text")
     
-    # Шаг 3: Создаем новый ENUM тип с нижним регистром
+    # Шаг 3: Приводим все значения к нижнему регистру (на случай если есть USER, ADMIN)
+    op.execute("UPDATE users SET role = LOWER(role)")
+    
+    # Шаг 4: Удаляем старый ENUM тип
+    op.execute("DROP TYPE IF EXISTS role")
+    
+    # Шаг 5: Создаем новый ENUM тип с нижним регистром
     op.execute("CREATE TYPE role AS ENUM ('user', 'moder', 'admin')")
     
-    # Шаг 4: Изменяем тип колонки с USING для конвертации существующих значений
+    # Шаг 6: Преобразуем колонку обратно в ENUM
     op.execute("ALTER TABLE users ALTER COLUMN role TYPE role USING role::text::role")
     
-    # Шаг 5: Устанавливаем новый default
+    # Шаг 7: Устанавливаем новый default
     op.execute("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'user'::role")
     # ### end Alembic commands ###
 
