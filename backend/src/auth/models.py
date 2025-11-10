@@ -17,7 +17,18 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    role = Column(SAEnum(Role, name="role", create_constraint=True, native_enum=True), default=Role.USER, nullable=False)
+    role = Column(
+        SAEnum(
+            Role,
+            name="role",
+            create_constraint=True,
+            native_enum=True,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            validate_strings=True,
+        ),
+        default=Role.USER,
+        nullable=False,
+    )
     shilka_coins = Column(Integer, default=0)
     # Настройки пользователя по умолчанию
     default_time = Column(Integer, default=30)
