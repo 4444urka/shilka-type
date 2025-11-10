@@ -100,9 +100,9 @@ const ProfileInfoBar: React.FC<ProfileInfoBarProps> = ({
         </Flex>
 
         {/* Right: Admin panel (if admin) + Content upload (if moder/admin) + logout */}
-        {user?.role?.toUpperCase() === "ADMIN" && <AdminPanel />}
-        {(user?.role?.toUpperCase() === "ADMIN" ||
-          user?.role?.toUpperCase() === "MODER") && (
+        {user?.role?.toLowerCase() === "admin" && <AdminPanel />}
+        {(user?.role?.toLowerCase() === "admin" ||
+          user?.role?.toLowerCase() === "moder") && (
           <ContentUploadModal
             defaultLanguage={selectedLanguage as "ru" | "en"}
           />

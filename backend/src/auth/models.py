@@ -6,9 +6,9 @@ from ..database import Base
 
 
 class Role(str, enum.Enum):
-    USER = "USER"
-    MODER = "MODER"
-    ADMIN = "ADMIN"
+    USER = "user"
+    MODER = "moder"
+    ADMIN = "admin"
 
 
 class User(Base):

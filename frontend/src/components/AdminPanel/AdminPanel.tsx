@@ -323,7 +323,7 @@ const AdminPanel: React.FC = () => {
                     Текущая роль: {selectedUserForRole?.role}
                   </Text>
                   <HStack gap={2} justify="center">
-                    {["USER", "MODER", "ADMIN"].map((role) => (
+                    {["user", "moder", "admin"].map((role) => (
                       <Button
                         key={role}
                         size="sm"
@@ -340,9 +340,9 @@ const AdminPanel: React.FC = () => {
                         }}
                         onClick={() => setNewRole(role)}
                       >
-                        {role === "USER" && "User"}
-                        {role === "MODER" && "Moderator"}
-                        {role === "ADMIN" && "Admin"}
+                        {role === "user" && "User"}
+                        {role === "moder" && "Moderator"}
+                        {role === "admin" && "Admin"}
                       </Button>
                     ))}
                   </HStack>
