@@ -33,16 +33,18 @@ def upgrade() -> None:
     op.drop_table('sentences', if_exists=True)
     
     # Шаг 1: Убираем старый default
-    op.alter_column('users', 'role', server_default=None)
+    op.execute("ALTER TABLE users ALTER COLUMN role DROP DEFAULT")
     
-    # Шаг 2: Создаем ENUM тип с нижним регистром
-    role_enum = postgresql.ENUM('user', 'moder', 'admin', name='role', create_type=False)
-    role_enum.create(op.get_bind(), checkfirst=True)
+    # Шаг 2: Удаляем старый ENUM тип если существует (может остаться от предыдущих миграций)
+    op.execute("DROP TYPE IF EXISTS role CASCADE")
     
-    # Шаг 3: Изменяем тип колонки с USING для конвертации
+    # Шаг 3: Создаем новый ENUM тип с нижним регистром
+    op.execute("CREATE TYPE role AS ENUM ('user', 'moder', 'admin')")
+    
+    # Шаг 4: Изменяем тип колонки с USING для конвертации существующих значений
     op.execute("ALTER TABLE users ALTER COLUMN role TYPE role USING role::text::role")
     
-    # Шаг 4: Устанавливаем новый default
+    # Шаг 5: Устанавливаем новый default
     op.execute("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'user'::role")
     # ### end Alembic commands ###
 
