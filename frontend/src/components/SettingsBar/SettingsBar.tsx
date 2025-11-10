@@ -126,7 +126,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   }
                   onClick={() => handleTestTypeChange(testType.code)}
                   onMouseDown={(e) => e.preventDefault()}
-                  fontSize={{ base: "sm", md: "lg" }}
+                  fontSize={{ base: "sm", md: "md" }}
                   px={{ base: 2, lg: 3 }}
                   py={{ base: 1, lg: 2 }}
                 >
