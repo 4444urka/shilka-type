@@ -32,18 +32,18 @@ def upgrade() -> None:
     op.drop_index(op.f('ix_sentences_language_active'), table_name='sentences', if_exists=True)
     op.drop_table('sentences', if_exists=True)
     
-    # Создаем ENUM тип с нижним регистром
+    # Шаг 1: Убираем старый default
+    op.alter_column('users', 'role', server_default=None)
+    
+    # Шаг 2: Создаем ENUM тип с нижним регистром
     role_enum = postgresql.ENUM('user', 'moder', 'admin', name='role', create_type=False)
     role_enum.create(op.get_bind(), checkfirst=True)
     
-    # Изменяем тип колонки с USING для конвертации
+    # Шаг 3: Изменяем тип колонки с USING для конвертации
     op.execute("ALTER TABLE users ALTER COLUMN role TYPE role USING role::text::role")
-    op.alter_column('users', 'role',
-               existing_type=sa.VARCHAR(),
-               type_=sa.Enum('user', 'moder', 'admin', name='role'),
-               existing_nullable=True,
-               existing_server_default=sa.text("'user'::character varying"),
-               server_default='user')
+    
+    # Шаг 4: Устанавливаем новый default
+    op.execute("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'user'::role")
     # ### end Alembic commands ###
 
 
