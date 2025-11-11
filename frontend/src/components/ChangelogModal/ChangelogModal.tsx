@@ -133,7 +133,6 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({
               {release ? `${release.tag_name}` : "История изменений"}
             </Dialog.Title>
           </Dialog.Header>
-          <Dialog.CloseTrigger color="textColor" />
           <Dialog.Body py={4}>
             {isLoading && (
               <Center py={8}>
