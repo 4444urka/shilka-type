@@ -7,6 +7,7 @@ import {
   MdTextFields,
 } from "react-icons/md";
 import SettingsBarButton from "../SettingsBarButton/SettingsBarButton";
+import React from "react";
 
 const MotionBox = motion.create(Box);
 
@@ -91,24 +92,24 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         bg="bgCardColor"
         exit={{ opacity: 0, y: -20 }}
         display="flex"
-        flexDirection={{ base: "column", md: "row" }}
+        flexDirection={{ base: "column", lg: "row" }}
         alignItems="center"
         justifyContent="center"
-        gap={{ base: 3, md: 8 }}
+        gap={{ base: 3, lg: 8 }}
         mb={4}
-        py={{ base: 3, md: 2 }}
-        px={{ base: 3, md: 4 }}
+        py={{ base: 3, lg: 2 }}
+        px={{ base: 3, lg: 4 }}
         borderRadius="lg"
         backdropFilter="blur(16px)"
         textStyle="input"
         maxW="100%"
-        overflowX={{ base: "auto", md: "visible" }}
+        overflowX={{ base: "auto", lg: "visible" }}
       >
         {/* Переключатель типа теста */}
         <Box
           display="flex"
           alignItems="center"
-          gap={{ base: 2, md: 3 }}
+          gap={{ base: 2, lg: 3 }}
           flexWrap="wrap"
           justifyContent="center"
         >
@@ -126,8 +127,8 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   onClick={() => handleTestTypeChange(testType.code)}
                   onMouseDown={(e) => e.preventDefault()}
                   fontSize={{ base: "sm", md: "md" }}
-                  px={{ base: 2, md: 3 }}
-                  py={{ base: 1, md: 2 }}
+                  px={{ base: 2, lg: 3 }}
+                  py={{ base: 1, lg: 2 }}
                 >
                   <IconComponent />
                   <Box as="span" hideBelow="sm">
@@ -139,17 +140,17 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
           </Box>
         </Box>
         <Box
-          width={{ base: "100%", md: "1px" }}
-          height={{ base: "1px", md: "32px" }}
+          width={{ base: "100%", lg: "1px" }}
+          height={{ base: "1px", lg: "32px" }}
           bg="primaryColor"
-          hideBelow="md"
+          hideBelow="lg"
         />
         {/* Настройка времени или количества слов */}
         {selectedTestType === "time" ? (
           <Box
             display="flex"
             alignItems="center"
-            gap={{ base: 2, md: 3 }}
+            gap={{ base: 2, lg: 3 }}
             flexWrap="wrap"
             justifyContent="center"
           >
@@ -159,9 +160,9 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   key={time}
                   color={selectedTime === time ? "primaryColor" : "textColor"}
                   onClick={() => handleTimeChange(time)}
-                  fontSize={{ base: "sm", md: "md" }}
-                  px={{ base: 2, md: 3 }}
-                  py={{ base: 1, md: 2 }}
+                  fontSize={{ base: "sm", lg: "md" }}
+                  px={{ base: 2, lg: 3 }}
+                  py={{ base: 1, lg: 2 }}
                 >
                   {time}с
                 </SettingsBarButton>
@@ -182,9 +183,9 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   key={words}
                   color={selectedWords === words ? "primaryColor" : "textColor"}
                   onClick={() => handleWordsChange(words)}
-                  fontSize={{ base: "sm", md: "md" }}
-                  px={{ base: 2, md: 3 }}
-                  py={{ base: 1, md: 2 }}
+                  fontSize={{ base: "sm", lg: "md" }}
+                  px={{ base: 2, lg: 3 }}
+                  py={{ base: 1, lg: 2 }}
                 >
                   {words}
                 </SettingsBarButton>
@@ -194,8 +195,8 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         )}
         {/* Разделитель */}
         <Box
-          width={{ base: "100%", md: "1px" }}
-          height={{ base: "1px", md: "32px" }}
+          width={{ base: "100%", lg: "1px" }}
+          height={{ base: "1px", lg: "32px" }}
           bg="primaryColor"
           hideBelow="md"
         />
@@ -203,7 +204,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
         <Box
           display="flex"
           alignItems="center"
-          gap={{ base: 2, md: 3 }}
+          gap={{ base: 2, lg: 3 }}
           flexWrap="wrap"
           justifyContent="center"
         >
@@ -217,9 +218,9 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                     selectedMode === mode.code ? "primaryColor" : "textColor"
                   }
                   onClick={() => handleModeChange(mode.code)}
-                  fontSize={{ base: "sm", md: "md" }}
-                  px={{ base: 2, md: 3 }}
-                  py={{ base: 1, md: 2 }}
+                  fontSize={{ base: "sm", lg: "md" }}
+                  px={{ base: 2, lg: 3 }}
+                  py={{ base: 1, lg: 2 }}
                 >
                   <IconComponent />
                   <Box as="span" hideBelow="sm">
@@ -269,4 +270,16 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
   );
 };
 
-export default SettingsBar;
+// Мемоизируем компонент и сравниваем только по значениям настроек, игнорируя функции
+export default React.memo(SettingsBar, (prevProps, nextProps) => {
+  // Возвращаем true если пропсы одинаковые (не нужно перерендеривать)
+  return (
+    prevProps.isVisible === nextProps.isVisible &&
+    prevProps.selectedTime === nextProps.selectedTime &&
+    prevProps.selectedWords === nextProps.selectedWords &&
+    prevProps.selectedLanguage === nextProps.selectedLanguage &&
+    prevProps.selectedMode === nextProps.selectedMode &&
+    prevProps.selectedTestType === nextProps.selectedTestType
+    // Намеренно НЕ сравниваем callback функции - они могут меняться, это нормально
+  );
+});

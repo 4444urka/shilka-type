@@ -78,3 +78,29 @@ async def authenticated_client(client, test_user):
     )
     assert response.status_code == 200
     return client
+
+
+@pytest_asyncio.fixture(scope="function")
+async def admin_user(db_session):
+    """Создаёт тестового пользователя с правами администратора"""
+    user = User(
+        username="admin",
+        hashed_password=get_password_hash("adminpass123"),
+        shilka_coins=1000,
+        role="admin"
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture(scope="function")
+async def admin_client(client, admin_user):
+    """Возвращает клиент с авторизованным администратором"""
+    response = await client.post(
+        "/auth/login",
+        data={"username": "admin", "password": "adminpass123"}
+    )
+    assert response.status_code == 200
+    return client

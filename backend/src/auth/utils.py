@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from ..config import settings
 from ..database import get_db
-from .models import User
+from .models import User, Role
 from .schemas import TokenData
 
 pwd_context = CryptContext(
@@ -79,3 +79,23 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
         print(f"User not found in database: {token_data.username}")
         raise credentials_exception
     return user
+
+
+async def get_current_admin(current_user: User = Depends(get_current_user)):
+    """Проверка, что текущий пользователь - администратор"""
+    if current_user.role != Role.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user
+
+
+async def get_current_moder_or_admin(current_user: User = Depends(get_current_user)):
+    """Проверка, что текущий пользователь - модератор или администратор"""
+    if current_user.role not in [Role.MODER, Role.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Moderator or Admin access required"
+        )
+    return current_user

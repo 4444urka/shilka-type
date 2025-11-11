@@ -38,4 +38,4 @@ const SettingsBarButton: React.FC<SettingsBarButtonProps> = ({
   );
 };
 
-export default SettingsBarButton;
+export default React.memo(SettingsBarButton);

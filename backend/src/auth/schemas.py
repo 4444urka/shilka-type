@@ -18,6 +18,7 @@ class UserCreate(UserBase):
 class UserInDB(UserBase):
     id: int
     hashed_password: str
+    role: str = "user"  # "user" или "admin"
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None
     default_time: int | None = 30
@@ -30,6 +31,7 @@ class UserInDB(UserBase):
 
 class UserPublic(UserBase):
     id: int
+    role: str = "user"  # "user" или "admin"
     # Может прийти None из ORM, позволяем и даём дефолт 0
     shilka_coins: int | None = 0
     selected_theme_id: int | None = None

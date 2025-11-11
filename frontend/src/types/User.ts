@@ -23,6 +23,7 @@ export type UserRegistrationRequest = {
 export type Me = {
   id: number;
   username: string;
+  role?: string;
   shilka_coins: number;
   default_time?: number;
   default_words?: number;

@@ -1,7 +1,8 @@
 import React from "react";
-import { getRandomRussianWords } from "../utils/getRandomRussianWords";
-import { getRandomRussianSentences } from "../utils/getRandomRussianSentences";
-import { getRandomLengthWords } from "../services/randomWordsService";
+import {
+  getRandomWords,
+  getRandomSentences,
+} from "../api/content/contentRequests";
 
 type LanguageCode = "ru" | "en";
 type ModeType = "words" | "sentences";
@@ -15,44 +16,42 @@ const useGetRandomWords = (
 ) => {
   const [words, setWords] = React.useState<string[]>([]);
   const [refreshKey, setRefreshKey] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const loadWords = async () => {
-      if (mode === "sentences") {
-        // Режим предложений (только для русского языка)
-        if (languageCode === "ru") {
-          const sentences = getRandomRussianSentences(totalChars + 50);
-          // Разбиваем предложения на слова
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const estimatedWordCount = Math.ceil(
+          totalChars / ((minLength + maxLength) / 2)
+        );
+        if (mode === "sentences") {
+          // Режим предложений - получаем предложения с сервера
+          const sentences = await getRandomSentences(languageCode, 10);
+          // Разбиваем предложения на слова для отображения
           const allWords = sentences.flatMap((sentence) =>
-            sentence.split(/\s+/).filter((word) => word.length > 0)
+            sentence.text.split(/\s+/).filter((word) => word.length > 0)
           );
-          setWords(allWords);
+          setWords(allWords.slice(0, estimatedWordCount));
         } else {
-          // Для английского языка в режиме предложений используем слова
-          const newWords = await getRandomLengthWords(
-            totalChars,
-            minLength,
-            maxLength
+          // Режим слов - получаем слова с сервера
+          // Вычисляем примерное количество слов исходя из totalChars
+          const serverWords = await getRandomWords(
+            languageCode,
+            estimatedWordCount
           );
-          setWords(newWords);
+          setWords(serverWords.map((w) => w.text));
         }
-      } else {
-        // Режим слов
-        if (languageCode === "en") {
-          const newWords = await getRandomLengthWords(
-            totalChars,
-            minLength,
-            maxLength
-          );
-          setWords(newWords);
-        } else {
-          const newWords = getRandomRussianWords(
-            minLength,
-            maxLength,
-            totalChars
-          );
-          setWords(newWords);
-        }
+      } catch (err) {
+        console.error("Failed to load words from server:", err);
+        setError("Failed to load words. Please try again.");
+        // Fallback: устанавливаем пустой массив
+        setWords([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -66,39 +65,37 @@ const useGetRandomWords = (
   const addMoreWords = React.useCallback(
     async (charsToAdd?: number) => {
       const charsCount = charsToAdd || totalChars;
-      let newWords: string[] = [];
 
-      if (mode === "sentences") {
-        if (languageCode === "ru") {
-          const sentences = getRandomRussianSentences(charsCount + 50);
+      try {
+        let newWords: string[] = [];
+
+        if (mode === "sentences") {
+          // Загружаем дополнительные предложения
+          const sentences = await getRandomSentences(languageCode, 5);
           newWords = sentences.flatMap((sentence) =>
-            sentence.split(/\s+/).filter((word) => word.length > 0)
+            sentence.text.split(/\s+/).filter((word) => word.length > 0)
           );
         } else {
-          newWords = await getRandomLengthWords(
-            charsCount,
-            minLength,
-            maxLength
+          // Загружаем дополнительные слова
+          const estimatedWordCount = Math.ceil(
+            charsCount / ((minLength + maxLength) / 2)
           );
-        }
-      } else {
-        if (languageCode === "en") {
-          newWords = await getRandomLengthWords(
-            charsCount,
-            minLength,
-            maxLength
+          const serverWords = await getRandomWords(
+            languageCode,
+            Math.max(estimatedWordCount, 25)
           );
-        } else {
-          newWords = getRandomRussianWords(minLength, maxLength, charsCount);
+          newWords = serverWords.map((w) => w.text);
         }
-      }
 
-      setWords((prev) => [...prev, ...newWords]);
+        setWords((prev) => [...prev, ...newWords]);
+      } catch (err) {
+        console.error("Failed to add more words:", err);
+      }
     },
     [minLength, languageCode, maxLength, totalChars, mode]
   );
 
-  return { words, refreshWords, addMoreWords };
+  return { words, refreshWords, addMoreWords, isLoading, error };
 };
 
 export default useGetRandomWords;
