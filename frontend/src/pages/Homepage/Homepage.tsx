@@ -66,13 +66,17 @@ const Homepage = () => {
     }
   }, [user, dispatch]);
 
+  // Вычисляем количество символов на основе выбранного количества слов
+  // Предполагаем среднюю длину слова ~5 символов
+  const totalChars = selectedTestType === "words" ? selectedWords * 5 : 80;
+
   const {
     words,
     refreshWords,
     addMoreWords: addMoreWordsToList,
     isLoading,
     error,
-  } = useGetRandomWords(2, 5, 80, selectedLanguage, selectedMode);
+  } = useGetRandomWords(2, 5, totalChars, selectedLanguage, selectedMode);
 
   const [isLoadingMoreWords, setIsLoadingMoreWords] = useState(false);
 
@@ -197,7 +201,6 @@ const Homepage = () => {
       dispatch(setWordsAction(words));
       if (!session.isStarted) {
         resetSession();
-        refreshWords();
       }
       if (isAuthed) {
         void updateUserSettings({ default_words: words }).catch((err) =>
@@ -205,47 +208,53 @@ const Homepage = () => {
         );
       }
     },
-    [session.isStarted, resetSession, refreshWords, isAuthed, dispatch]
+    [session.isStarted, resetSession, isAuthed, dispatch]
   );
 
   const handleLanguageChange = useCallback(
     (language: "en" | "ru") => {
       dispatch(setLanguageAction(language));
-      // refreshWords не нужен - изменение selectedLanguage автоматически обновит слова
+      // refreshWords вызывается для сброса сессии при смене языка
+      if (!session.isStarted) {
+        resetSession();
+      }
       if (isAuthed) {
         void updateUserSettings({ default_language: language }).catch((err) =>
           console.error("Failed to save settings:", err)
         );
       }
     },
-    [isAuthed, dispatch]
+    [isAuthed, dispatch, session.isStarted, resetSession]
   );
 
   const handleModeChange = useCallback(
     (mode: "words" | "sentences") => {
       dispatch(setModeAction(mode));
-      refreshWords();
+      if (!session.isStarted) {
+        resetSession();
+      }
       if (isAuthed) {
         void updateUserSettings({ default_mode: mode }).catch((err) =>
           console.error("Failed to save settings:", err)
         );
       }
     },
-    [refreshWords, isAuthed, dispatch]
+    [isAuthed, dispatch, session.isStarted, resetSession]
   );
 
   const handleTestTypeChange = useCallback(
     (testType: "time" | "words") => {
       dispatch(setTestTypeAction(testType));
-      refreshWords();
-      resetSession();
+      if (!session.isStarted) {
+        resetSession();
+      }
       if (isAuthed) {
         void updateUserSettings({ default_test_type: testType }).catch((err) =>
           console.error("Failed to save settings:", err)
         );
       }
     },
-    [refreshWords, resetSession, isAuthed, dispatch]
+    [resetSession, isAuthed, dispatch, session.isStarted]
   );
 
   return (
