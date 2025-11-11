@@ -3,6 +3,7 @@ import React from "react";
 import { FaGithub, FaTelegram } from "react-icons/fa";
 import { getMyAppVer } from "../../api/github/githubRequests";
 import ThemeSelectorMenu from "../ThemeSelectorMenu/ThemeSelectorMenu";
+import ChangelogModal from "../ChangelogModal/ChangelogModal";
 
 interface FooterProps extends BoxProps {
   children?: React.ReactNode;
@@ -10,6 +11,8 @@ interface FooterProps extends BoxProps {
 
 const Footer: React.FC<FooterProps> = () => {
   const [version, setVersion] = React.useState<string>("");
+  const [changelogOpen, setChangelogOpen] = React.useState(false);
+
   React.useEffect(() => {
     const fetchVersion = async () => {
       const appVersion = await getMyAppVer();
@@ -44,7 +47,15 @@ const Footer: React.FC<FooterProps> = () => {
           justifyContent="center"
         >
           <Text>&copy; shilkagod {new Date().getFullYear()}</Text>
-          <Text animation="fadeIn 1s ease-in-out">{version}</Text>
+          <Text
+            animation="fadeIn 1s ease-in-out"
+            cursor="pointer"
+            _hover={{ opacity: 1, color: "primaryColor" }}
+            transition="all 0.2s"
+            onClick={() => setChangelogOpen(true)}
+          >
+            {version}
+          </Text>
         </Box>
         <Flex gap={4} align="center">
           <ThemeSelectorMenu />
@@ -76,6 +87,11 @@ const Footer: React.FC<FooterProps> = () => {
           </Link>
         </Flex>
       </Flex>
+
+      <ChangelogModal
+        open={changelogOpen}
+        onOpenChange={(details) => setChangelogOpen(details.open)}
+      />
     </Box>
   );
 };
