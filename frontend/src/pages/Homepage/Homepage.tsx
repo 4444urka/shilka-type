@@ -184,7 +184,7 @@ const Homepage = () => {
     (time: number) => {
       dispatch(setTimeAction(time));
       if (!session.isStarted) {
-        resetSession();
+        refreshWords(); // Принудительно обновляем слова
       }
       // Сохраняем настройку на сервере, если пользователь авторизован
       if (isAuthed) {
@@ -193,14 +193,14 @@ const Homepage = () => {
         );
       }
     },
-    [session.isStarted, resetSession, isAuthed, dispatch]
+    [session.isStarted, refreshWords, isAuthed, dispatch]
   );
 
   const handleWordsChange = useCallback(
     (words: number) => {
       dispatch(setWordsAction(words));
       if (!session.isStarted) {
-        resetSession();
+        refreshWords(); // Принудительно обновляем слова
       }
       if (isAuthed) {
         void updateUserSettings({ default_words: words }).catch((err) =>
@@ -208,15 +208,14 @@ const Homepage = () => {
         );
       }
     },
-    [session.isStarted, resetSession, isAuthed, dispatch]
+    [session.isStarted, refreshWords, isAuthed, dispatch]
   );
 
   const handleLanguageChange = useCallback(
     (language: "en" | "ru") => {
       dispatch(setLanguageAction(language));
-      // refreshWords вызывается для сброса сессии при смене языка
       if (!session.isStarted) {
-        resetSession();
+        refreshWords(); // Принудительно обновляем слова
       }
       if (isAuthed) {
         void updateUserSettings({ default_language: language }).catch((err) =>
@@ -224,14 +223,14 @@ const Homepage = () => {
         );
       }
     },
-    [isAuthed, dispatch, session.isStarted, resetSession]
+    [isAuthed, dispatch, session.isStarted, refreshWords]
   );
 
   const handleModeChange = useCallback(
     (mode: "words" | "sentences") => {
       dispatch(setModeAction(mode));
       if (!session.isStarted) {
-        resetSession();
+        refreshWords(); // Принудительно обновляем слова
       }
       if (isAuthed) {
         void updateUserSettings({ default_mode: mode }).catch((err) =>
@@ -239,14 +238,14 @@ const Homepage = () => {
         );
       }
     },
-    [isAuthed, dispatch, session.isStarted, resetSession]
+    [isAuthed, dispatch, session.isStarted, refreshWords]
   );
 
   const handleTestTypeChange = useCallback(
     (testType: "time" | "words") => {
       dispatch(setTestTypeAction(testType));
       if (!session.isStarted) {
-        resetSession();
+        refreshWords(); // Принудительно обновляем слова
       }
       if (isAuthed) {
         void updateUserSettings({ default_test_type: testType }).catch((err) =>
@@ -254,7 +253,7 @@ const Homepage = () => {
         );
       }
     },
-    [resetSession, isAuthed, dispatch, session.isStarted]
+    [isAuthed, dispatch, session.isStarted, refreshWords]
   );
 
   return (
