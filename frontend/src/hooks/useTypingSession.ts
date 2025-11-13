@@ -320,12 +320,10 @@ export const useTypingSession = ({
 
   // Инициализируем сессию только при первой загрузке слов или изменении настроек
   useEffect(() => {
-    const currentSignature =
-      words.length > 0 ? words.join("\u0001") : null;
+    const currentSignature = words.length > 0 ? words.join("\u0001") : null;
 
     const settingsChanged = settingsKey !== prevSettingsKeyRef.current;
-    const wordsChanged =
-      currentSignature !== prevWordsSignatureRef.current;
+    const wordsChanged = currentSignature !== prevWordsSignatureRef.current;
 
     if (settingsChanged) {
       prevSettingsKeyRef.current = settingsKey;
