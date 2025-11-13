@@ -312,26 +312,25 @@ export const useTypingSession = ({
 
   // Отслеживаем изменения настроек и слов
   const prevSettingsKeyRef = useRef(settingsKey);
-  const prevWordsFirstRef = useRef(words[0]);
+  const prevWordsSignatureRef = useRef<string | null>(
+    words.length > 0 ? words.join("\u0001") : null
+  );
   const waitingForWordsRef = useRef(false);
   const resetTimeoutRef = useRef<number | null>(null);
 
   // Инициализируем сессию только при первой загрузке слов или изменении настроек
   useEffect(() => {
-    const settingsChanged = settingsKey !== prevSettingsKeyRef.current;
-    const wordsChanged =
-      words.length > 0 && words[0] !== prevWordsFirstRef.current;
+    const currentSignature = words.length > 0 ? words.join("\u0001") : null;
 
-    // Если настройки изменились, всегда ждём новых слов или сбрасываем
+    const settingsChanged = settingsKey !== prevSettingsKeyRef.current;
+    const wordsChanged = currentSignature !== prevWordsSignatureRef.current;
+
     if (settingsChanged) {
       prevSettingsKeyRef.current = settingsKey;
 
       if (!wordsChanged) {
-        // Настройки изменились, но слова ещё не пришли - ждём
         waitingForWordsRef.current = true;
 
-        // Устанавливаем таймаут: если слова не придут за 100мс, сбрасываем принудительно
-        // (это значит, что изменились только время/количество/тип, не требующие новых слов)
         if (resetTimeoutRef.current) {
           clearTimeout(resetTimeoutRef.current);
         }
@@ -340,29 +339,20 @@ export const useTypingSession = ({
             waitingForWordsRef.current = false;
             resetSession();
             isInitializedRef.current = true;
-            if (words.length > 0) {
-              prevWordsFirstRef.current = words[0];
-            }
+            prevWordsSignatureRef.current = currentSignature;
           }
         }, 100);
-      } else {
-        // Настройки и слова изменились одновременно
-        if (resetTimeoutRef.current) {
-          clearTimeout(resetTimeoutRef.current);
-          resetTimeoutRef.current = null;
-        }
+      } else if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+        resetTimeoutRef.current = null;
       }
     }
 
-    // Два случая для сброса:
-    // 1. Первая инициализация - есть слова
-    // 2. Настройки изменились И слова обновились (или ждали и дождались)
     const shouldReset =
       (!isInitializedRef.current && words.length > 0) ||
       (waitingForWordsRef.current && wordsChanged);
 
     if (shouldReset) {
-      // Очищаем таймаут если он был установлен
       if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);
         resetTimeoutRef.current = null;
@@ -370,14 +360,12 @@ export const useTypingSession = ({
 
       resetSession();
       isInitializedRef.current = true;
-      prevWordsFirstRef.current = words[0];
+      prevWordsSignatureRef.current = currentSignature;
       waitingForWordsRef.current = false;
     } else if (wordsChanged && !waitingForWordsRef.current) {
-      // Если только слова изменились (подгрузка), обновляем ссылку
-      prevWordsFirstRef.current = words[0];
+      prevWordsSignatureRef.current = currentSignature;
     }
 
-    // Очистка таймаута при размонтировании
     return () => {
       if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);
