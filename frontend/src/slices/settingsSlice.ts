@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type ModeType = "words" | "sentences";
+export type ModeType = "words" | "sentences" | "problem";
 export type TestType = "time" | "words";
 
 export interface SettingsState {
