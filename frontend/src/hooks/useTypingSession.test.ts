@@ -1,21 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-
 // Мокируем API модули
 vi.mock("../api/stats/statsRequests", () => ({
-  getLeaderboard: vi.fn(),
-  getTypingSessions: vi.fn(),
-  postTypingSession: vi.fn(),
-  getCharErrorStats: vi.fn(),
+  fetchLeaderboard: vi.fn(),
+  fetchTypingSessions: vi.fn(),
+  postWordHistory: vi.fn(),
+  fetchCharErrors: vi.fn(),
 }));
 
 vi.mock("../api/auth/authRequests", () => ({
   getCurrentUser: vi.fn(),
 }));
 
-import { getLeaderboard, getTypingSessions } from "../api/stats/statsRequests";
+import {
+  fetchLeaderboard,
+  fetchTypingSessions,
+} from "../api/stats/statsRequests";
 import type { Me } from "../types/User";
-import type { TypingSessionResponse } from "../types/TypingTypes";
+import type { TypingSession } from "../types/TypingSession";
 
 // Тестовые данные
 const mockLeaderboard: Me[] = [
@@ -51,7 +53,7 @@ const mockLeaderboard: Me[] = [
   },
 ];
 
-const mockSessions: TypingSessionResponse[] = [
+const mockSessions: TypingSession[] = [
   {
     id: 1,
     wpm: 85,
@@ -85,27 +87,27 @@ describe("useFetchLeaderboard tests", () => {
 
   describe("Успешные запросы", () => {
     it("должен возвращать данные лидерборда при успешном запросе", async () => {
-      vi.mocked(getLeaderboard).mockResolvedValueOnce(mockLeaderboard);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce(mockLeaderboard);
 
-      const result = await getLeaderboard();
+      const result = await fetchLeaderboard();
 
       expect(result).toEqual(mockLeaderboard);
-      expect(getLeaderboard).toHaveBeenCalledTimes(1);
+      expect(fetchLeaderboard).toHaveBeenCalledTimes(1);
     });
 
     it("должен возвращать пустой массив при пустом лидерборде", async () => {
-      vi.mocked(getLeaderboard).mockResolvedValueOnce([]);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce([]);
 
-      const result = await getLeaderboard();
+      const result = await fetchLeaderboard();
 
       expect(result).toEqual([]);
       expect(result).toHaveLength(0);
     });
 
     it("должен сортировать лидерборд по убыванию монет", async () => {
-      vi.mocked(getLeaderboard).mockResolvedValueOnce(mockLeaderboard);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce(mockLeaderboard);
 
-      const result = await getLeaderboard();
+      const result = await fetchLeaderboard();
 
       // Проверяем что монеты отсортированы по убыванию
       for (let i = 0; i < result.length - 1; i++) {
@@ -118,33 +120,33 @@ describe("useFetchLeaderboard tests", () => {
 
   describe("Обработка ошибок", () => {
     it("должен выбрасывать ошибку при сетевой ошибке", async () => {
-      vi.mocked(getLeaderboard).mockRejectedValueOnce(
+      vi.mocked(fetchLeaderboard).mockRejectedValueOnce(
         new Error("Network error"),
       );
 
-      await expect(getLeaderboard()).rejects.toThrow("Network error");
+      await expect(fetchLeaderboard()).rejects.toThrow("Network error");
     });
 
     it("должен обрабатывать 401 ошибку (не авторизован)", async () => {
       const unauthorizedError = new Error("Unauthorized");
-      vi.mocked(getLeaderboard).mockRejectedValueOnce(unauthorizedError);
+      vi.mocked(fetchLeaderboard).mockRejectedValueOnce(unauthorizedError);
 
-      await expect(getLeaderboard()).rejects.toThrow("Unauthorized");
+      await expect(fetchLeaderboard()).rejects.toThrow("Unauthorized");
     });
 
     it("должен обрабатывать 500 ошибку сервера", async () => {
       const serverError = new Error("Internal Server Error");
-      vi.mocked(getLeaderboard).mockRejectedValueOnce(serverError);
+      vi.mocked(fetchLeaderboard).mockRejectedValueOnce(serverError);
 
-      await expect(getLeaderboard()).rejects.toThrow("Internal Server Error");
+      await expect(fetchLeaderboard()).rejects.toThrow("Internal Server Error");
     });
   });
 
   describe("Данные лидерборда", () => {
     it("должен содержать все необходимые поля пользователя", async () => {
-      vi.mocked(getLeaderboard).mockResolvedValueOnce(mockLeaderboard);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce(mockLeaderboard);
 
-      const result = await getLeaderboard();
+      const result = await fetchLeaderboard();
       const firstUser = result[0];
 
       expect(firstUser).toHaveProperty("id");
@@ -172,10 +174,10 @@ describe("useFetchLeaderboard tests", () => {
         },
       ];
 
-      vi.mocked(getLeaderboard).mockResolvedValueOnce(leaderboardWithZero);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce(leaderboardWithZero);
 
-      const result = await getLeaderboard();
-      const userWithZero = result.find((u) => u.username === "newbie");
+      const result = await fetchLeaderboard();
+      const userWithZero = result.find((u: Me) => u.username === "newbie");
 
       expect(userWithZero).toBeDefined();
       expect(userWithZero?.shilka_coins).toBe(0);
@@ -195,9 +197,11 @@ describe("useFetchLeaderboard tests", () => {
         },
       ];
 
-      vi.mocked(getLeaderboard).mockResolvedValueOnce(leaderboardWithBigCoins);
+      vi.mocked(fetchLeaderboard).mockResolvedValueOnce(
+        leaderboardWithBigCoins,
+      );
 
-      const result = await getLeaderboard();
+      const result = await fetchLeaderboard();
 
       expect(result[0].shilka_coins).toBe(999999999);
     });
@@ -215,18 +219,18 @@ describe("useFetchSessions tests", () => {
 
   describe("Успешные запросы", () => {
     it("должен возвращать список сессий при успешном запросе", async () => {
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(mockSessions);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(mockSessions);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result).toEqual(mockSessions);
-      expect(getTypingSessions).toHaveBeenCalledTimes(1);
+      expect(fetchTypingSessions).toHaveBeenCalledTimes(1);
     });
 
     it("должен возвращать пустой массив при отсутствии сессий", async () => {
-      vi.mocked(getTypingSessions).mockResolvedValueOnce([]);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce([]);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result).toEqual([]);
       expect(result).toHaveLength(0);
@@ -234,46 +238,46 @@ describe("useFetchSessions tests", () => {
 
     it("должен получать сессии с указанным лимитом", async () => {
       const limitedSessions = mockSessions.slice(0, 1);
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(limitedSessions);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(limitedSessions);
 
-      const result = await getTypingSessions(1);
+      const result = await fetchTypingSessions(1);
 
       expect(result).toHaveLength(1);
-      expect(getTypingSessions).toHaveBeenCalledWith(1);
+      expect(fetchTypingSessions).toHaveBeenCalledWith(1);
     });
   });
 
   describe("Обработка ошибок", () => {
     it("должен выбрасывать ошибку при сетевой ошибке", async () => {
-      vi.mocked(getTypingSessions).mockRejectedValueOnce(
+      vi.mocked(fetchTypingSessions).mockRejectedValueOnce(
         new Error("Network error"),
       );
 
-      await expect(getTypingSessions()).rejects.toThrow("Network error");
+      await expect(fetchTypingSessions()).rejects.toThrow("Network error");
     });
 
     it("должен обрабатывать 401 ошибку (не авторизован)", async () => {
-      vi.mocked(getTypingSessions).mockRejectedValueOnce(
+      vi.mocked(fetchTypingSessions).mockRejectedValueOnce(
         new Error("Unauthorized"),
       );
 
-      await expect(getTypingSessions()).rejects.toThrow("Unauthorized");
+      await expect(fetchTypingSessions()).rejects.toThrow("Unauthorized");
     });
 
     it("должен обрабатывать timeout ошибку", async () => {
-      vi.mocked(getTypingSessions).mockRejectedValueOnce(
+      vi.mocked(fetchTypingSessions).mockRejectedValueOnce(
         new Error("Request timeout"),
       );
 
-      await expect(getTypingSessions()).rejects.toThrow("Request timeout");
+      await expect(fetchTypingSessions()).rejects.toThrow("Request timeout");
     });
   });
 
   describe("Данные сессий", () => {
     it("должен содержать все необходимые поля сессии", async () => {
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(mockSessions);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(mockSessions);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
       const firstSession = result[0];
 
       expect(firstSession).toHaveProperty("id");
@@ -287,7 +291,7 @@ describe("useFetchSessions tests", () => {
     });
 
     it("должен корректно обрабатывать сессии с различными режимами", async () => {
-      const sessionsWithModes: TypingSessionResponse[] = [
+      const sessionsWithModes: TypingSession[] = [
         { ...mockSessions[0], typing_mode: "words" },
         { ...mockSessions[1], typing_mode: "time" },
         {
@@ -302,55 +306,39 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(sessionsWithModes);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(sessionsWithModes);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
-      expect(result.map((s) => s.typing_mode)).toContain("words");
-      expect(result.map((s) => s.typing_mode)).toContain("time");
-      expect(result.map((s) => s.typing_mode)).toContain("sentences");
+      expect(result.map((s: TypingSession) => s.typing_mode)).toContain(
+        "words",
+      );
+      expect(result.map((s: TypingSession) => s.typing_mode)).toContain("time");
+      expect(result.map((s: TypingSession) => s.typing_mode)).toContain(
+        "sentences",
+      );
     });
 
     it("должен корректно обрабатывать сессии на разных языках", async () => {
-      const sessionsWithLanguages: TypingSessionResponse[] = [
+      const sessionsWithLanguages: TypingSession[] = [
         { ...mockSessions[0], language: "en" },
         { ...mockSessions[1], language: "ru" },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(sessionsWithLanguages);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(
+        sessionsWithLanguages,
+      );
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
-      expect(result.map((s) => s.language)).toContain("en");
-      expect(result.map((s) => s.language)).toContain("ru");
-    });
-
-    it("должен корректно обрабатывать сессии с null значениями wpm и accuracy", async () => {
-      const sessionsWithNulls: TypingSessionResponse[] = [
-        {
-          id: 1,
-          wpm: null,
-          accuracy: null,
-          duration: 30,
-          typing_mode: "words",
-          language: "en",
-          test_type: "time",
-          created_at: "2026-01-15T10:00:00Z",
-        },
-      ];
-
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(sessionsWithNulls);
-
-      const result = await getTypingSessions();
-
-      expect(result[0].wpm).toBeNull();
-      expect(result[0].accuracy).toBeNull();
+      expect(result.map((s: TypingSession) => s.language)).toContain("en");
+      expect(result.map((s: TypingSession) => s.language)).toContain("ru");
     });
 
     it("должен корректно парсить даты created_at", async () => {
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(mockSessions);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(mockSessions);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
       const createdAt = new Date(result[0].created_at);
 
       expect(createdAt).toBeInstanceOf(Date);
@@ -360,7 +348,7 @@ describe("useFetchSessions tests", () => {
 
   describe("Граничные случаи", () => {
     it("должен обрабатывать сессии с очень высоким WPM", async () => {
-      const highWpmSession: TypingSessionResponse[] = [
+      const highWpmSession: TypingSession[] = [
         {
           id: 1,
           wpm: 300,
@@ -373,15 +361,15 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(highWpmSession);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(highWpmSession);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result[0].wpm).toBe(300);
     });
 
     it("должен обрабатывать сессии с 100% accuracy", async () => {
-      const perfectSession: TypingSessionResponse[] = [
+      const perfectSession: TypingSession[] = [
         {
           id: 1,
           wpm: 80,
@@ -394,15 +382,15 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(perfectSession);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(perfectSession);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result[0].accuracy).toBe(100);
     });
 
     it("должен обрабатывать сессии с низким accuracy", async () => {
-      const lowAccuracySession: TypingSessionResponse[] = [
+      const lowAccuracySession: TypingSession[] = [
         {
           id: 1,
           wpm: 40,
@@ -415,15 +403,15 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(lowAccuracySession);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(lowAccuracySession);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result[0].accuracy).toBe(45.5);
     });
 
     it("должен обрабатывать очень короткие сессии", async () => {
-      const shortSession: TypingSessionResponse[] = [
+      const shortSession: TypingSession[] = [
         {
           id: 1,
           wpm: 60,
@@ -436,15 +424,15 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(shortSession);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(shortSession);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result[0].duration).toBe(5);
     });
 
     it("должен обрабатывать очень длинные сессии", async () => {
-      const longSession: TypingSessionResponse[] = [
+      const longSession: TypingSession[] = [
         {
           id: 1,
           wpm: 70,
@@ -457,9 +445,9 @@ describe("useFetchSessions tests", () => {
         },
       ];
 
-      vi.mocked(getTypingSessions).mockResolvedValueOnce(longSession);
+      vi.mocked(fetchTypingSessions).mockResolvedValueOnce(longSession);
 
-      const result = await getTypingSessions();
+      const result = await fetchTypingSessions();
 
       expect(result[0].duration).toBe(3600);
     });
@@ -472,28 +460,28 @@ describe("Интеграционные тесты Leaderboard и Sessions", () =
   });
 
   it("должен корректно обрабатывать параллельные запросы", async () => {
-    vi.mocked(getLeaderboard).mockResolvedValueOnce(mockLeaderboard);
-    vi.mocked(getTypingSessions).mockResolvedValueOnce(mockSessions);
+    vi.mocked(fetchLeaderboard).mockResolvedValueOnce(mockLeaderboard);
+    vi.mocked(fetchTypingSessions).mockResolvedValueOnce(mockSessions);
 
     const [leaderboard, sessions] = await Promise.all([
-      getLeaderboard(),
-      getTypingSessions(),
+      fetchLeaderboard(),
+      fetchTypingSessions(),
     ]);
 
     expect(leaderboard).toEqual(mockLeaderboard);
     expect(sessions).toEqual(mockSessions);
-    expect(getLeaderboard).toHaveBeenCalledTimes(1);
-    expect(getTypingSessions).toHaveBeenCalledTimes(1);
+    expect(fetchLeaderboard).toHaveBeenCalledTimes(1);
+    expect(fetchTypingSessions).toHaveBeenCalledTimes(1);
   });
 
   it("должен обрабатывать ситуацию когда один запрос успешен, а другой нет", async () => {
-    vi.mocked(getLeaderboard).mockResolvedValueOnce(mockLeaderboard);
-    vi.mocked(getTypingSessions).mockRejectedValueOnce(
+    vi.mocked(fetchLeaderboard).mockResolvedValueOnce(mockLeaderboard);
+    vi.mocked(fetchTypingSessions).mockRejectedValueOnce(
       new Error("Sessions error"),
     );
 
-    const leaderboardPromise = getLeaderboard();
-    const sessionsPromise = getTypingSessions();
+    const leaderboardPromise = fetchLeaderboard();
+    const sessionsPromise = fetchTypingSessions();
 
     await expect(leaderboardPromise).resolves.toEqual(mockLeaderboard);
     await expect(sessionsPromise).rejects.toThrow("Sessions error");

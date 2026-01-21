@@ -186,8 +186,7 @@ describe("Leaderboard", () => {
   it("должен фильтровать невалидных пользователей", () => {
     const leaderboardWithInvalid = [
       ...mockLeaderboard,
-      // @ts-expect-error - намеренно передаём невалидные данные для теста
-      { id: null, username: null, shilka_coins: 100 },
+      { id: null, username: null, shilka_coins: 100 } as unknown as Me,
     ];
 
     renderWithProviders(<Leaderboard leaderboard={leaderboardWithInvalid} />);
