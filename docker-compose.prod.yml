@@ -73,8 +73,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:/root/.acme.sh/shilkaphilosophy.ru_ecc/fullchain.cer:ro
-      - /root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:/root/.acme.sh/shilkaphilosophy.ru_ecc/shilkaphilosophy.ru.key:ro
+      - /root/.acme.sh:/root/.acme.sh:ro
     depends_on:
       - backend
     restart: unless-stopped
