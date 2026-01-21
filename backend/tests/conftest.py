@@ -1,16 +1,27 @@
 """
 Конфигурация pytest и общие фикстуры для тестов
 """
+
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from src.database import Base, get_db
-from src.main import app
 from src.auth.models import User
 from src.auth.utils import get_password_hash
+from src.database import Base, get_db
+from src.main import app
+
+
+# Инициализируем кэш для тестов (in-memory backend)
+@pytest.fixture(scope="session", autouse=True)
+def init_cache():
+    """Инициализирует fastapi_cache с in-memory backend для тестов"""
+    FastAPICache.init(InMemoryBackend(), prefix="test-cache")
+
 
 # Создаём in-memory SQLite базу для тестов (async версия)
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -30,10 +41,10 @@ async def db_session():
     """Создаёт новую async сессию БД для каждого теста"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     async with TestingSessionLocal() as session:
         yield session
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
@@ -41,17 +52,17 @@ async def db_session():
 @pytest_asyncio.fixture(scope="function")
 async def client(db_session):
     """Создаёт async тестовый клиент FastAPI с тестовой БД"""
+
     async def override_get_db():
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test/api"
+        transport=ASGITransport(app=app), base_url="http://test/api"
     ) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
@@ -61,7 +72,7 @@ async def test_user(db_session):
     user = User(
         username="testuser",
         hashed_password=get_password_hash("testpass123"),
-        shilka_coins=100
+        shilka_coins=100,
     )
     db_session.add(user)
     await db_session.commit()
@@ -73,8 +84,7 @@ async def test_user(db_session):
 async def authenticated_client(client, test_user):
     """Возвращает клиент с авторизованным пользователем"""
     response = await client.post(
-        "/auth/login",
-        data={"username": "testuser", "password": "testpass123"}
+        "/auth/login", data={"username": "testuser", "password": "testpass123"}
     )
     assert response.status_code == 200
     return client
@@ -87,7 +97,7 @@ async def admin_user(db_session):
         username="admin",
         hashed_password=get_password_hash("adminpass123"),
         shilka_coins=1000,
-        role="admin"
+        role="admin",
     )
     db_session.add(user)
     await db_session.commit()
@@ -99,8 +109,7 @@ async def admin_user(db_session):
 async def admin_client(client, admin_user):
     """Возвращает клиент с авторизованным администратором"""
     response = await client.post(
-        "/auth/login",
-        data={"username": "admin", "password": "adminpass123"}
+        "/auth/login", data={"username": "admin", "password": "adminpass123"}
     )
     assert response.status_code == 200
     return client

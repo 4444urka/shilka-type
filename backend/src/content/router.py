@@ -1,20 +1,22 @@
 """
 API роутер для управления контентом (слова и предложения)
 """
-from typing import Literal
-from fastapi import APIRouter, Depends, status, Query
+
+from typing import List, Literal
+
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..database import get_db
 from ..auth.models import User
 from ..auth.utils import get_current_admin
+from ..database import get_db
+from . import service
 from .schemas import (
+    SentenceResponse,
     TextUploadRequest,
     TextUploadResponse,
     WordResponse,
-    SentenceResponse
 )
-from . import service
 
 router = APIRouter(tags=["content"])
 
@@ -23,11 +25,11 @@ router = APIRouter(tags=["content"])
 async def upload_content(
     payload: TextUploadRequest,
     db: AsyncSession = Depends(get_db),
-    admin: User = Depends(get_current_admin)
+    admin: User = Depends(get_current_admin),
 ):
     """
     Загрузить сырой текст для обработки и сохранения (только для админов)
-    
+
     Текст будет автоматически:
     - Очищен от лишних символов
     - Нормализован (множественные пробелы -> один пробел)
@@ -35,16 +37,14 @@ async def upload_content(
     - Сохранён в БД (дубликаты игнорируются)
     """
     words_created, sentences_created = await service.upload_text_content(
-        db=db,
-        raw_text=payload.raw_text,
-        language=payload.language
+        db=db, raw_text=payload.raw_text, language=payload.language
     )
-    
+
     return TextUploadResponse(
         message=f"Successfully processed: {words_created} words, {sentences_created} sentences",
         words_created=words_created,
         sentences_created=sentences_created,
-        language=payload.language
+        language=payload.language,
     )
 
 
@@ -52,11 +52,11 @@ async def upload_content(
 async def get_random_words(
     language: Literal["ru", "en"] = Query("en", description="Язык слов"),
     count: int = Query(25, ge=1, le=1000, description="Количество слов"),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Получить случайные слова для печати
-    
+
     - **language**: Язык слов ('ru' или 'en')
     - **count**: Количество слов (от 1 до 1000, по умолчанию 25)
     """
@@ -68,13 +68,35 @@ async def get_random_words(
 async def get_random_sentences(
     language: Literal["ru", "en"] = Query("en", description="Язык предложений"),
     count: int = Query(10, ge=1, le=100, description="Количество предложений"),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Получить случайные предложения для печати
-    
+
     - **language**: Язык предложений ('ru' или 'en')
     - **count**: Количество предложений (от 1 до 100, по умолчанию 10)
     """
     sentences = await service.get_random_sentences(db, language, count)
     return sentences
+
+
+@router.get("/words/problem", response_model=list[WordResponse])
+async def get_words_with_problem_chars(
+    chars: str = Query(
+        ..., description="Проблемные символы (например: 'asd' или 'фыв')"
+    ),
+    language: Literal["ru", "en"] = Query("en", description="Язык слов"),
+    count: int = Query(25, ge=1, le=500, description="Количество слов"),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Получить случайные слова, содержащие указанные символы
+
+    Полезно для практики проблемных символов.
+
+    - **chars**: Строка с символами для поиска (слова будут содержать хотя бы один из них)
+    - **language**: Язык слов ('ru' или 'en')
+    - **count**: Количество слов (от 1 до 500, по умолчанию 25)
+    """
+    words = await service.get_words_with_chars(db, language, list(chars), count)
+    return words

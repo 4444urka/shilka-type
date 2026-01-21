@@ -6,6 +6,7 @@ import { TypingScreenStats } from "../TypingScreenStats/TypingScreenStats";
 import RestartButton from "../RestartButton/RestartButton";
 import type { TypingSessionNew } from "../../types/TypingTypes";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 
 interface TypingScreenProps {
   session: TypingSessionNew;
@@ -26,6 +27,12 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
   const wordRefs = React.useRef<Array<HTMLElement | null>>([]);
+
+  // Quick restart with Tab or Escape keys
+  useKeyboardShortcuts({
+    onRestart,
+    enabled: !isLoading,
+  });
 
   // Обработка клавиатуры вынесена в родительский компонент
   React.useEffect(() => {
@@ -212,7 +219,7 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
         <Box height={{ base: "24px", md: "28px" }} />
       )}
 
-      {/* 
+      {/*
         Основной контейнер для слов или экрана загрузки.
         Используем AnimatePresence для создания эффекта кросс-фейда.
       */}
@@ -304,7 +311,14 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
                   </Box>
                 ))}
               </Box>
-              <RestartButton onClick={onRestart} />
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={2}
+              >
+                <RestartButton onClick={onRestart} />
+              </Box>
             </motion.div>
           )}
         </AnimatePresence>

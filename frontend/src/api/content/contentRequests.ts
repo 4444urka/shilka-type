@@ -30,7 +30,7 @@ export interface TextUploadResponse {
  */
 export const getRandomWords = async (
   language: "ru" | "en" = "en",
-  count: number = 25
+  count: number = 25,
 ): Promise<Word[]> => {
   const response = await myapiInstance.get<Word[]>("/content/words", {
     params: { language, count },
@@ -43,7 +43,7 @@ export const getRandomWords = async (
  */
 export const getRandomSentences = async (
   language: "ru" | "en" = "en",
-  count: number = 10
+  count: number = 10,
 ): Promise<Sentence[]> => {
   const response = await myapiInstance.get<Sentence[]>("/content/sentences", {
     params: { language, count },
@@ -55,11 +55,26 @@ export const getRandomSentences = async (
  * Загрузить текст на сервер (только для админов)
  */
 export const uploadText = async (
-  payload: TextUploadRequest
+  payload: TextUploadRequest,
 ): Promise<TextUploadResponse> => {
   const response = await myapiInstance.post<TextUploadResponse>(
     "/content/upload",
-    payload
+    payload,
   );
+  return response.data;
+};
+
+/**
+ * Получить слова, содержащие указанные проблемные символы
+ * Полезно для режима практики проблемных символов
+ */
+export const getWordsWithProblemChars = async (
+  chars: string,
+  language: "ru" | "en" = "en",
+  count: number = 25,
+): Promise<Word[]> => {
+  const response = await myapiInstance.get<Word[]>("/content/words/problem", {
+    params: { chars, language, count },
+  });
   return response.data;
 };

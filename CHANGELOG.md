@@ -107,7 +107,7 @@
 ### ✨ Новые возможности
 
 * **ci:** обновить версию Node.js до 24 и улучшить конфигурацию переменных окружения для тестов бэкенда ([fc35b6b](https://github.com/4444urka/shilka-type/commit/fc35b6b258060dc1788fc048ec83c89050e1680d))
-* implement typing session tracking and leaderboard functionality ([50a8aef](https://github.com/4444urka/shilka-type/commit/50a8aef101fda39c98f53226d6b80d5606aa73cf))
+* implement Sc session tracking and leaderboard functionality ([50a8aef](https://github.com/4444urka/shilka-type/commit/50a8aef101fda39c98f53226d6b80d5606aa73cf))
 * Refactor typing session management and UI components ([dce7335](https://github.com/4444urka/shilka-type/commit/dce733515b3ade251c5e2661747bc3ea071f3a7e))
 * **tests:** add comprehensive tests for components, hooks, and utilities ([e5e144f](https://github.com/4444urka/shilka-type/commit/e5e144fbf8daeaacbd8d602fcbf393ef6b295038))
 * восстановить конфигурацию Vercel для развертывания приложения ([a4f0ffd](https://github.com/4444urka/shilka-type/commit/a4f0ffd7e5f5a03ddedba14b0e26b2bc4f24d20d))

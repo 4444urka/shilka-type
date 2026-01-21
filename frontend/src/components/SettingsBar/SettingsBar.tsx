@@ -5,13 +5,14 @@ import {
   MdFunctions,
   MdSubject,
   MdTextFields,
+  MdWarning,
 } from "react-icons/md";
 import SettingsBarButton from "../SettingsBarButton/SettingsBarButton";
 import React from "react";
 
 const MotionBox = motion.create(Box);
 
-type ModeType = "words" | "sentences";
+type ModeType = "words" | "sentences" | "problem";
 type TestType = "time" | "words";
 
 interface SettingsBarProps extends BoxProps {
@@ -51,6 +52,7 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
   const modeOptions = [
     { code: "words" as const, name: "Слова", icon: MdTextFields },
     { code: "sentences" as const, name: "Предложения", icon: MdSubject },
+    { code: "problem" as const, name: "Проблемные", icon: MdWarning },
   ];
   const testTypeOptions = [
     { code: "time" as const, name: "Время", icon: MdAccessTimeFilled },
@@ -221,6 +223,11 @@ const SettingsBar: React.FC<SettingsBarProps> = ({
                   fontSize={{ base: "sm", lg: "md" }}
                   px={{ base: 2, lg: 3 }}
                   py={{ base: 1, lg: 2 }}
+                  title={
+                    mode.code === "problem"
+                      ? "Практика слов с проблемными символами"
+                      : undefined
+                  }
                 >
                   <IconComponent />
                   <Box as="span" hideBelow="sm">
