@@ -2,15 +2,22 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen, fireEvent } from "@testing-library/react";
 import { renderWithProviders } from "../../tests/test-utils";
 import TypingScreen from "./TypingScreen";
+import React from "react";
 import type { TypingSessionNew } from "../../types/TypingTypes";
 
 // Мокируем framer-motion с полной поддержкой motion.create
 vi.mock("framer-motion", () => {
   const createMotionComponent = (Component: string | React.ComponentType) => {
-    const MotionComponent = (props: any) => {
-      const { children, ...rest } = props;
+    const MotionComponent = (
+      props: React.PropsWithChildren<Record<string, unknown>>,
+    ) => {
+      const { children, ...rest } = props || {};
       const Tag = typeof Component === "string" ? Component : "div";
-      return <Tag {...rest}>{children}</Tag>;
+      return React.createElement(
+        Tag,
+        rest as unknown as Record<string, unknown>,
+        children,
+      );
     };
     return MotionComponent;
   };
@@ -23,13 +30,15 @@ vi.mock("framer-motion", () => {
     {
       get: (target, prop: string | symbol) => {
         if (prop === "create") return target.create;
-        return createMotionComponent(prop as any);
+        return createMotionComponent(String(prop));
       },
     },
   );
 
   return {
-    AnimatePresence: (props: any) => <>{props.children}</>,
+    AnimatePresence: (
+      props: React.PropsWithChildren<Record<string, unknown>>,
+    ) => React.createElement(React.Fragment, null, props.children),
     motion,
   };
 });
