@@ -7,15 +7,10 @@ import type { TypingSessionNew } from "../../types/TypingTypes";
 // Мокируем framer-motion с полной поддержкой motion.create
 vi.mock("framer-motion", () => {
   const createMotionComponent = (Component: string | React.ComponentType) => {
-    const MotionComponent = ({
-      children,
-      ...props
-    }: {
-      children?: React.ReactNode;
-      [key: string]: unknown;
-    }) => {
+    const MotionComponent = (props: any) => {
+      const { children, ...rest } = props;
       const Tag = typeof Component === "string" ? Component : "div";
-      return <Tag {...props}>{children}</Tag>;
+      return <Tag {...rest}>{children}</Tag>;
     };
     return MotionComponent;
   };
@@ -26,17 +21,15 @@ vi.mock("framer-motion", () => {
         createMotionComponent(Component),
     },
     {
-      get: (target, prop: string) => {
+      get: (target, prop: string | symbol) => {
         if (prop === "create") return target.create;
-        return createMotionComponent(prop);
+        return createMotionComponent(prop as any);
       },
     },
   );
 
   return {
-    AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-      <>{children}</>
-    ),
+    AnimatePresence: (props: any) => <>{props.children}</>,
     motion,
   };
 });
@@ -54,22 +47,23 @@ describe("TypingScreen", () => {
     overrides: Partial<TypingSessionNew> = {},
   ): TypingSessionNew => ({
     words: [
-      { text: "hello", chars: [], isCompleted: false, hasError: false },
-      { text: "world", chars: [], isCompleted: false, hasError: false },
+      { text: "hello", chars: [], completed: false, active: false },
+      { text: "world", chars: [], completed: false, active: false },
     ],
     currentWordIndex: 0,
     currentCharIndex: 0,
+    initialTime: 0,
+    startTime: null,
+    endTime: null,
     isStarted: false,
-    isFinished: false,
+    isCompleted: false,
     stats: {
       wpm: 0,
       accuracy: 100,
       correctChars: 0,
       incorrectChars: 0,
       totalChars: 0,
-      elapsedTime: 0,
     },
-    history: [],
     ...overrides,
   });
 
@@ -156,7 +150,6 @@ describe("TypingScreen", () => {
           correctChars: 10,
           incorrectChars: 1,
           totalChars: 11,
-          elapsedTime: 10,
         },
       });
 
@@ -318,8 +311,8 @@ describe("TypingScreen", () => {
       const session = createMockSession({
         isStarted: true,
         words: [
-          { text: "one", chars: [], isCompleted: false, hasError: false },
-          { text: "two", chars: [], isCompleted: false, hasError: false },
+          { text: "one", chars: [], completed: false, active: false },
+          { text: "two", chars: [], completed: false, active: false },
         ],
       });
 
@@ -428,6 +421,8 @@ describe("TypingScreen", () => {
 
       // Input должен получить фокус
       // Примечание: в jsdom фокус может работать не так как в браузере
+      // Используем простую проверку чтобы избежать нестабильных ожиданий фокуса
+      expect(input).toBeInTheDocument();
     });
   });
 
@@ -456,8 +451,8 @@ describe("TypingScreen", () => {
       const manyWords = Array.from({ length: 100 }, (_, i) => ({
         text: `word${i}`,
         chars: [],
-        isCompleted: false,
-        hasError: false,
+        completed: false,
+        active: false,
       }));
 
       const session = createMockSession({
@@ -486,11 +481,11 @@ describe("TypingScreen", () => {
           {
             text: "hello-world",
             chars: [],
-            isCompleted: false,
-            hasError: false,
+            completed: false,
+            active: false,
           },
-          { text: "test_case", chars: [], isCompleted: false, hasError: false },
-          { text: "don't", chars: [], isCompleted: false, hasError: false },
+          { text: "test_case", chars: [], completed: false, active: false },
+          { text: "don't", chars: [], completed: false, active: false },
         ],
       });
 
