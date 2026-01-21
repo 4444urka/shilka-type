@@ -162,7 +162,7 @@ jobs:
           passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            cd /home/vpn/shilka-type/
+            cd /home/churka/shilka-type/
             git fetch origin
             git reset --hard origin/develop
             docker compose -f docker-compose.prod.yml down 
