@@ -1,4 +1,4 @@
-import { Box, Input, Text } from "@chakra-ui/react";
+import { Box, Input } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { TypingWordComponent } from "../TypingWordComponent/TypingWordComponent";
@@ -318,14 +318,6 @@ const TypingScreen: React.FC<TypingScreenProps> = ({
                 gap={2}
               >
                 <RestartButton onClick={onRestart} />
-                <Text
-                  fontSize="xs"
-                  color="gray.500"
-                  opacity={0.7}
-                  textStyle="body"
-                >
-                  Tab / Esc — перезапуск
-                </Text>
               </Box>
             </motion.div>
           )}
